@@ -1,0 +1,53 @@
+body {
+    padding-top: 50px;
+}
+.game-pagination {
+    margin: 10px 0px;
+}
+.group-title {
+    text-align: center;
+}
+.game-subtitle {
+    font-size: 14px;
+}
+.game-panel-body {
+    margin-top: 0px;
+    height: 280px;
+}
+.game-cover-container {
+    width: 40%;
+    height: 100%;
+}
+.game-cover {
+    max-width: 100%;
+    max-height: 100%;
+    margin: auto;
+}
+.game-info {
+    height: 100%;
+    overflow: auto;
+}
+.panel-title {
+    line-height: 1.2;
+}
+
+.overflow-ellipsis {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.hand {
+    cursor: pointer;
+}
+.half-height {
+    height: 50%;
+}
+.full-height {
+    height: 100%;
+}
+.list-column {
+    overflow: auto;
+}
+.detail-column {
+    padding: 20px;
+}

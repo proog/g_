@@ -1,0 +1,57 @@
+<div class="panel" ng-class="{'panel-success': game.finished == 1, 'panel-default': game.finished != 1}">
+    <div class="panel-heading">
+        <div class="btn-group btn-group-xs pull-right">
+            <button type="button" class="btn btn-default" ng-click="linkCallback({game:game})">
+                <span class="glyphicon glyphicon-link"></span>
+            </button>
+            <button type="button" class="btn btn-default" ng-if="showEdit" ng-click="editCallback({game:game})">
+                <span class="glyphicon glyphicon-pencil"></span>
+            </button>
+        </div>
+        <h1 class="panel-title overflow-ellipsis" title="{{game.title}}">
+            {{game.mainTitle}}<span class="game-subtitle" ng-if="game.subTitle">: {{game.subTitle}}</span>
+        </h1>
+    </div>
+    <div class="panel-body media game-panel-body" ng-style="heightStyle">
+        <div class="pull-left game-cover-container">
+            <img class="media-object game-cover" ng-if="game.image" ng-src="{{game.decachedImage}}" alt="Game cover">
+            <p ng-if="!game.image">
+                No cover image
+            </p>
+        </div>
+        <div class="media-body game-info">
+            <p class="overflow-ellipsis">
+                <span ng-if="game.developer">by <strong title="{{game.developer}}">{{game.developer}}</strong></span><br>
+                <span ng-if="game.publisher && game.publisher != game.developer">
+                    <span ng-if="game.developer">and</span>
+                    <span ng-if="!game.developer">by</span>
+                    <strong title="{{game.publisher}}">{{game.publisher}}</strong>
+                </span><br>
+
+                <span ng-if="game.platform_ids.length > 0">
+                    for
+                    <strong ng-repeat="id in game.platform_ids" title="{{platform.name != platform.short_name ? platform.name : ''}}">
+                        {{(platform = getPlatform(id)).short_name}}<span ng-if="!$last">, </span>
+                    </strong>
+                </span>
+                <span ng-if="game.year">in <strong>{{game.year}}</strong></span><br>
+                <strong ng-if="game.genre_ids.length > 0" ng-repeat="id in game.genre_ids" title="{{genre.name != genre.short_name ? genre.name : ''}}">
+                    {{(genre = getGenre(id)).short_name}}<span ng-if="!$last">, </span>
+                </strong><br><br>
+                <strong ng-if="game.finished == 0">Not completed</strong>
+                <strong ng-if="game.finished == 1">Completed</strong>
+                <span ng-if="game.finished == 1 && game.playtime && game.playtime != '00:00:00'">
+                    in <strong>{{game.getPlaytimeDisplay()}}</strong>
+                </span><br>
+                <game-rating game="game"></game-rating>
+                <br>
+                <strong ng-if="game.tag_ids.length > 0" ng-repeat="id in game.tag_ids" title="{{tag.name != tag.short_name ? tag.name : ''}}">
+                    {{(tag = getTag(id)).short_name}}<span ng-if="!$last">, </span>
+                </strong>
+            </p>
+            <div class="gamecomment" ng-if="game.comment.length > 0">
+                {{game.comment}}
+            </div>
+        </div>
+    </div>
+</div>

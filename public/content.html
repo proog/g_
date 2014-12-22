@@ -1,0 +1,125 @@
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a class="dropdown-toggle hand"><strong>g_</strong> <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li ng-if="ctrl.authenticated && (!ctrl.userId || ctrl.authenticated_id == ctrl.userId)">
+                            <a class="hand" ng-click="ctrl.addClick()">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                Add game
+                            </a>
+                        </li>
+                        <li ng-if="ctrl.authenticated && (!ctrl.userId || ctrl.authenticated_id == ctrl.userId)" class="divider"></li>
+                        <li ng-if="ctrl.authenticated && (!ctrl.userId || ctrl.authenticated_id == ctrl.userId)">
+                            <a class="hand" ng-click="ctrl.manageGenresClick()">
+                                <span class="glyphicon glyphicon-list"></span>
+                                Manage genres
+                            </a>
+                        </li>
+                        <li ng-if="ctrl.authenticated && (!ctrl.userId || ctrl.authenticated_id == ctrl.userId)">
+                            <a class="hand" ng-click="ctrl.managePlatformsClick()">
+                                <span class="glyphicon glyphicon-list"></span>
+                                Manage platforms
+                            </a>
+                        </li>
+                        <li ng-if="ctrl.authenticated && (!ctrl.userId || ctrl.authenticated_id == ctrl.userId)">
+                            <a class="hand" ng-click="ctrl.manageTagsClick()">
+                                <span class="glyphicon glyphicon-list"></span>
+                                Manage tags
+                            </a>
+                        </li>
+                        <li ng-if="ctrl.authenticated && (!ctrl.userId || ctrl.authenticated_id == ctrl.userId)">
+                            <a class="hand" ng-click="ctrl.manageQueueClick()">
+                                <span class="glyphicon glyphicon-list"></span>
+                                Manage queue
+                            </a>
+                        </li>
+                        <li ng-if="ctrl.authenticated && (!ctrl.userId || ctrl.authenticated_id == ctrl.userId)" class="divider"></li>
+                        <li>
+                            <a class="hand" ng-click="ctrl.viewChanged(ctrl.LIST_VIEW)">
+                                <span class="glyphicon glyphicon-list"></span>
+                                List view
+                            </a>
+                        </li>
+                        <li>
+                            <a class="hand" ng-click="ctrl.viewChanged(ctrl.GRID_VIEW)">
+                                <span class="glyphicon glyphicon-th"></span>
+                                Grid view
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li ng-repeat="user in ctrl.users | orderBy:'username'">
+                            <a class="hand" href="#/{{user.id}}">
+                                <span class="glyphicon glyphicon-th-large"></span>
+                                {{user.username}}'s collection
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a class="hand" ng-click="ctrl.aboutClick()">
+                                <span class="glyphicon glyphicon-info-sign"></span>
+                                About
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <form class="navbar-form navbar-left">
+                <div class="form-group">
+                    <input type="search" class="form-control" placeholder="Title" ng-model="ctrl.query.title" ng-model-options="{debounce: 200}">
+                </div>
+                <div class="form-group">
+                    <select class="form-control" ng-model="ctrl.query.platform" ng-options="p.id as p.name for p in ctrl.platforms | orderBy:'name'">
+                        <option value="">Any platform</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select class="form-control" ng-model="ctrl.query.genre" ng-options="g.id as g.name for g in ctrl.genres | orderBy:'name'">
+                        <option value="">Any genre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select class="form-control" ng-model="ctrl.query.tag" ng-options="t.id as t.name for t in ctrl.tags | orderBy:'name'">
+                        <option value="">Any tag</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select class="form-control" ng-model="ctrl.query.year" ng-options="y for y in ctrl.getYears() | orderBy:'-valueOf()'">
+                        <option value="">Any year</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select class="form-control" ng-model="ctrl.query.finished" ng-options="f.value as f.name for f in ctrl.finishedOptions">
+                        <option value="">Any completion</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select class="form-control" ng-model="ctrl.query.rating" ng-options="r for r in [1,2,3,4,5]">
+                        <option value="">Any rating</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-default" ng-click="ctrl.query = {}">
+                    <span class="glyphicon glyphicon-refresh"></span>
+                </button>
+            </form>
+            <form class="navbar-form navbar-right">
+                <button ng-if="!ctrl.authenticated" type="button" class="btn btn-default" ng-click="ctrl.loginClick()"><span class="glyphicon glyphicon-log-in"></span></button>
+                <button ng-if="ctrl.authenticated" type="button" class="btn btn-default" ng-click="ctrl.logoutClick()"><span class="glyphicon glyphicon-log-out"></span></button>
+            </form>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+<div class="container-fluid full-height">
+    <ng-include src="'grid-view.html'" ng-if="ctrl.view == ctrl.GRID_VIEW"></ng-include>
+    <ng-include src="'list-view.html'" ng-if="ctrl.view == ctrl.LIST_VIEW"></ng-include>
+</div><!-- /.container -->

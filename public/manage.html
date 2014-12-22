@@ -1,0 +1,50 @@
+<div class="modal-header">
+    <button type="button" class="close"></button>
+    <h4 class="modal-title">
+        <span ng-if="type == 'genre'">Manage genres</span>
+        <span ng-if="type == 'platform'">Manage platforms</span>
+        <span ng-if="type == 'tag'">Manage tags</span>
+    </h4>
+</div>
+<div class="modal-body">
+    <div class="container-fluid">
+        <div class="row" ng-repeat="item in items | filter:{deleted: false} | orderBy:'name'">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Name" ng-model="item.name" ng-change="nameChange(item)">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Short name" ng-model="item.short_name" ng-change="shortNameChange(item)">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-danger" type="button" ng-click="deleteClick(item)">
+                    <span class="glyphicon glyphicon-minus"></span>
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Name" ng-model="form.name" ng-change="nameChange(form)">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Short name" ng-model="form.short_name" ng-change="shortNameChange(form)">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary" type="button" ng-click="addClick()">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-primary" ng-click="saveClick()">OK</button>
+    <button type="button" class="btn btn-default" ng-click="cancelClick()">Cancel</button>
+</div>
