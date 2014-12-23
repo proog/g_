@@ -343,7 +343,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
 
         if($routeParams.userId) {
             self.userId = $routeParams.userId;
-            var promise = self.refreshAll()
+            var promise = self.refreshAll();
 
             if($routeParams.gameId) {
                 promise.then(function() {
