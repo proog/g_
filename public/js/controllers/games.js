@@ -300,15 +300,24 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
 
         if($routeParams.userId) {
             self.userId = $routeParams.userId;
-            var promise = self.refreshAll();
+            if(!gameService.initialized) {
+                var promise = gameService.refreshAll(self.userId);
 
-            if($routeParams.gameId) {
-                promise.then(function() {
-                    angular.forEach(self.games, function(game) {
-                        if(game.id == $routeParams.gameId) {
-                            //self.gameSelected(game);
-                        }
+                if($routeParams.gameId) {
+                    promise.then(function() {
+                        angular.forEach(gameService.games, function(game) {
+                            if(game.id == $routeParams.gameId) {
+                                self.gameSelected(game);
+                            }
+                        });
                     });
+                }
+            }
+            else {
+                angular.forEach(gameService.games, function(game) {
+                    if(game.id == $routeParams.gameId) {
+                        self.gameSelected(game);
+                    }
                 });
             }
         }
