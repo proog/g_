@@ -245,15 +245,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             return;
 
         self.view = view;
-
-        /*if(gameService.authenticated) {
-            angular.forEach(gameService.users, function(user) {
-                if(user.id == gameService.authenticatedUser.id) {
-                    user.view = view;
-                    user.$update();
-                }
-            });
-        }*/
+        $cookies.view = view;
     };
 
     self.gameSelected = function(game) {
@@ -303,7 +295,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         self.selectedGame = null;
         self.GRID_VIEW = 1;
         self.LIST_VIEW = 2;
-        self.view = self.LIST_VIEW;
+        self.view = $cookies.view ? $cookies.view : self.LIST_VIEW;
         self.gameService = gameService;
 
         if(!$routeParams.userId) {
@@ -325,22 +317,18 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             });
         };
 
-        // data not fetched yet, refresh all
         if(!gameService.initialized) {
-            var promise = gameService.refreshAll(self.userId);
+            // check if session is active
+            gameService.checkLogin();
 
+            // data not fetched yet, refresh all
+            var promise = gameService.refreshAll(self.userId);
             if($routeParams.gameId)
                 promise.then(findGameFn);
         }
         else {
             findGameFn();
         }
-
-        // check if session is active, and set the user's view
-        gameService.checkLogin().then(function(user) {
-            if(user.view)
-                self.view = data.view;
-        });
     };
 
     self.init();
