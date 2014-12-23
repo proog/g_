@@ -1,35 +1,9 @@
-angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$route', '$http', '$q', '$location', 'upload', '$modal', '$filter', 'Games', 'Genres', 'Platforms', 'Tags', 'Users', function($scope, $routeParams, $route, $http, $q, $location, upload, $modal, $filter, Games, Genres, Platforms, Tags, Users) {
+angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$route', '$http', '$q', '$location', 'upload', '$modal', '$filter', 'Games', 'Genres', 'Platforms', 'Tags', 'Users', 'gameService', function($scope, $routeParams, $route, $http, $q, $location, upload, $modal, $filter, Games, Genres, Platforms, Tags, Users, gameService) {
     var self = this;
-
-    self.refreshGames = function() {
-        return Games.query({userId: self.userId}).$promise.then(function(data) {
-            self.games = data;
-        });
-    };
-    self.refreshGenres = function() {
-        return Genres.query({userId: self.userId}).$promise.then(function(data) {
-            self.genres = data;
-        });
-    };
-    self.refreshPlatforms = function() {
-        return Platforms.query({userId: self.userId}).$promise.then(function(data) {
-            self.platforms = data;
-        });
-    };
-    self.refreshTags = function() {
-        return Tags.query({userId: self.userId}).$promise.then(function(data) {
-            self.tags = data;
-        });
-    };
-    self.refreshUsers = function() {
-        return Users.query().$promise.then(function(data) {
-            self.users = data;
-        });
-    };
 
     self.getYears = function() {
         var years = [];
-        angular.forEach(self.games, function(game) {
+        angular.forEach(gameService.games, function(game) {
             if(game.year && years.indexOf(game.year) < 0)
                 years.push(game.year);
         });
@@ -38,26 +12,26 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
     };
 
     self.countFinished = function() {
-        return $filter('filter')(self.games, {finished: 1}).length;
+        return $filter('filter')(gameService.games, {finished: 1}).length;
     };
     self.countFinishedPct = function() {
-        return Math.round(self.countFinished()/self.games.length*100);
+        return Math.round(self.countFinished()/gameService.games.length*100);
     };
 
     self.countGenre = function(genre) {
-        genre.count = $filter('filter')(self.games, function(game) {
+        genre.count = $filter('filter')(gameService.games, function(game) {
             return game.genre_ids.indexOf(genre.id) > -1;
         }).length;
         return genre.count;
     };
     self.countPlatform = function(platform) {
-        platform.count = $filter('filter')(self.games, function(game) {
+        platform.count = $filter('filter')(gameService.games, function(game) {
             return game.platform_ids.indexOf(platform.id) > -1;
         }).length;
         return platform.count;
     };
     self.countTag = function(tag) {
-        tag.count = $filter('filter')(self.games, function(game) {
+        tag.count = $filter('filter')(gameService.games, function(game) {
             return game.tag_ids.indexOf(tag.id) > -1;
         }).length;
         return tag.count;
@@ -77,10 +51,10 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             size: 'lg',
             resolve: {
                 game: function() { return game; },
-                genres: function() { return self.genres; },
-                platforms: function() { return self.platforms; },
-                tags: function() { return self.tags; },
-                games: function() { return self.games; }
+                genres: function() { return gameService.genres; },
+                platforms: function() { return gameService.platforms; },
+                tags: function() { return gameService.tags; },
+                games: function() { return gameService.games; }
             }
         });
         modalInstance.result.then(function(result) {
@@ -95,17 +69,17 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         if(del && form.id) {
             // delete game
             game.$delete({userId: self.userId}, function() {
-                var pos = self.games.indexOf(game);
+                var pos = gameService.games.indexOf(game);
                 if(pos > -1)
-                    self.games.splice(pos, 1);
+                    gameService.games.splice(pos, 1);
             });
         }
         else if(isNew) {
             // add game
             game = new Games(form);
             game.$save({userId: self.userId}, function(data) {
-                self.games.push(game);
-                if(image)
+                gameService.games.push(game);
+                if(image && image[0].files.length > 0)
                     game.uploadImage(self.userId, image);
             });
         }
@@ -114,22 +88,22 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             var g = new Games(form);
             g.$update({userId: self.userId}, function(data) {
                 angular.copy(data, game);
-                if(image)
+                if(image && image[0].files.length > 0)
                     game.uploadImage(self.userId, image);
             });
         }
     };
 
     self.manageGenresClick = function() {
-        self.openManageForm(Genres, self.genres, 'genre');
+        self.openManageForm(Genres, gameService.genres, 'genre');
     };
 
     self.managePlatformsClick = function() {
-        self.openManageForm(Platforms, self.platforms, 'platform');
+        self.openManageForm(Platforms, gameService.platforms, 'platform');
     };
 
     self.manageTagsClick = function() {
-        self.openManageForm(Tags, self.tags, 'tag');
+        self.openManageForm(Tags, gameService.tags, 'tag');
     };
 
     self.openManageForm = function(Entities, items) {
@@ -187,7 +161,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             $q.all(requests).then(function() {
                 var ids = Entities.prototype.ids;
 
-                angular.forEach(self.games, function (game) {
+                angular.forEach(gameService.games, function (game) {
                     for(var i = 0; i < game[ids].length; i++) {
                         var id = game[ids][i];
                         var found = false;
@@ -213,15 +187,15 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             size: 'md',
             resolve: {
                 games: function() {
-                    return $filter('filter')(self.games, { queue_position: '!!' });
+                    return $filter('filter')(gameService.games, { queue_position: '!!' });
                 }
             }
         });
         modalInstance.result.then(function(result) {
             // handle game queue list
             angular.forEach(result, function(game) {
-                for(var i = 0; i < self.games.length; i++) {
-                    var original = self.games[i];
+                for(var i = 0; i < gameService.games.length; i++) {
+                    var original = gameService.games[i];
 
                     if(original.id == game.id) {
                         original.queue_position = game.queue_position;
@@ -247,15 +221,15 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             }
         });
         modalInstance.result.then(function(result) {
-            self.authenticated = true;
-            self.authenticated_id = result.id;
+            gameService.authenticated = true;
+            gameService.authenticated_id = result.id;
         });
     };
 
     self.logoutClick = function() {
         $http.post('api/logout').success(function() {
-            self.authenticated = false;
-            self.authenticated_id = false;
+            gameService.authenticated = false;
+            gameService.authenticated_id = false;
         });
     };
 
@@ -267,14 +241,14 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
     };
 
     self.viewChanged = function(view) {
-        if(view != self.GRID_VIEW && view != self.LIST_VIEW)
+        if(view != gameService.GRID_VIEW && view != gameService.LIST_VIEW)
             return;
 
-        self.view = view;
+        gameService.view = view;
 
-        if(self.authenticated) {
-            angular.forEach(self.users, function(user) {
-                if(user.id == self.authenticated_id) {
+        if(gameService.authenticated) {
+            angular.forEach(gameService.users, function(user) {
+                if(user.id == gameService.authenticated_id) {
                     user.view = view;
                     user.$update();
                 }
@@ -285,7 +259,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
     self.gameSelected = function(game) {
         self.selectedGame = game;
 
-        if(self.view == self.GRID_VIEW)
+        if(gameService.view == gameService.GRID_VIEW)
             self.query = { title: game.title };
     };
 
@@ -312,16 +286,6 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         return game.hasPlaytime();
     };
 
-    self.refreshAll = function() {
-        return $q.all([
-            self.refreshGames(),
-            self.refreshGenres(),
-            self.refreshPlatforms(),
-            self.refreshTags(),
-            self.refreshUsers()
-        ]);
-    };
-
     self.init = function() {
         self.finishedOptions = [
             { name: 'Completed', value: 1 },
@@ -331,25 +295,19 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         self.offset = 0;
         self.itemsPerPage = 18;
         self.currentPage = 0;
-        self.games = [];
-        self.genres = [];
-        self.platforms = [];
-        self.tags = [];
-        self.users = [];
         self.selectedGame = null;
-        self.GRID_VIEW = 1;
-        self.LIST_VIEW = 2;
-        self.view = self.LIST_VIEW;
+        self.gameService = gameService;
 
         if($routeParams.userId) {
             self.userId = $routeParams.userId;
-            var promise = self.refreshAll()
+            var promise = self.refreshAll();
 
             if($routeParams.gameId) {
                 promise.then(function() {
                     angular.forEach(self.games, function(game) {
-                        if(game.id == $routeParams.gameId)
-                            self.gameSelected(game);
+                        if(game.id == $routeParams.gameId) {
+                            //self.gameSelected(game);
+                        }
                     });
                 });
             }
@@ -363,19 +321,6 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
 
             return;
         }
-
-        $http.get('api/login').success(function(data) {
-            self.authenticated = true;
-            self.authenticated_id = data.id;
-            self.loginError = false;
-            self.loginForm = {
-                username: '',
-                password: ''
-            };
-
-            if(data.view)
-                self.view = data.view;
-        });
     };
 
     self.init();
