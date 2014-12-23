@@ -4,14 +4,14 @@
     </div>
 </div>
 <div class="row" ng-show="currentlyPlaying.length > 0">
-    <div class="col-lg-4" ng-repeat="game in currentlyPlaying = (ctrl.games | search:ctrl.query | filter:{currently_playing: true} | orderBy:'sort_as')">
+    <div class="col-lg-4" ng-repeat="game in currentlyPlaying = (ctrl.gameService.games | search:ctrl.query | filter:{currently_playing: true} | orderBy:'sort_as')">
         <game game="game"
-              genres="ctrl.genres"
-              platforms="ctrl.platforms"
-              tags="ctrl.tags"
+              genres="ctrl.gameService.genres"
+              platforms="ctrl.gameService.platforms"
+              tags="ctrl.gameService.tags"
               link-callback="ctrl.openLinkDialog(game)"
               edit-callback="ctrl.editClick(game)"
-              show-edit="ctrl.authenticated && game.user_id == ctrl.authenticated_id">
+              show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
         </game>
     </div>
 </div>
@@ -21,14 +21,14 @@
     </div>
 </div>
 <div class="row" ng-show="queue.length > 0">
-    <div class="col-lg-4" ng-repeat="game in queue = (ctrl.games | search:ctrl.query | filter:{queue_position: '!!'} | orderBy:['queue_position', 'sort_as'])">
+    <div class="col-lg-4" ng-repeat="game in queue = (ctrl.gameService.games | search:ctrl.query | filter:{queue_position: '!!'} | orderBy:['queue_position', 'sort_as'])">
         <game game="game"
-              genres="ctrl.genres"
-              platforms="ctrl.platforms"
-              tags="ctrl.tags"
+              genres="ctrl.gameService.genres"
+              platforms="ctrl.gameService.platforms"
+              tags="ctrl.gameService.tags"
               link-callback="ctrl.openLinkDialog(game)"
               edit-callback="ctrl.editClick(game)"
-              show-edit="ctrl.authenticated && game.user_id == ctrl.authenticated_id">
+              show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
         </game>
     </div>
 </div>
@@ -52,17 +52,17 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-lg-4" ng-repeat="game in filtered = (ctrl.games | search:ctrl.query | orderBy:'sort_as') | offset:ctrl.offset | limitTo:ctrl.itemsPerPage">
+    <div class="col-lg-4" ng-repeat="game in filtered = (ctrl.gameService.games | search:ctrl.query | orderBy:'sort_as') | offset:ctrl.offset | limitTo:ctrl.itemsPerPage">
         <game game="game"
-              genres="ctrl.genres"
-              platforms="ctrl.platforms"
-              tags="ctrl.tags"
+              genres="ctrl.gameService.genres"
+              platforms="ctrl.gameService.platforms"
+              tags="ctrl.gameService.tags"
               link-callback="ctrl.openLinkDialog(game)"
               edit-callback="ctrl.editClick(game)"
-              show-edit="ctrl.authenticated && game.user_id == ctrl.authenticated_id">
+              show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
         </game>
     </div>
-    <div class="col-lg-12 text-center" ng-if="ctrl.games.length > 0 && filtered.length == 0">
+    <div class="col-lg-12 text-center" ng-if="ctrl.gameService.games.length > 0 && filtered.length == 0">
         <h3>No results</h3>
     </div>
 </div>
@@ -100,7 +100,7 @@
             </div>
             <div class="panel-body">
                 <dl class="dl-horizontal">
-                    <dt style="width: 100px;">{{ctrl.games.length}}</dt>
+                    <dt style="width: 100px;">{{ctrl.gameService.games.length}}</dt>
                     <dd style="margin-left: 120px;" class="overflow-ellipsis">games</dd>
                     <dt style="width: 100px;">{{ctrl.countFinished()}}</dt>
                     <dd style="margin-left: 120px;" class="overflow-ellipsis">completed ({{ctrl.countFinishedPct()}}%)</dd>
@@ -109,21 +109,21 @@
         </div>
     </div>
     <div class="col-md-3">
-        <stats-panel panel-title="Playtime" key="playtime" value="title" items="ctrl.games" filter-by="ctrl.hasPlaytime" order-by="['playtimeAsInt()', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item)"></stats-panel>
+        <stats-panel panel-title="Playtime" key="playtime" value="title" items="ctrl.gameService.games" filter-by="ctrl.hasPlaytime" order-by="['playtimeAsInt()', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item)"></stats-panel>
     </div>
     <div class="col-md-3">
-        <stats-panel panel-title="Rating" key="rating" value="title" items="ctrl.games" filter-by="{rating: '!!'}" order-by="['rating', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item)"></stats-panel>
+        <stats-panel panel-title="Rating" key="rating" value="title" items="ctrl.gameService.games" filter-by="{rating: '!!'}" order-by="['rating', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item)"></stats-panel>
     </div>
     <div class="col-md-3">
-        <stats-panel panel-title="Year" key="year" value="title" items="ctrl.games" filter-by="{year: '!!'}" order-by="['year', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item)"></stats-panel>
+        <stats-panel panel-title="Year" key="year" value="title" items="ctrl.gameService.games" filter-by="{year: '!!'}" order-by="['year', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item)"></stats-panel>
     </div>
     <div class="col-md-3">
-        <stats-panel panel-title="Genres" key="count" value="name" items="ctrl.genres" order-by="[ctrl.countGenre, '-name']" descending="true" on-click="ctrl.query = {genre: item.id}"></stats-panel>
+        <stats-panel panel-title="Genres" key="count" value="name" items="ctrl.gameService.genres" order-by="[ctrl.countGenre, '-name']" descending="true" on-click="ctrl.query = {genre: item.id}"></stats-panel>
     </div>
     <div class="col-md-3">
-        <stats-panel panel-title="Platforms" key="count" value="name" items="ctrl.platforms" order-by="[ctrl.countPlatform, '-name']" descending="true" on-click="ctrl.query = {platform: item.id}"></stats-panel>
+        <stats-panel panel-title="Platforms" key="count" value="name" items="ctrl.gameService.platforms" order-by="[ctrl.countPlatform, '-name']" descending="true" on-click="ctrl.query = {platform: item.id}"></stats-panel>
     </div>
     <div class="col-md-3">
-        <stats-panel panel-title="Tags" key="count" value="name" items="ctrl.tags" order-by="[ctrl.countTag, '-name']" descending="true" on-click="ctrl.query = {tag: item.id}"></stats-panel>
+        <stats-panel panel-title="Tags" key="count" value="name" items="ctrl.gameService.tags" order-by="[ctrl.countTag, '-name']" descending="true" on-click="ctrl.query = {tag: item.id}"></stats-panel>
     </div>
 </div>

@@ -27,6 +27,8 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
         });
     };
     self.refreshAll = function(userId) {
+        self.resetAll();
+
         return $q.all([
             self.refreshGames(userId),
             self.refreshGenres(userId),
@@ -37,27 +39,23 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
             self.initialized = true;
         });
     };
+    self.resetAll = function() {
+        self.initialized = false;
+        self.games = [];
+        self.genres = [];
+        self.platforms = [];
+        self.tags = [];
+        self.users = [];
+    };
 
-    self.games = [];
-    self.genres = [];
-    self.platforms = [];
-    self.tags = [];
-    self.users = [];
-    self.GRID_VIEW = 1;
-    self.LIST_VIEW = 2;
-    self.view = self.LIST_VIEW;
-    self.initialized = false;
+    self.checkLogin = function() {
+        return $http.get('api/login').success(function(data) {
+            self.authenticated = true;
+            self.authenticatedUser = data;
+        });
+    };
 
-    $http.get('api/login').success(function(data) {
-        self.authenticated = true;
-        self.authenticated_id = data.id;
-        self.loginError = false;
-        self.loginForm = {
-            username: '',
-            password: ''
-        };
-
-        if(data.view)
-            self.view = data.view;
-    });
+    self.authenticated = false;
+    self.authenticatedUser = null;
+    self.resetAll();
 }]);

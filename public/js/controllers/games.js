@@ -1,4 +1,4 @@
-angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$route', '$http', '$q', '$location', 'upload', '$modal', '$filter', 'Games', 'Genres', 'Platforms', 'Tags', 'Users', 'gameService', function($scope, $routeParams, $route, $http, $q, $location, upload, $modal, $filter, Games, Genres, Platforms, Tags, Users, gameService) {
+angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$route', '$http', '$q', '$location', 'upload', '$modal', '$filter', 'Games', 'Genres', 'Platforms', 'Tags', 'Users', 'gameService', '$cookies', function($scope, $routeParams, $route, $http, $q, $location, upload, $modal, $filter, Games, Genres, Platforms, Tags, Users, gameService, $cookies) {
     var self = this;
 
     self.getYears = function() {
@@ -222,14 +222,14 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         });
         modalInstance.result.then(function(result) {
             gameService.authenticated = true;
-            gameService.authenticated_id = result.id;
+            gameService.authenticatedUser = result;
         });
     };
 
     self.logoutClick = function() {
         $http.post('api/logout').success(function() {
             gameService.authenticated = false;
-            gameService.authenticated_id = false;
+            gameService.authenticatedUser = null;
         });
     };
 
@@ -241,25 +241,25 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
     };
 
     self.viewChanged = function(view) {
-        if(view != gameService.GRID_VIEW && view != gameService.LIST_VIEW)
+        if(view != self.GRID_VIEW && view != self.LIST_VIEW)
             return;
 
-        gameService.view = view;
+        self.view = view;
 
-        if(gameService.authenticated) {
+        /*if(gameService.authenticated) {
             angular.forEach(gameService.users, function(user) {
-                if(user.id == gameService.authenticated_id) {
+                if(user.id == gameService.authenticatedUser.id) {
                     user.view = view;
                     user.$update();
                 }
             });
-        }
+        }*/
     };
 
     self.gameSelected = function(game) {
         self.selectedGame = game;
 
-        if(gameService.view == gameService.GRID_VIEW)
+        if(self.view == self.GRID_VIEW)
             self.query = { title: game.title };
     };
 
@@ -282,6 +282,11 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         });
     };
 
+    self.changeUser = function(user) {
+        gameService.resetAll();
+        $location.path('/' + user.id);
+    };
+
     self.hasPlaytime = function(game) {
         return game.hasPlaytime();
     };
@@ -296,40 +301,46 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         self.itemsPerPage = 18;
         self.currentPage = 0;
         self.selectedGame = null;
+        self.GRID_VIEW = 1;
+        self.LIST_VIEW = 2;
+        self.view = self.LIST_VIEW;
         self.gameService = gameService;
 
-        if($routeParams.userId) {
-            self.userId = $routeParams.userId;
-            if(!gameService.initialized) {
-                var promise = gameService.refreshAll(self.userId);
-
-                if($routeParams.gameId) {
-                    promise.then(function() {
-                        angular.forEach(gameService.games, function(game) {
-                            if(game.id == $routeParams.gameId) {
-                                self.gameSelected(game);
-                            }
-                        });
-                    });
-                }
-            }
-            else {
-                angular.forEach(gameService.games, function(game) {
-                    if(game.id == $routeParams.gameId) {
-                        self.gameSelected(game);
-                    }
-                });
-            }
-        }
-        else {
+        if(!$routeParams.userId) {
             // no user id specified, load default user and redirect
             $http.get('api/config').success(function(data) {
                 self.userId = data.default_user.id;
                 $location.path('/' + self.userId).replace();
             });
-
             return;
         }
+
+        // user id specified, load data and linked game
+        self.userId = $routeParams.userId;
+
+        var findGameFn = function() {
+            angular.forEach(gameService.games, function(game) {
+                if(game.id == $routeParams.gameId)
+                    self.gameSelected(game);
+            });
+        };
+
+        // data not fetched yet, refresh all
+        if(!gameService.initialized) {
+            var promise = gameService.refreshAll(self.userId);
+
+            if($routeParams.gameId)
+                promise.then(findGameFn);
+        }
+        else {
+            findGameFn();
+        }
+
+        // check if session is active, and set the user's view
+        gameService.checkLogin().then(function(user) {
+            if(user.view)
+                self.view = data.view;
+        });
     };
 
     self.init();

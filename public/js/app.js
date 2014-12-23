@@ -1,4 +1,4 @@
-angular.module('games', ['ngRoute', 'ngResource', 'lr.upload', 'ui.bootstrap', 'angular-loading-bar'])
+angular.module('games', ['ngRoute', 'ngResource', 'ngCookies', 'lr.upload', 'ui.bootstrap', 'angular-loading-bar'])
 .config(['$routeProvider', 'cfpLoadingBarProvider', function($routeProvider, loadingBarProvider) {
     $routeProvider
         .when('/:userId?/:gameId?', {
