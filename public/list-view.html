@@ -48,7 +48,7 @@
               tags="ctrl.gameService.tags"
               link-callback="ctrl.openLinkDialog(ctrl.selectedGame)"
               edit-callback="ctrl.editClick(ctrl.selectedGame)"
-              show-edit="ctrl.authenticated && ctrl.selectedGame.user_id == ctrl.authenticated_id"
+              show-edit="ctrl.gameService.authenticated && ctrl.selectedGame.user_id == ctrl.gameService.authenticatedUser.id"
               height="100%"
               ng-if="ctrl.selectedGame">
         </game>
