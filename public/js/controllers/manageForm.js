@@ -51,5 +51,14 @@ angular.module('games').controller('manageFormCtrl', ['$scope', '$modalInstance'
         $modalInstance.dismiss();
     };
 
+    $scope.canSave = function() {
+        for(var i = 0; i < $scope.items.length; i++) {
+            var item = $scope.items[i];
+            if(!item.name || !item.short_name)
+                return false;
+        }
+        return true;
+    };
+
     $scope.initialize();
 }]);

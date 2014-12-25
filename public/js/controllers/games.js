@@ -184,7 +184,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         var modalInstance = $modal.open({
             templateUrl: 'queue.html',
             controller: 'queueFormCtrl',
-            size: 'md',
+            size: 'sm',
             resolve: {
                 games: function() {
                     return $filter('filter')(gameService.games, { queue_position: '!!' });
@@ -281,6 +281,10 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
 
     self.hasPlaytime = function(game) {
         return game.hasPlaytime();
+    };
+
+    self.canShowAuthenticatedMenuItems = function() {
+        return gameService.authenticated && gameService.authenticatedUser.id == self.userId && gameService.initialized;
     };
 
     self.init = function() {

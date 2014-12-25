@@ -10,49 +10,51 @@
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class="dropdown">
-                    <a class="dropdown-toggle hand"><strong>g_</strong> <span class="caret"></span></a>
+                <li class="dropdown" dropdown>
+                    <a class="dropdown-toggle hand" dropdown-toggle>
+                        <strong>g_</strong> <span class="caret"></span>
+                    </a>
                     <ul class="dropdown-menu" role="menu">
-                        <li ng-if="ctrl.gameService.authenticated && ctrl.gameService.authenticatedUser.id == ctrl.userId">
+                        <li ng-if="ctrl.canShowAuthenticatedMenuItems()">
                             <a class="hand" ng-click="ctrl.addClick()">
                                 <span class="glyphicon glyphicon-plus"></span>
                                 Add game
                             </a>
                         </li>
-                        <li ng-if="ctrl.gameService.authenticated && ctrl.gameService.authenticatedUser.id == ctrl.userId" class="divider"></li>
-                        <li ng-if="ctrl.gameService.authenticated && ctrl.gameService.authenticatedUser.id == ctrl.userId">
-                            <a class="hand" ng-click="ctrl.manageGenresClick()">
-                                <span class="glyphicon glyphicon-list"></span>
-                                Manage genres
-                            </a>
-                        </li>
-                        <li ng-if="ctrl.gameService.authenticated && ctrl.gameService.authenticatedUser.id == ctrl.userId">
-                            <a class="hand" ng-click="ctrl.managePlatformsClick()">
-                                <span class="glyphicon glyphicon-list"></span>
-                                Manage platforms
-                            </a>
-                        </li>
-                        <li ng-if="ctrl.gameService.authenticated && ctrl.gameService.authenticatedUser.id == ctrl.userId">
-                            <a class="hand" ng-click="ctrl.manageTagsClick()">
-                                <span class="glyphicon glyphicon-list"></span>
-                                Manage tags
-                            </a>
-                        </li>
-                        <li ng-if="ctrl.gameService.authenticated && ctrl.gameService.authenticatedUser.id == ctrl.userId">
+                        <li ng-if="ctrl.canShowAuthenticatedMenuItems()">
                             <a class="hand" ng-click="ctrl.manageQueueClick()">
-                                <span class="glyphicon glyphicon-list"></span>
+                                <span class="glyphicon glyphicon-sort"></span>
                                 Manage queue
                             </a>
                         </li>
-                        <li ng-if="ctrl.gameService.authenticated && ctrl.gameService.authenticatedUser.id == ctrl.userId" class="divider"></li>
+                        <li ng-if="ctrl.canShowAuthenticatedMenuItems()" class="divider"></li>
+                        <li ng-if="ctrl.canShowAuthenticatedMenuItems()">
+                            <a class="hand" ng-click="ctrl.manageGenresClick()">
+                                <span class="glyphicon glyphicon-cog"></span>
+                                Manage genres
+                            </a>
+                        </li>
+                        <li ng-if="ctrl.canShowAuthenticatedMenuItems()">
+                            <a class="hand" ng-click="ctrl.managePlatformsClick()">
+                                <span class="glyphicon glyphicon-cog"></span>
+                                Manage platforms
+                            </a>
+                        </li>
+                        <li ng-if="ctrl.canShowAuthenticatedMenuItems()">
+                            <a class="hand" ng-click="ctrl.manageTagsClick()">
+                                <span class="glyphicon glyphicon-cog"></span>
+                                Manage tags
+                            </a>
+                        </li>
+                        <li ng-if="ctrl.canShowAuthenticatedMenuItems()" class="divider"></li>
                         <li>
-                            <a class="hand" ng-click="ctrl.viewChanged(ctrl.LIST_VIEW)">
+                            <a class="hand" ng-if="ctrl.view != ctrl.LIST_VIEW" ng-click="ctrl.viewChanged(ctrl.LIST_VIEW)">
                                 <span class="glyphicon glyphicon-list"></span>
                                 List view
                             </a>
                         </li>
                         <li>
-                            <a class="hand" ng-click="ctrl.viewChanged(ctrl.GRID_VIEW)">
+                            <a class="hand" ng-if="ctrl.view != ctrl.GRID_VIEW" ng-click="ctrl.viewChanged(ctrl.GRID_VIEW)">
                                 <span class="glyphicon glyphicon-th"></span>
                                 Grid view
                             </a>
@@ -60,7 +62,7 @@
                         <li class="divider"></li>
                         <li ng-repeat="user in ctrl.gameService.users | orderBy:'username'">
                             <a class="hand" ng-click="ctrl.changeUser(user)">
-                                <span class="glyphicon glyphicon-th-large"></span>
+                                <span class="glyphicon glyphicon-user"></span>
                                 {{user.username}}'s collection
                             </a>
                         </li>

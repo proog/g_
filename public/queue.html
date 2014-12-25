@@ -1,7 +1,7 @@
 <div class="modal-header">
     <button type="button" class="close"></button>
     <h4 class="modal-title">
-        Manage queue
+        Manage Queue
     </h4>
 </div>
 <div class="modal-body">
@@ -12,17 +12,17 @@
             </div>
         </div>
         <div class="row" ng-repeat="game in games | orderBy:'queue_position'">
-            <div class="col-md-10">
-                {{game.title}}
-            </div>
-            <div class="col-md-2">
-                <div class="form-group btn-group btn-group-xs">
+            <div class="col-md-12">
+                <div class="form-group btn-group btn-group-xs pull-right">
                     <button class="btn btn-default" type="button" ng-click="moveUpClick(game)" ng-class="{'disabled': game.queue_position == 0}">
                         <span class="glyphicon glyphicon-arrow-up"></span>
                     </button>
                     <button class="btn btn-default" type="button" ng-click="moveDownClick(game)" ng-class="{'disabled': game.queue_position == games.length - 1}">
                         <span class="glyphicon glyphicon-arrow-down"></span>
                     </button>
+                </div>
+                <div class="overflow-ellipsis" title="{{game.title}}">
+                    {{$index+1}}. {{game.title}}
                 </div>
             </div>
         </div>
