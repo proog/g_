@@ -70,14 +70,18 @@ angular.module('games').factory('Games', ['$resource', 'upload', function($resou
     };
 
     Games.prototype.playtimeAsInt = function() {
-        if(!this.playtime || this.playtime == '00:00:00')
+        if(!this.hasPlaytime())
             return 0;
 
         return parseInt(this.playtime.split(':').join(''));
     };
 
     Games.prototype.hasPlaytime = function() {
-        return this.playtimeAsInt() > 0;
+        return this.playtime && this.playtime != '00:00:00';
+    };
+
+    Games.prototype.hasRating = function() {
+        return this.rating != null;
     };
 
     Games.prototype.getPlaytimeDisplay = function() {

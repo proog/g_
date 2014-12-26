@@ -49,5 +49,6 @@ body {
     overflow: auto;
 }
 .detail-column {
+    overflow: auto;
     padding: 20px;
 }

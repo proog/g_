@@ -1,6 +1,8 @@
 <div class="row text-center" ng-show="currentlyPlaying.length > 0">
     <div class="col-lg-12">
-        <h1>Currently Playing</h1>
+        <div class="page-header">
+            <h1>Currently Playing</h1>
+        </div>
     </div>
 </div>
 <div class="row" ng-show="currentlyPlaying.length > 0">
@@ -17,7 +19,9 @@
 </div>
 <div class="row text-center" ng-show="queue.length > 0">
     <div class="col-lg-12">
-        <h1>Queue</h1>
+        <div class="page-header">
+            <h1>Queue</h1>
+        </div>
     </div>
 </div>
 <div class="row" ng-show="queue.length > 0">
@@ -34,7 +38,9 @@
 </div>
 <div class="row text-center">
     <div class="col-lg-12">
-        <h1>All Games</h1>
+        <div class="page-header">
+            <h1>All Games</h1>
+        </div>
         <pagination total-items="filtered.length"
                     items-per-page="ctrl.itemsPerPage"
                     num-pages="ctrl.pageCount"
@@ -86,7 +92,9 @@
 </div>
 <div class="row text-center">
     <div class="col-lg-12">
-        <h1>Statistics</h1>
+        <div class="page-header">
+            <h1>Statistics</h1>
+        </div>
     </div>
 </div>
 <div class="row">

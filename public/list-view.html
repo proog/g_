@@ -1,11 +1,14 @@
 <div class="row full-height">
     <div class="col-sm-3 list-column full-height">
         <div ng-show="currentlyPlaying.length > 0">
-            <h1 class="text-center">Currently Playing</h1>
+            <div class="page-header">
+                <h1 class="text-center">Currently Playing</h1>
+            </div>
             <div class="list-group">
                 <a class="list-group-item hand overflow-ellipsis" ng-repeat="game in currentlyPlaying = (ctrl.gameService.games | search:ctrl.query | filter:{currently_playing: true} | orderBy:'sort_as')" ng-click="ctrl.gameSelected(game)" ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == 1}">
-                    <div class="pull-right" ng-if="game.rating">
-                        <game-rating game="game"></game-rating>
+                    <div class="pull-right">
+                        <span class="glyphicon glyphicon-time" ng-style="{visibility: game.hasPlaytime() ? 'visible' : 'hidden'}"></span>
+                        <span class="glyphicon glyphicon-star" ng-style="{visibility: game.hasRating() ? 'visible' : 'hidden'}"></span>
                     </div>
                     <div class="overflow-ellipsis">
                         {{game.title}}
@@ -14,11 +17,14 @@
             </div>
         </div>
         <div ng-show="queue.length > 0">
-            <h1 class="text-center">Queue</h1>
+            <div class="page-header">
+                <h1 class="text-center">Queue</h1>
+            </div>
             <div class="list-group">
                 <a class="list-group-item hand overflow-ellipsis" ng-repeat="game in queue = (ctrl.gameService.games | search:ctrl.query | filter:{queue_position: '!!'} | orderBy:['queue_position', 'sort_as'])" ng-click="ctrl.gameSelected(game)" ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == 1}">
-                    <div class="pull-right" ng-if="game.rating">
-                        <game-rating game="game"></game-rating>
+                    <div class="pull-right">
+                        <span class="glyphicon glyphicon-time" ng-style="{visibility: game.hasPlaytime() ? 'visible' : 'hidden'}"></span>
+                        <span class="glyphicon glyphicon-star" ng-style="{visibility: game.hasRating() ? 'visible' : 'hidden'}"></span>
                     </div>
                     <div class="overflow-ellipsis">
                         {{game.title}}
@@ -26,14 +32,17 @@
                 </a>
             </div>
         </div>
-        <h1 class="text-center">All Games</h1>
+        <div class="page-header">
+            <h1 class="text-center">All Games</h1>
+        </div>
         <div ng-if="ctrl.gameService.games.length > 0 && filtered.length == 0">
             <h3 class="text-center">No results</h3>
         </div>
         <div class="list-group">
             <a class="list-group-item hand overflow-ellipsis" ng-repeat="game in filtered = (ctrl.gameService.games | search:ctrl.query | orderBy:'sort_as')" ng-click="ctrl.gameSelected(game)" ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == 1}">
-                <div class="pull-right" ng-if="game.rating">
-                    <game-rating game="game"></game-rating>
+                <div class="pull-right">
+                    <span class="glyphicon glyphicon-time" ng-style="{visibility: game.hasPlaytime() ? 'visible' : 'hidden'}"></span>
+                    <span class="glyphicon glyphicon-star" ng-style="{visibility: game.hasRating() ? 'visible' : 'hidden'}"></span>
                 </div>
                 <div class="overflow-ellipsis">
                     {{game.title}}
@@ -41,7 +50,7 @@
             </a>
         </div>
     </div>
-    <div class="col-sm-6 detail-column">
+    <div class="col-sm-6 detail-column full-height">
         <game game="ctrl.selectedGame"
               genres="ctrl.gameService.genres"
               platforms="ctrl.gameService.platforms"
@@ -56,7 +65,10 @@
             <h3 class="text-center">Select a game</h3>
         </div>
     </div>
-    <div class="col-sm-3 list-column detail-column full-height">
+    <div class="col-sm-3 list-column full-height">
+        <div class="page-header">
+            <h1 class="text-center">Statistics</h1>
+        </div>
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h1 class="panel-title overflow-ellipsis">

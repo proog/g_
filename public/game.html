@@ -40,10 +40,10 @@
                 </strong><br><br>
                 <strong ng-if="game.finished == 0">Not completed</strong>
                 <strong ng-if="game.finished == 1">Completed</strong>
-                <span ng-if="game.finished == 1 && game.playtime && game.playtime != '00:00:00'">
+                <span ng-if="game.hasPlaytime()">
                     in <strong>{{game.getPlaytimeDisplay()}}</strong>
                 </span><br>
-                <game-rating game="game"></game-rating>
+                <game-rating game="game" ng-if="game.hasRating()"></game-rating>
                 <br>
                 <strong ng-if="game.tag_ids.length > 0" ng-repeat="id in game.tag_ids" title="{{tag.name != tag.short_name ? tag.name : ''}}">
                     {{(tag = getTag(id)).short_name}}<span ng-if="!$last">, </span>
