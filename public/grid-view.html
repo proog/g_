@@ -1,3 +1,8 @@
+<div class="row text-center" ng-show="filtered.length == 0 && queue.length == 0 && currentlyPlaying.length == 0">
+    <div class="col-lg-12">
+        <h3>No results</h3>
+    </div>
+</div>
 <div class="row text-center" ng-show="currentlyPlaying.length > 0">
     <div class="col-lg-12">
         <div class="page-header">
@@ -36,7 +41,7 @@
         </game>
     </div>
 </div>
-<div class="row text-center">
+<div class="row text-center" ng-show="filtered.length > 0">
     <div class="col-lg-12">
         <div class="page-header">
             <h1>All Games</h1>
@@ -57,7 +62,7 @@
         </pagination>
     </div>
 </div>
-<div class="row">
+<div class="row" ng-show="filtered.length > 0">
     <div class="col-lg-4" ng-repeat="game in filtered = (ctrl.gameService.games | search:ctrl.query | orderBy:'sort_as') | offset:ctrl.offset | limitTo:ctrl.itemsPerPage">
         <game game="game"
               genres="ctrl.gameService.genres"
@@ -68,11 +73,8 @@
               show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
         </game>
     </div>
-    <div class="col-lg-12 text-center" ng-if="ctrl.gameService.games.length > 0 && filtered.length == 0">
-        <h3>No results</h3>
-    </div>
 </div>
-<div class="row text-center">
+<div class="row text-center" ng-show="filtered.length > 0">
     <div class="col-lg-12">
         <pagination total-items="filtered.length"
                     items-per-page="ctrl.itemsPerPage"

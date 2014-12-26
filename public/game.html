@@ -41,7 +41,8 @@
                 <strong ng-if="game.finished == 0">Not completed</strong>
                 <strong ng-if="game.finished == 1">Completed</strong>
                 <span ng-if="game.hasPlaytime()">
-                    in <strong>{{game.getPlaytimeDisplay()}}</strong>
+                    <span ng-if="game.finished == 0 || game.finished == 1">in</span>
+                    <strong>{{game.getPlaytimeDisplay()}}</strong>
                 </span><br>
                 <game-rating game="game" ng-if="game.hasRating()"></game-rating>
                 <br>
