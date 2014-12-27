@@ -1,4 +1,4 @@
-angular.module('games').controller('manageFormCtrl', ['$scope', '$modalInstance', 'Entities', 'items', function($scope, $modalInstance, Entities, items) {
+angular.module('games').controller('manageFormCtrl', ['$scope', '$modalInstance', '$filter', 'Entities', 'items', function($scope, $modalInstance, $filter, Entities, items) {
     $scope.initialize = function() {
         $scope.form = { };
         $scope.items = angular.copy(items);
@@ -9,6 +9,9 @@ angular.module('games').controller('manageFormCtrl', ['$scope', '$modalInstance'
             item.deleted = false;
             item.updated = false;
         });
+
+        // one time sort
+        $scope.items = $filter('orderBy')($scope.items, 'name');
     };
 
     $scope.addClick = function() {

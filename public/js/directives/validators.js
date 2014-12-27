@@ -14,7 +14,7 @@ angular.module('games').directive('validateTimespan', function() {
     return {
         require: 'ngModel',
         link: function(scope, element, attributes, modelCtrl) {
-            var regex = /^\d{4}$/;
+            var regex = /^\d+$/;
             modelCtrl.$validators.year = function(modelValue, viewValue) {
                 if(modelCtrl.$isEmpty(viewValue))
                     return true;

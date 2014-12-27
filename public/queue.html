@@ -12,18 +12,21 @@
                     The queue is empty
                 </div>
             </div>
-            <div class="row" ng-repeat="game in games | orderBy:'queue_position'">
+            <div class="row" ng-repeat="game in games | filter:{queue_position: '!!'} | orderBy:'queue_position'">
                 <div class="col-md-12">
                     <div class="form-group btn-group btn-group-xs pull-right">
-                        <button class="btn btn-default" type="button" ng-click="moveUpClick(game)" ng-class="{'disabled': game.queue_position == 0}">
+                        <button class="btn btn-default" type="button" ng-click="moveUpClick(game)">
                             <span class="glyphicon glyphicon-arrow-up"></span>
                         </button>
-                        <button class="btn btn-default" type="button" ng-click="moveDownClick(game)" ng-class="{'disabled': game.queue_position == games.length - 1}">
+                        <button class="btn btn-danger" type="button" ng-click="removeClick(game)">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </button>
+                        <button class="btn btn-default" type="button" ng-click="moveDownClick(game)">
                             <span class="glyphicon glyphicon-arrow-down"></span>
                         </button>
                     </div>
                     <div class="overflow-ellipsis" title="{{game.title}}">
-                        {{$index+1}}. {{game.title}}
+                        {{game.queue_position + 1}}. {{game.title}}
                     </div>
                 </div>
             </div>
