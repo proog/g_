@@ -4,18 +4,17 @@
         Log In
     </h4>
 </div>
-<div class="modal-body">
-    <form ng-submit="loginClick()">
+<form name="form">
+    <div class="modal-body">
         <div class="form-group" ng-class="{'has-error': loginError}">
-            <input type="text" class="form-control" placeholder="Username" ng-model="loginForm.username">
+            <input type="text" class="form-control" placeholder="Username" ng-model="loginForm.username" required>
         </div>
         <div class="form-group" ng-class="{'has-error': loginError}">
-            <input type="password" class="form-control" placeholder="Password" ng-model="loginForm.password">
+            <input type="password" class="form-control" placeholder="Password" ng-model="loginForm.password" required>
         </div>
-        <input type="submit" style="display: none;">
-    </form>
-</div>
-<div class="modal-footer">
-    <button type="button" class="btn btn-primary" ng-click="loginClick()">Log in</button>
-    <button type="button" class="btn btn-default" ng-click="cancelClick()">Cancel</button>
-</div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" ng-click="loginClick()" ng-disabled="form.$invalid">Log in</button>
+        <button type="button" class="btn btn-default" ng-click="cancelClick()">Cancel</button>
+    </div>
+</form>

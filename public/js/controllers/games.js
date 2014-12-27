@@ -58,15 +58,15 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             }
         });
         modalInstance.result.then(function(result) {
-            self.formSubmit(game, result.form, result.image, result.delete, result.isNew);
+            self.formSubmit(game, result.model, result.image, result.delete, result.isNew);
         });
     };
 
-    self.formSubmit = function(game, form, image, del, isNew) {
-        if(!form.rating || form.rating.length == 0)
-            form.rating = null;
+    self.formSubmit = function(game, model, image, del, isNew) {
+        if(!model.rating || model.rating.length == 0)
+            model.rating = null;
 
-        if(del && form.id) {
+        if(del && model.id) {
             // delete game
             game.$delete({userId: self.userId}, function() {
                 var pos = gameService.games.indexOf(game);
@@ -76,7 +76,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         }
         else if(isNew) {
             // add game
-            game = new Games(form);
+            game = new Games(model);
             game.$save({userId: self.userId}, function(data) {
                 gameService.games.push(game);
                 if(image && image[0].files.length > 0)
@@ -85,7 +85,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         }
         else {
             // update game
-            var g = new Games(form);
+            var g = new Games(model);
             g.$update({userId: self.userId}, function(data) {
                 angular.copy(data, game);
                 if(image && image[0].files.length > 0)

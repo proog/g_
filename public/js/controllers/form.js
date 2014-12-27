@@ -7,11 +7,11 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
 
         if(game) {
             $scope.isNew = false;
-            $scope.form = angular.copy(game);
+            $scope.model = angular.copy(game);
         }
         else {
             $scope.isNew = true;
-            $scope.form = {
+            $scope.model = {
                 title: null,
                 developer: null,
                 publisher: null,
@@ -31,27 +31,27 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
     };
 
     $scope.genreClick = function(genreId) {
-        var pos = $scope.form.genre_ids.indexOf(genreId);
+        var pos = $scope.model.genre_ids.indexOf(genreId);
         if(pos > -1)
-            $scope.form.genre_ids.splice(pos, 1);
+            $scope.model.genre_ids.splice(pos, 1);
         else
-            $scope.form.genre_ids.push(genreId);
+            $scope.model.genre_ids.push(genreId);
     };
 
     $scope.platformClick = function(platformId) {
-        var pos = $scope.form.platform_ids.indexOf(platformId);
+        var pos = $scope.model.platform_ids.indexOf(platformId);
         if(pos > -1)
-            $scope.form.platform_ids.splice(pos, 1);
+            $scope.model.platform_ids.splice(pos, 1);
         else
-            $scope.form.platform_ids.push(platformId);
+            $scope.model.platform_ids.push(platformId);
     };
 
     $scope.tagClick = function(tagId) {
-        var pos = $scope.form.tag_ids.indexOf(tagId);
+        var pos = $scope.model.tag_ids.indexOf(tagId);
         if(pos > -1)
-            $scope.form.tag_ids.splice(pos, 1);
+            $scope.model.tag_ids.splice(pos, 1);
         else
-            $scope.form.tag_ids.push(tagId);
+            $scope.model.tag_ids.push(tagId);
     };
 
     $scope.clearImageInput = function() {
@@ -67,14 +67,11 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
     };
 
     $scope.titleChanged = function() {
-        if(!$scope.isNew)
-            return;
-
-        $scope.form.sort_as = $scope.form.title.replace(/^The\s|A\s/, '');
+        $scope.model.sort_as = $scope.model.title.replace(/^The\s|A\s|An\s/, '');
     };
 
     $scope.inQueueClicked = function() {
-        if($scope.form.queue_position == null) {
+        if($scope.model.queue_position == null) {
             // set the queue position to the largest queue position + 1
             var maxPos = -1;
             angular.forEach($scope.games, function(game) {
@@ -82,9 +79,9 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
                     maxPos = game.queue_position;
             });
 
-            $scope.form.queue_position = maxPos + 1;
+            $scope.model.queue_position = maxPos + 1;
         }
-        else $scope.form.queue_position = null;
+        else $scope.model.queue_position = null;
     };
 
     $scope.formSubmit = function() {
@@ -96,7 +93,7 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
 
     $scope.addClick = function() {
         var result = {
-            form: $scope.form,
+            model: $scope.model,
             image: $scope.image,
             delete: false,
             isNew: true
@@ -106,7 +103,7 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
 
     $scope.saveClick = function() {
         var result = {
-            form: $scope.form,
+            model: $scope.model,
             image: $scope.image,
             delete: false,
             isNew: false
@@ -115,12 +112,12 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
     };
 
     $scope.deleteClick = function() {
-        var dialog = confirm('Are you sure you want to delete ' + $scope.form.title + '?');
+        var dialog = confirm('Are you sure you want to delete ' + $scope.model.title + '?');
         if(!dialog)
             return;
 
         var result = {
-            form: $scope.form,
+            model: $scope.model,
             image: $scope.image,
             delete: true,
             isNew: false

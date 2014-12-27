@@ -43,13 +43,15 @@ angular.module('games').factory('Games', ['$resource', 'upload', function($resou
         game.decachedImage = game.image;
         game.currently_playing = (game.currently_playing == 1);
 
-        var splitter = ': ';
-        var splitterPos = game.title.indexOf(splitter);
-        if(splitterPos > -1) {
-            game.mainTitle = game.title.substr(0, splitterPos);
-            game.subTitle = game.title.substr(splitterPos + splitter.length);
+        if(game.title) {
+            var splitter = ': ';
+            var splitterPos = game.title.indexOf(splitter);
+            if(splitterPos > -1) {
+                game.mainTitle = game.title.substr(0, splitterPos);
+                game.subTitle = game.title.substr(splitterPos + splitter.length);
+            }
+            else game.mainTitle = game.title;
         }
-        else game.mainTitle = game.title;
 
         return game;
     };
@@ -85,6 +87,9 @@ angular.module('games').factory('Games', ['$resource', 'upload', function($resou
     };
 
     Games.prototype.getPlaytimeDisplay = function() {
+        if(!this.playtime)
+            return '';
+
         var split = this.playtime.split(':');
         var hours = split[0];
         var mins = split[1];

@@ -6,53 +6,55 @@
         <span ng-if="type == 'tag'">Manage Tags</span>
     </h4>
 </div>
-<div class="modal-body">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-6">
-                <label>Name</label>
-            </div>
-            <div class="col-md-4">
-                <label>Short name</label>
-            </div>
-        </div>
-        <div class="row" ng-repeat="item in items | filter:{deleted: false} | orderBy:'name'">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Name" ng-model="item.name" ng-change="nameChange(item)">
+<form name="form">
+    <div class="modal-body">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Name</label>
+                </div>
+                <div class="col-md-4">
+                    <label>Short name</label>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Short name" ng-model="item.short_name" ng-change="shortNameChange(item)">
+            <div class="row" ng-repeat="item in items | filter:{deleted: false} | orderBy:'name'">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Name" ng-model="item.name" ng-change="nameChange(item)">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Short name" ng-model="item.short_name" ng-change="shortNameChange(item)">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-danger" type="button" ng-click="deleteClick(item)">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
                 </div>
             </div>
-            <div class="col-md-2">
-                <button class="btn btn-danger" type="button" ng-click="deleteClick(item)">
-                    <span class="glyphicon glyphicon-remove"></span>
-                </button>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Name" ng-model="form.name" ng-change="nameChange(form)">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Name" ng-model="form.name" ng-change="nameChange(form)">
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Short name" ng-model="form.short_name" ng-change="shortNameChange(form)">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Short name" ng-model="form.short_name" ng-change="shortNameChange(form)">
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-primary" type="button" ng-click="addClick()" ng-disabled="!form.name || !form.short_name">
-                    <span class="glyphicon glyphicon-plus"></span>
-                </button>
+                <div class="col-md-2">
+                    <button class="btn btn-primary" type="button" ng-click="addClick()" ng-disabled="!form.name || !form.short_name">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div class="modal-footer">
-    <button type="button" class="btn btn-primary" ng-click="saveClick()" ng-disabled="!canSave()">OK</button>
-    <button type="button" class="btn btn-default" ng-click="cancelClick()">Cancel</button>
-</div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" ng-click="saveClick()" ng-disabled="!canSave()">OK</button>
+        <button type="button" class="btn btn-default" ng-click="cancelClick()">Cancel</button>
+    </div>
+</form>

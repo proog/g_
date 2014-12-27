@@ -5,70 +5,71 @@
         <span ng-if="!isNew">Edit Game</span>
     </h4>
 </div>
-<div class="modal-body">
-    <form ng-submit="formSubmit()">
+<form name="form">
+    <div class="modal-body">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-4">
                     <h4>Details</h4>
-                    <div class="form-group">
-                        <input type="text" class="form-control input-lg" placeholder="Title" ng-model="form.title" ng-change="titleChanged()">
+                    <div class="form-group" ng-class="{'has-error': form.title.$invalid}">
+                        <input type="text" class="form-control input-lg" placeholder="Title" ng-model="model.title" ng-change="titleChanged()" name="title" required>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': form.sort_as.$invalid}">
+                        <input type="text" class="form-control" placeholder="Sort as" ng-model="model.sort_as" name="sort_as" required>
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Sort as" ng-model="form.sort_as">
+                        <input type="text" class="form-control" placeholder="Developer" ng-model="model.developer" name="developer">
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Developer" ng-model="form.developer">
+                        <input type="text" class="form-control" placeholder="Publisher" ng-model="model.publisher" name="publisher">
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': form.year.$invalid}">
+                        <input type="number" class="form-control" placeholder="Year" ng-model="model.year" name="year" validate-year>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': form.playtime.$invalid}">
+                        <input type="text" class="form-control" placeholder="Playtime" ng-model="model.playtime" name="playtime" validate-timespan>
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Publisher" ng-model="form.publisher">
-                    </div>
-                    <div class="form-group">
-                        <input type="number" class="form-control" placeholder="Year" ng-model="form.year">
-                    </div>
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Playtime" ng-model="form.playtime">
-                    </div>
-                    <div class="form-group">
-                        <input type="number" class="form-control" placeholder="Rating" ng-model="form.rating">
-                    </div>
-                    <div class="form-group">
-                        <textarea class="form-control" placeholder="Comment" ng-model="form.comment"></textarea>
+                        <textarea class="form-control" placeholder="Comment" ng-model="model.comment" name="comment"></textarea>
                     </div>
                     <div class="form-group">
                         <div class="radio">
                             <label>
-                                <input type="radio" ng-model="form.finished" value="0">
+                                <input type="radio" ng-model="model.finished" value="0" name="finished">
                                 Not completed
                             </label>
                         </div>
                         <div class="radio">
                             <label>
-                                <input type="radio" ng-model="form.finished" value="1">
+                                <input type="radio" ng-model="model.finished" value="1" name="finished">
                                 Completed
                             </label>
                         </div>
                         <div class="radio">
                             <label>
-                                <input type="radio" ng-model="form.finished" value="2">
+                                <input type="radio" ng-model="model.finished" value="2" name="finished">
                                 N/A
                             </label>
                         </div>
                     </div>
                     <div class="form-group">
-                        <input type="file" id="image" file-upload input-element="image">
-                        <a class="hand" ng-click="clearImageInput()">Cancel image upload</a>
+                        <rating ng-model="model.rating" max="5"></rating>
+                        <span class="glyphicon glyphicon-remove hand pull-right" ng-click="model.rating = null"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="file" id="image" accept="image/*" style="width: 70%; display: inline-block;" bind-element="image">
+                        <span class="glyphicon glyphicon-remove hand pull-right" ng-click="clearImageInput()"></span>
                     </div>
                     <div class="form-group">
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" ng-model="form.currently_playing">
+                                <input type="checkbox" ng-model="model.currently_playing">
                                 Currently playing
                             </label>
                         </div>
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" ng-click="inQueueClicked()" ng-checked="form.queue_position != null">
+                                <input type="checkbox" ng-click="inQueueClicked()" ng-checked="model.queue_position != null">
                                 In queue
                             </label>
                         </div>
@@ -78,7 +79,7 @@
                     <h4>Genres</h4>
                     <div class="checkbox" ng-repeat="genre in genres | orderBy:'name'">
                         <label>
-                            <input type="checkbox" ng-attr-value="{{genre.id}}" ng-checked="form.genre_ids.indexOf(genre.id) > -1" ng-click="genreClick(genre.id)">
+                            <input type="checkbox" ng-attr-value="{{genre.id}}" ng-checked="model.genre_ids.indexOf(genre.id) > -1" ng-click="genreClick(genre.id)">
                             {{genre.name}}
                         </label>
                     </div>
@@ -87,7 +88,7 @@
                     <h4>Platforms</h4>
                     <div class="checkbox" ng-repeat="platform in platforms | orderBy:'name'">
                         <label>
-                            <input type="checkbox" ng-attr-value="{{platform.id}}" ng-checked="form.platform_ids.indexOf(platform.id) > -1" ng-click="platformClick(platform.id)">
+                            <input type="checkbox" ng-attr-value="{{platform.id}}" ng-checked="model.platform_ids.indexOf(platform.id) > -1" ng-click="platformClick(platform.id)">
                             {{platform.name}}
                         </label>
                     </div>
@@ -96,26 +97,21 @@
                     <h4>Tags</h4>
                     <div class="checkbox" ng-repeat="tag in tags | orderBy:'name'">
                         <label>
-                            <input type="checkbox" ng-attr-value="{{tag.id}}" ng-checked="form.tag_ids.indexOf(tag.id) > -1" ng-click="tagClick(tag.id)">
+                            <input type="checkbox" ng-attr-value="{{tag.id}}" ng-checked="model.tag_ids.indexOf(tag.id) > -1" ng-click="tagClick(tag.id)">
                             {{tag.name}}
                         </label>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- to make ng-submit work -->
-        <input type="submit" style="display: none;">
-    </form>
-</div>
-<div class="modal-footer">
-    <button type="button" class="btn btn-primary" ng-if="isNew" ng-click="addClick()">
-        <span class="glyphicon glyphicon-ok"></span>
-    </button>
-    <button type="button" class="btn btn-primary" ng-if="!isNew" ng-click="saveClick()">
-        <span class="glyphicon glyphicon-ok"></span>
-    </button>
-    <button type="button" class="btn btn-danger" ng-if="!isNew" ng-click="deleteClick()">
-        <span class="glyphicon glyphicon-remove"></span>
-    </button>
-    <button type="button" class="btn btn-default" ng-click="cancelClick()">Cancel</button>
-</div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" ng-click="formSubmit()" ng-disabled="form.$invalid">
+            <span class="glyphicon glyphicon-ok"></span>
+        </button>
+        <button type="button" class="btn btn-danger" ng-if="!isNew" ng-click="deleteClick()">
+            <span class="glyphicon glyphicon-remove"></span>
+        </button>
+        <button type="button" class="btn btn-default" ng-click="cancelClick()">Cancel</button>
+    </div>
+</form>
