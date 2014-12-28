@@ -4,44 +4,62 @@
             <h3 class="text-center">No results</h3>
         </div>
         <div ng-show="currentlyPlaying.length > 0">
-            <h1 class="text-center" ng-click="currentlyPlayingCollapsed = !currentlyPlayingCollapsed">
+            <h1 class="text-center hand" ng-click="currentlyPlayingCollapsed = !currentlyPlayingCollapsed">
                 <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{currentlyPlayingCollapsed ? 'right' : 'down'}}"></span>
                 Currently Playing
             </h1>
             <div class="list-group" collapse="currentlyPlayingCollapsed">
                 <a class="list-group-item hand overflow-ellipsis"
-                   ng-repeat="game in currentlyPlaying = (ctrl.gameService.games | search:ctrl.query | filter:{currently_playing: true} | orderBy:'sort_as')"
+                   ng-repeat="game in currentlyPlaying = (ctrl.gameService.games | search:ctrl.query | filter:{currently_playing: true} | orderBy:ctrl.sorting)"
                    ng-click="ctrl.gameSelected(game)"
                    ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == 1}">
-                    <ng-include src="'list-view-item.html'"></ng-include>
+                    <div class="pull-right">
+                        <span class="glyphicon glyphicon-time" ng-style="{visibility: game.hasPlaytime() ? 'visible' : 'hidden'}"></span>
+                        <span class="glyphicon glyphicon-star" ng-style="{visibility: game.hasRating() ? 'visible' : 'hidden'}"></span>{{game.rating}}
+                    </div>
+                    <div class="overflow-ellipsis">
+                        {{game.title}}
+                    </div>
                 </a>
             </div>
         </div>
         <div ng-show="queue.length > 0">
-            <h1 class="text-center" ng-click="queueCollapsed = !queueCollapsed">
+            <h1 class="text-center hand" ng-click="queueCollapsed = !queueCollapsed">
                 <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{queueCollapsed ? 'right' : 'down'}}"></span>
                 Queue
             </h1>
             <div class="list-group" collapse="queueCollapsed">
                 <a class="list-group-item hand overflow-ellipsis"
-                   ng-repeat="game in queue = (ctrl.gameService.games | search:ctrl.query | filter:{queue_position: '!!'} | orderBy:['queue_position', 'sort_as'])"
+                   ng-repeat="game in queue = (ctrl.gameService.games | search:ctrl.query | filter:{queue_position: '!!'} | orderBy:'queue_position')"
                    ng-click="ctrl.gameSelected(game)"
                    ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == 1}">
-                    <ng-include src="'list-view-item.html'"></ng-include>
+                    <div class="pull-right">
+                        <span class="glyphicon glyphicon-time" ng-style="{visibility: game.hasPlaytime() ? 'visible' : 'hidden'}"></span>
+                        <span class="glyphicon glyphicon-star" ng-style="{visibility: game.hasRating() ? 'visible' : 'hidden'}"></span>{{game.rating}}
+                    </div>
+                    <div class="overflow-ellipsis">
+                        {{game.title}}
+                    </div>
                 </a>
             </div>
         </div>
         <div ng-show="filtered.length > 0">
-            <h1 class="text-center" ng-click="allGamesCollapsed = !allGamesCollapsed">
+            <h1 class="text-center hand" ng-click="allGamesCollapsed = !allGamesCollapsed">
                 <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{allGamesCollapsed ? 'right' : 'down'}}"></span>
                 All Games
             </h1>
             <div class="list-group" collapse="allGamesCollapsed">
                 <a class="list-group-item hand overflow-ellipsis"
-                   ng-repeat="game in filtered = (ctrl.gameService.games | search:ctrl.query | orderBy:'sort_as')"
+                   ng-repeat="game in filtered = (ctrl.gameService.games | search:ctrl.query | orderBy:ctrl.sorting)"
                    ng-click="ctrl.gameSelected(game)"
                    ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == 1}">
-                    <ng-include src="'list-view-item.html'"></ng-include>
+                    <div class="pull-right">
+                        <span class="glyphicon glyphicon-time" ng-style="{visibility: game.hasPlaytime() ? 'visible' : 'hidden'}"></span>
+                        <span class="glyphicon glyphicon-star" ng-style="{visibility: game.hasRating() ? 'visible' : 'hidden'}"></span>{{game.rating}}
+                    </div>
+                    <div class="overflow-ellipsis">
+                        {{game.title}}
+                    </div>
                 </a>
             </div>
         </div>
@@ -62,7 +80,7 @@
         </div>
     </div>
     <div class="col-sm-3 list-column full-height">
-        <h1 class="text-center" ng-click="statsCollapsed = !statsCollapsed">
+        <h1 class="text-center hand" ng-click="statsCollapsed = !statsCollapsed">
             <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{statsCollapsed ? 'right' : 'down'}}"></span>
             Statistics
         </h1>

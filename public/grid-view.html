@@ -6,7 +6,7 @@
 <div class="row text-center" ng-show="currentlyPlaying.length > 0">
     <div class="col-lg-12">
         <div class="page-header">
-            <h1 ng-click="currentlyPlayingCollapsed = !currentlyPlayingCollapsed">
+            <h1 ng-click="currentlyPlayingCollapsed = !currentlyPlayingCollapsed" class="hand">
                 <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{currentlyPlayingCollapsed ? 'right' : 'down'}}"></span>
                 Currently Playing
             </h1>
@@ -14,7 +14,7 @@
     </div>
 </div>
 <div class="row" ng-show="currentlyPlaying.length > 0" collapse="currentlyPlayingCollapsed">
-    <div class="col-lg-4" ng-repeat="game in currentlyPlaying = (ctrl.gameService.games | search:ctrl.query | filter:{currently_playing: true} | orderBy:'sort_as')">
+    <div class="col-lg-4" ng-repeat="game in currentlyPlaying = (ctrl.gameService.games | search:ctrl.query | filter:{currently_playing: true} | orderBy:ctrl.sorting)">
         <game game="game"
               genres="ctrl.gameService.genres"
               platforms="ctrl.gameService.platforms"
@@ -28,7 +28,7 @@
 <div class="row text-center" ng-show="queue.length > 0">
     <div class="col-lg-12">
         <div class="page-header">
-            <h1 ng-click="queueCollapsed = !queueCollapsed">
+            <h1 ng-click="queueCollapsed = !queueCollapsed" class="hand">
                 <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{queueCollapsed ? 'right' : 'down'}}"></span>
                 Queue
             </h1>
@@ -36,7 +36,7 @@
     </div>
 </div>
 <div class="row" ng-show="queue.length > 0" collapse="queueCollapsed">
-    <div class="col-lg-4" ng-repeat="game in queue = (ctrl.gameService.games | search:ctrl.query | filter:{queue_position: '!!'} | orderBy:['queue_position', 'sort_as'])">
+    <div class="col-lg-4" ng-repeat="game in queue = (ctrl.gameService.games | search:ctrl.query | filter:{queue_position: '!!'} | orderBy:'queue_position')">
         <game game="game"
               genres="ctrl.gameService.genres"
               platforms="ctrl.gameService.platforms"
@@ -50,7 +50,7 @@
 <div class="row text-center" ng-show="filtered.length > 0">
     <div class="col-lg-12">
         <div class="page-header">
-            <h1 ng-click="allGamesCollapsed = !allGamesCollapsed">
+            <h1 ng-click="allGamesCollapsed = !allGamesCollapsed" class="hand">
                 <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{allGamesCollapsed ? 'right' : 'down'}}"></span>
                 All Games
             </h1>
@@ -74,7 +74,7 @@
                     class="game-pagination">
         </pagination>
     </div>
-    <div class="col-lg-4" ng-repeat="game in filtered = (ctrl.gameService.games | search:ctrl.query | orderBy:'sort_as') | offset:ctrl.offset | limitTo:ctrl.itemsPerPage">
+    <div class="col-lg-4" ng-repeat="game in filtered = (ctrl.gameService.games | search:ctrl.query | orderBy:ctrl.sorting) | offset:ctrl.offset | limitTo:ctrl.itemsPerPage">
         <game game="game"
               genres="ctrl.gameService.genres"
               platforms="ctrl.gameService.platforms"
@@ -104,7 +104,7 @@
 <div class="row text-center">
     <div class="col-lg-12">
         <div class="page-header">
-            <h1 ng-click="statsCollapsed = !statsCollapsed">
+            <h1 ng-click="statsCollapsed = !statsCollapsed" class="hand">
                 <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{statsCollapsed ? 'right' : 'down'}}"></span>
                 Statistics
             </h1>

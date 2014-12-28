@@ -293,6 +293,12 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             { name: 'Not completed', value: 0 },
             { name: 'N/A', value: 2 }
         ];
+        self.sortOptions = [
+            { name: 'Sort by title', value: 'sort_as' },
+            { name: 'Sort by year', value: ['year', 'sort_as'] },
+            { name: 'Sort by rating', value: ['rating', 'sort_as'] }
+        ];
+        self.sorting = self.sortOptions[0].value;
         self.offset = 0;
         self.itemsPerPage = 18;
         self.currentPage = 0;
