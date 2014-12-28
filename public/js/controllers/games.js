@@ -1,4 +1,4 @@
-angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$route', '$http', '$q', '$location', 'upload', '$modal', '$filter', 'Games', 'Genres', 'Platforms', 'Tags', 'Users', 'gameService', '$cookies', function($scope, $routeParams, $route, $http, $q, $location, upload, $modal, $filter, Games, Genres, Platforms, Tags, Users, gameService, $cookies) {
+angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$route', '$http', '$q', '$location', 'upload', '$modal', '$filter', 'Games', 'Genres', 'Platforms', 'Tags', 'Users', 'gameService', '$cookies', 'searchFilter', '$timeout', function($scope, $routeParams, $route, $http, $q, $location, upload, $modal, $filter, Games, Genres, Platforms, Tags, Users, gameService, $cookies, searchFilter, $timeout) {
     var self = this;
 
     self.getYears = function() {
@@ -248,11 +248,11 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         $cookies.view = view;
     };
 
-    self.gameSelected = function(game) {
+    self.gameSelected = function(game, scroll) {
         self.selectedGame = game;
 
-        if(self.view == self.GRID_VIEW)
-            self.query = { title: game.title };
+        if(scroll)
+            self.scrollToGame(game);
     };
 
     self.openLinkDialog = function(game) {
@@ -287,6 +287,49 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         return gameService.authenticated && gameService.authenticatedUser.id == self.userId && gameService.initialized;
     };
 
+    self.resetFilter = function() {
+        self.query = {};
+        self.sorting = self.sortOptions[0].value;
+    };
+
+    self.scrollToGame = function(game) {
+        if(self.view == self.GRID_VIEW) {
+            // find the page of the game, change to it, and scroll to the game
+            for(var i = 0; i < self.filtered.length; i++) {
+                var item = self.filtered[i];
+                if(item == game) {
+                    self.currentPage = parseInt(i/self.itemsPerPage)+1;
+
+                    $timeout(function() {
+                        var target = $('#game'+game.id);
+                        if(!target.length)
+                            return;
+
+                        var body = $('body');
+                        body.animate({scrollTop: target.offset().top - 50 - body.height()/2 + target.height()/2});
+                    });
+
+                    break;
+                }
+            }
+        }
+        else if(self.view == self.LIST_VIEW) {
+            // scroll to the game
+            var target = $('#game'+game.id);
+            if(!target.length)
+                return;
+
+            var list = $('#game-list');
+            list.animate({scrollTop: list.scrollTop() + target.position().top + 50 - list.height()/2 + target.height()/2});
+        }
+    };
+
+    self.collapseSection = function(sectionKey) {
+        var collapsed = !self.sections[sectionKey];
+        self.sections[sectionKey] = collapsed;
+        $cookies[sectionKey] = (collapsed ? 1 : 0);
+    };
+
     self.init = function() {
         self.finishedOptions = [
             { name: 'Completed', value: 1 },
@@ -298,10 +341,17 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             { name: 'Sort by year', value: ['year', 'sort_as'] },
             { name: 'Sort by rating', value: ['rating', 'sort_as'] }
         ];
+        self.sections = {
+            currently_playing: $cookies.currently_playing == 1,
+            queue: $cookies.queue == 1,
+            all_games: $cookies.all_games == 1,
+            statistics: $cookies.statistics == 1
+        };
+
         self.sorting = self.sortOptions[0].value;
         self.offset = 0;
         self.itemsPerPage = 18;
-        self.currentPage = 0;
+        self.currentPage = 1;
         self.selectedGame = null;
         self.GRID_VIEW = 1;
         self.LIST_VIEW = 2;
@@ -339,6 +389,11 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         else {
             findGameFn();
         }
+
+        // for programmatic page changes to work, instead of ng-change
+        $scope.$watch(function() { return self.currentPage; }, function() {
+            self.pageChanged();
+        });
     };
 
     self.init();

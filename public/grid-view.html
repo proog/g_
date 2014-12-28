@@ -1,4 +1,4 @@
-<div class="row text-center" ng-show="filtered.length == 0 && queue.length == 0 && currentlyPlaying.length == 0">
+<div class="row text-center" ng-show="ctrl.filtered.length == 0 && queue.length == 0 && currentlyPlaying.length == 0">
     <div class="col-lg-12">
         <h3>No results</h3>
     </div>
@@ -6,14 +6,14 @@
 <div class="row text-center" ng-show="currentlyPlaying.length > 0">
     <div class="col-lg-12">
         <div class="page-header">
-            <h1 ng-click="currentlyPlayingCollapsed = !currentlyPlayingCollapsed" class="hand">
-                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{currentlyPlayingCollapsed ? 'right' : 'down'}}"></span>
+            <h1 ng-click="ctrl.collapseSection('currently_playing')" class="hand">
+                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.currently_playing ? 'right' : 'down'}}"></span>
                 Currently Playing
             </h1>
         </div>
     </div>
 </div>
-<div class="row" ng-show="currentlyPlaying.length > 0" collapse="currentlyPlayingCollapsed">
+<div class="row" ng-show="currentlyPlaying.length > 0" collapse="ctrl.sections.currently_playing">
     <div class="col-lg-4" ng-repeat="game in currentlyPlaying = (ctrl.gameService.games | search:ctrl.query | filter:{currently_playing: true} | orderBy:ctrl.sorting)">
         <game game="game"
               genres="ctrl.gameService.genres"
@@ -28,14 +28,14 @@
 <div class="row text-center" ng-show="queue.length > 0">
     <div class="col-lg-12">
         <div class="page-header">
-            <h1 ng-click="queueCollapsed = !queueCollapsed" class="hand">
-                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{queueCollapsed ? 'right' : 'down'}}"></span>
+            <h1 ng-click="ctrl.collapseSection('queue')" class="hand">
+                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.queue ? 'right' : 'down'}}"></span>
                 Queue
             </h1>
         </div>
     </div>
 </div>
-<div class="row" ng-show="queue.length > 0" collapse="queueCollapsed">
+<div class="row" ng-show="queue.length > 0" collapse="ctrl.sections.queue">
     <div class="col-lg-4" ng-repeat="game in queue = (ctrl.gameService.games | search:ctrl.query | filter:{queue_position: '!!'} | orderBy:'queue_position')">
         <game game="game"
               genres="ctrl.gameService.genres"
@@ -47,19 +47,19 @@
         </game>
     </div>
 </div>
-<div class="row text-center" ng-show="filtered.length > 0">
+<div class="row text-center" ng-show="ctrl.filtered.length > 0">
     <div class="col-lg-12">
         <div class="page-header">
-            <h1 ng-click="allGamesCollapsed = !allGamesCollapsed" class="hand">
-                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{allGamesCollapsed ? 'right' : 'down'}}"></span>
+            <h1 ng-click="ctrl.collapseSection('all_games')" class="hand">
+                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.all_games ? 'right' : 'down'}}"></span>
                 All Games
             </h1>
         </div>
     </div>
 </div>
-<div class="row" ng-show="filtered.length > 0" collapse="allGamesCollapsed">
+<div class="row" ng-show="ctrl.filtered.length > 0" collapse="ctrl.sections.all_games">
     <div class="col-lg-12 text-center">
-        <pagination total-items="filtered.length"
+        <pagination total-items="ctrl.filtered.length"
                     items-per-page="ctrl.itemsPerPage"
                     num-pages="ctrl.pageCount"
                     boundary-links="false"
@@ -70,11 +70,10 @@
                     first-text="{{1}}"
                     last-text="{{ctrl.pageCount}}"
                     ng-model="ctrl.currentPage"
-                    ng-change="ctrl.pageChanged()"
                     class="game-pagination">
         </pagination>
     </div>
-    <div class="col-lg-4" ng-repeat="game in filtered = (ctrl.gameService.games | search:ctrl.query | orderBy:ctrl.sorting) | offset:ctrl.offset | limitTo:ctrl.itemsPerPage">
+    <div class="col-lg-4" ng-repeat="game in ctrl.filtered = (ctrl.gameService.games | search:ctrl.query | orderBy:ctrl.sorting) | offset:ctrl.offset | limitTo:ctrl.itemsPerPage" id="game{{game.id}}">
         <game game="game"
               genres="ctrl.gameService.genres"
               platforms="ctrl.gameService.platforms"
@@ -85,7 +84,7 @@
         </game>
     </div>
     <div class="col-lg-12 text-center">
-        <pagination total-items="filtered.length"
+        <pagination total-items="ctrl.filtered.length"
                     items-per-page="ctrl.itemsPerPage"
                     num-pages="ctrl.pageCount"
                     boundary-links="false"
@@ -96,7 +95,6 @@
                     first-text="{{1}}"
                     last-text="{{ctrl.pageCount}}"
                     ng-model="ctrl.currentPage"
-                    ng-change="ctrl.pageChanged()"
                     class="game-pagination">
         </pagination>
     </div>
@@ -104,14 +102,14 @@
 <div class="row text-center">
     <div class="col-lg-12">
         <div class="page-header">
-            <h1 ng-click="statsCollapsed = !statsCollapsed" class="hand">
-                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{statsCollapsed ? 'right' : 'down'}}"></span>
+            <h1 ng-click="ctrl.collapseSection('statistics')" class="hand">
+                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.statistics ? 'right' : 'down'}}"></span>
                 Statistics
             </h1>
         </div>
     </div>
 </div>
-<div class="row" collapse="statsCollapsed">
+<div class="row" collapse="ctrl.sections.statistics">
     <div class="col-md-3">
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -131,13 +129,13 @@
         </div>
     </div>
     <div class="col-md-3">
-        <stats-panel panel-title="Playtime" key="playtime" value="title" items="ctrl.gameService.games" filter-by="ctrl.hasPlaytime" order-by="['playtimeAsInt()', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item)"></stats-panel>
+        <stats-panel panel-title="Playtime" key="playtime" value="title" items="ctrl.gameService.games" filter-by="ctrl.hasPlaytime" order-by="['playtimeAsInt()', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item, true)"></stats-panel>
     </div>
     <div class="col-md-3">
-        <stats-panel panel-title="Rating" key="rating" value="title" items="ctrl.gameService.games" filter-by="{rating: '!!'}" order-by="['rating', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item)"></stats-panel>
+        <stats-panel panel-title="Rating" key="rating" value="title" items="ctrl.gameService.games" filter-by="{rating: '!!'}" order-by="['rating', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item, true)"></stats-panel>
     </div>
     <div class="col-md-3">
-        <stats-panel panel-title="Year" key="year" value="title" items="ctrl.gameService.games" filter-by="{year: '!!'}" order-by="['year', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item)"></stats-panel>
+        <stats-panel panel-title="Year" key="year" value="title" items="ctrl.gameService.games" filter-by="{year: '!!'}" order-by="['year', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item, true)"></stats-panel>
     </div>
     <div class="col-md-3">
         <stats-panel panel-title="Genres" key="count" value="name" items="ctrl.gameService.genres" order-by="[ctrl.countGenre, '-name']" descending="true" on-click="ctrl.query = {genre: item.id}"></stats-panel>

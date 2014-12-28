@@ -113,7 +113,7 @@
                 <div class="form-group">
                     <select class="form-control" ng-model="ctrl.sorting" ng-options="s.value as s.name for s in ctrl.sortOptions"></select>
                 </div>
-                <button type="button" class="btn btn-default" ng-click="ctrl.query = {}">
+                <button type="button" class="btn btn-default" ng-click="ctrl.resetFilter()">
                     <span class="glyphicon glyphicon-refresh"></span>
                 </button>
             </form>

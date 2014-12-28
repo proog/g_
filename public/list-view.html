@@ -1,14 +1,14 @@
 <div class="row full-height">
-    <div class="col-sm-3 list-column full-height">
-        <div ng-show="filtered.length == 0 && queue.length == 0 && currentlyPlaying.length == 0">
+    <div class="col-sm-3 list-column full-height" id="game-list">
+        <div ng-show="ctrl.filtered.length == 0 && queue.length == 0 && currentlyPlaying.length == 0">
             <h3 class="text-center">No results</h3>
         </div>
         <div ng-show="currentlyPlaying.length > 0">
-            <h1 class="text-center hand" ng-click="currentlyPlayingCollapsed = !currentlyPlayingCollapsed">
-                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{currentlyPlayingCollapsed ? 'right' : 'down'}}"></span>
+            <h1 class="text-center hand" ng-click="ctrl.collapseSection('currently_playing')">
+                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.currently_playing ? 'right' : 'down'}}"></span>
                 Currently Playing
             </h1>
-            <div class="list-group" collapse="currentlyPlayingCollapsed">
+            <div class="list-group" collapse="ctrl.sections.currently_playing">
                 <a class="list-group-item hand overflow-ellipsis"
                    ng-repeat="game in currentlyPlaying = (ctrl.gameService.games | search:ctrl.query | filter:{currently_playing: true} | orderBy:ctrl.sorting)"
                    ng-click="ctrl.gameSelected(game)"
@@ -24,11 +24,11 @@
             </div>
         </div>
         <div ng-show="queue.length > 0">
-            <h1 class="text-center hand" ng-click="queueCollapsed = !queueCollapsed">
-                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{queueCollapsed ? 'right' : 'down'}}"></span>
+            <h1 class="text-center hand" ng-click="ctrl.collapseSection('queue')">
+                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.queue ? 'right' : 'down'}}"></span>
                 Queue
             </h1>
-            <div class="list-group" collapse="queueCollapsed">
+            <div class="list-group" collapse="ctrl.sections.queue">
                 <a class="list-group-item hand overflow-ellipsis"
                    ng-repeat="game in queue = (ctrl.gameService.games | search:ctrl.query | filter:{queue_position: '!!'} | orderBy:'queue_position')"
                    ng-click="ctrl.gameSelected(game)"
@@ -43,14 +43,14 @@
                 </a>
             </div>
         </div>
-        <div ng-show="filtered.length > 0">
-            <h1 class="text-center hand" ng-click="allGamesCollapsed = !allGamesCollapsed">
-                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{allGamesCollapsed ? 'right' : 'down'}}"></span>
+        <div ng-show="ctrl.filtered.length > 0">
+            <h1 class="text-center hand" ng-click="ctrl.collapseSection('all_games')">
+                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.all_games ? 'right' : 'down'}}"></span>
                 All Games
             </h1>
-            <div class="list-group" collapse="allGamesCollapsed">
-                <a class="list-group-item hand overflow-ellipsis"
-                   ng-repeat="game in filtered = (ctrl.gameService.games | search:ctrl.query | orderBy:ctrl.sorting)"
+            <div class="list-group" collapse="ctrl.sections.all_games">
+                <a class="list-group-item hand overflow-ellipsis" id="game{{game.id}}"
+                   ng-repeat="game in ctrl.filtered = (ctrl.gameService.games | search:ctrl.query | orderBy:ctrl.sorting)"
                    ng-click="ctrl.gameSelected(game)"
                    ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == 1}">
                     <div class="pull-right">
@@ -80,11 +80,11 @@
         </div>
     </div>
     <div class="col-sm-3 list-column full-height">
-        <h1 class="text-center hand" ng-click="statsCollapsed = !statsCollapsed">
-            <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{statsCollapsed ? 'right' : 'down'}}"></span>
+        <h1 class="text-center hand" ng-click="ctrl.collapseSection('statistics')">
+            <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.statistics ? 'right' : 'down'}}"></span>
             Statistics
         </h1>
-        <div collapse="statsCollapsed">
+        <div collapse="ctrl.sections.statistics">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h1 class="panel-title overflow-ellipsis">
@@ -101,9 +101,9 @@
                     </dl>
                 </div>
             </div>
-            <stats-panel panel-title="Playtime" key="playtime" value="title" items="ctrl.gameService.games" filter-by="ctrl.hasPlaytime" order-by="['playtimeAsInt()', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item)"></stats-panel>
-            <stats-panel panel-title="Rating" key="rating" value="title" items="ctrl.gameService.games" filter-by="{rating: '!!'}" order-by="['rating', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item)"></stats-panel>
-            <stats-panel panel-title="Year" key="year" value="title" items="ctrl.gameService.games" filter-by="{year: '!!'}" order-by="['year', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item)"></stats-panel>
+            <stats-panel panel-title="Playtime" key="playtime" value="title" items="ctrl.gameService.games" filter-by="ctrl.hasPlaytime" order-by="['playtimeAsInt()', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item, true)"></stats-panel>
+            <stats-panel panel-title="Rating" key="rating" value="title" items="ctrl.gameService.games" filter-by="{rating: '!!'}" order-by="['rating', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item, true)"></stats-panel>
+            <stats-panel panel-title="Year" key="year" value="title" items="ctrl.gameService.games" filter-by="{year: '!!'}" order-by="['year', '-sort_as']" descending="true" on-click="ctrl.gameSelected(item, true)"></stats-panel>
             <stats-panel panel-title="Genres" key="count" value="name" items="ctrl.gameService.genres" order-by="[ctrl.countGenre, '-name']" descending="true" on-click="ctrl.query = {genre: item.id}"></stats-panel>
             <stats-panel panel-title="Platforms" key="count" value="name" items="ctrl.gameService.platforms" order-by="[ctrl.countPlatform, '-name']" descending="true" on-click="ctrl.query = {platform: item.id}"></stats-panel>
             <stats-panel panel-title="Tags" key="count" value="name" items="ctrl.gameService.tags" order-by="[ctrl.countTag, '-name']" descending="true" on-click="ctrl.query = {tag: item.id}"></stats-panel>
