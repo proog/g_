@@ -6,8 +6,8 @@
 <div class="row text-center" ng-show="currentlyPlaying.length > 0">
     <div class="col-lg-12">
         <div class="page-header">
-            <h1>
-                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{currentlyPlayingCollapsed ? 'right' : 'down'}}" ng-click="currentlyPlayingCollapsed = !currentlyPlayingCollapsed"></span>
+            <h1 ng-click="currentlyPlayingCollapsed = !currentlyPlayingCollapsed">
+                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{currentlyPlayingCollapsed ? 'right' : 'down'}}"></span>
                 Currently Playing
             </h1>
         </div>
@@ -28,8 +28,8 @@
 <div class="row text-center" ng-show="queue.length > 0">
     <div class="col-lg-12">
         <div class="page-header">
-            <h1>
-                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{queueCollapsed ? 'right' : 'down'}}" ng-click="queueCollapsed = !queueCollapsed"></span>
+            <h1 ng-click="queueCollapsed = !queueCollapsed">
+                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{queueCollapsed ? 'right' : 'down'}}"></span>
                 Queue
             </h1>
         </div>
@@ -50,8 +50,8 @@
 <div class="row text-center" ng-show="filtered.length > 0">
     <div class="col-lg-12">
         <div class="page-header">
-            <h1>
-                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{allGamesCollapsed ? 'right' : 'down'}}" ng-click="allGamesCollapsed = !allGamesCollapsed"></span>
+            <h1 ng-click="allGamesCollapsed = !allGamesCollapsed">
+                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{allGamesCollapsed ? 'right' : 'down'}}"></span>
                 All Games
             </h1>
         </div>
@@ -104,8 +104,8 @@
 <div class="row text-center">
     <div class="col-lg-12">
         <div class="page-header">
-            <h1>
-                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{statsCollapsed ? 'right' : 'down'}}" ng-click="statsCollapsed = !statsCollapsed"></span>
+            <h1 ng-click="statsCollapsed = !statsCollapsed">
+                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{statsCollapsed ? 'right' : 'down'}}"></span>
                 Statistics
             </h1>
         </div>
