@@ -337,9 +337,16 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             { name: 'N/A', value: 2 }
         ];
         self.sortOptions = [
-            { name: 'Sort by title', value: 'sort_as' },
-            { name: 'Sort by year', value: ['year', 'sort_as'] },
-            { name: 'Sort by rating', value: ['rating', 'sort_as'] }
+            { name: 'Sort by title, asc.', value: 'sort_as' },
+            { name: 'Sort by title, desc.', value: '-sort_as' },
+            { name: 'Sort by year, asc.', value: ['year', 'sort_as'] },
+            { name: 'Sort by year, desc.', value: [function(game) {
+                return game.year != null ? -game.year : Number.MAX_VALUE; // empty year at end
+            }, 'sort_as'] },
+            { name: 'Sort by rating, asc.', value: ['rating', 'sort_as'] },
+            { name: 'Sort by rating, desc.', value: [function(game) {
+                return game.rating ? -game.rating : Number.MAX_VALUE; // empty rating at end
+            }, 'sort_as'] }
         ];
         self.sections = {
             currently_playing: $cookies.currently_playing == 1,

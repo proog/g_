@@ -14,8 +14,11 @@
                    ng-click="ctrl.gameSelected(game)"
                    ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == 1}">
                     <div class="pull-right">
+                        <span ng-style="{visibility: game.year ? 'visible' : 'hidden'}">({{game.year}})</span>
                         <span class="glyphicon glyphicon-time" ng-style="{visibility: game.hasPlaytime() ? 'visible' : 'hidden'}"></span>
-                        <span class="glyphicon glyphicon-star" ng-style="{visibility: game.hasRating() ? 'visible' : 'hidden'}"></span>{{game.rating}}
+                        <span ng-style="{visibility: game.hasRating() ? 'visible' : 'hidden'}">
+                            <span class="glyphicon glyphicon-star"></span>{{game.rating || 0}}
+                        </span>
                     </div>
                     <div class="overflow-ellipsis">
                         {{game.title}}
@@ -34,8 +37,11 @@
                    ng-click="ctrl.gameSelected(game)"
                    ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == 1}">
                     <div class="pull-right">
+                        <span ng-style="{visibility: game.year ? 'visible' : 'hidden'}">({{game.year}})</span>
                         <span class="glyphicon glyphicon-time" ng-style="{visibility: game.hasPlaytime() ? 'visible' : 'hidden'}"></span>
-                        <span class="glyphicon glyphicon-star" ng-style="{visibility: game.hasRating() ? 'visible' : 'hidden'}"></span>{{game.rating}}
+                        <span ng-style="{visibility: game.hasRating() ? 'visible' : 'hidden'}">
+                            <span class="glyphicon glyphicon-star"></span>{{game.rating || 0}}
+                        </span>
                     </div>
                     <div class="overflow-ellipsis">
                         {{game.title}}
@@ -54,8 +60,11 @@
                    ng-click="ctrl.gameSelected(game)"
                    ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == 1}">
                     <div class="pull-right">
+                        <span ng-style="{visibility: game.year ? 'visible' : 'hidden'}">({{game.year}})</span>
                         <span class="glyphicon glyphicon-time" ng-style="{visibility: game.hasPlaytime() ? 'visible' : 'hidden'}"></span>
-                        <span class="glyphicon glyphicon-star" ng-style="{visibility: game.hasRating() ? 'visible' : 'hidden'}"></span>{{game.rating}}
+                        <span ng-style="{visibility: game.hasRating() ? 'visible' : 'hidden'}">
+                            <span class="glyphicon glyphicon-star"></span>{{game.rating || 0}}
+                        </span>
                     </div>
                     <div class="overflow-ellipsis">
                         {{game.title}}
