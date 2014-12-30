@@ -8,6 +8,7 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
         if(game) {
             $scope.isNew = false;
             $scope.model = angular.copy(game);
+            $scope.originalQueuePosition = $scope.model.queue_position;
         }
         else {
             $scope.isNew = true;
@@ -27,6 +28,14 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
                 platform_ids: [],
                 tag_ids: []
             };
+
+            // find the potential queue position
+            var maxPos = -1;
+            angular.forEach($scope.games, function(game) {
+                if(game.queue_position != null && game.queue_position > maxPos)
+                    maxPos = game.queue_position;
+            });
+            $scope.originalQueuePosition = maxPos + 1;
         }
     };
 
@@ -71,17 +80,10 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
     };
 
     $scope.inQueueClicked = function() {
-        if($scope.model.queue_position == null) {
-            // set the queue position to the largest queue position + 1
-            var maxPos = -1;
-            angular.forEach($scope.games, function(game) {
-                if(game.queue_position != null && game.queue_position > maxPos)
-                    maxPos = game.queue_position;
-            });
-
-            $scope.model.queue_position = maxPos + 1;
-        }
-        else $scope.model.queue_position = null;
+        if($scope.model.queue_position == null)
+            $scope.model.queue_position = $scope.originalQueuePosition;
+        else
+            $scope.model.queue_position = null;
     };
 
     $scope.formSubmit = function() {
