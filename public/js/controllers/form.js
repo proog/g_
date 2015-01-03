@@ -8,7 +8,6 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
         if(game) {
             $scope.isNew = false;
             $scope.model = angular.copy(game);
-            $scope.originalQueuePosition = $scope.model.queue_position;
         }
         else {
             $scope.isNew = true;
@@ -28,7 +27,13 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
                 platform_ids: [],
                 tag_ids: []
             };
+        }
 
+        // set up the queue position to toggle between this and null when queue checkbox is checked
+        if($scope.model.queue_position != null) {
+            $scope.originalQueuePosition = $scope.model.queue_position;
+        }
+        else {
             // find the potential queue position
             var maxPos = -1;
             angular.forEach($scope.games, function(game) {
