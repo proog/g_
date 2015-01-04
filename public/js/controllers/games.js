@@ -305,7 +305,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                         if(!target.length)
                             return;
 
-                        var body = $('body');
+                        var body = $('body,html');
                         body.animate({scrollTop: target.offset().top - 50 - body.height()/2 + target.height()/2});
                     });
 
