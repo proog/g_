@@ -1,23 +1,11 @@
 angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$route', '$http', '$q', '$location', 'upload', '$modal', '$filter', 'Games', 'Genres', 'Platforms', 'Tags', 'Users', 'gameService', '$cookies', 'searchFilter', '$timeout', function($scope, $routeParams, $route, $http, $q, $location, upload, $modal, $filter, Games, Genres, Platforms, Tags, Users, gameService, $cookies, searchFilter, $timeout) {
     var self = this;
 
-    self.getYears = function() {
-        return gameService.getYears();
-    };
     self.countFinished = function() {
         return gameService.countFinished();
     };
     self.countFinishedPct = function() {
         return gameService.countFinishedPct();
-    };
-    self.countGenre = function(genre) {
-        return gameService.countGenre(genre);
-    };
-    self.countPlatform = function(platform) {
-        return gameService.countPlatform(platform);
-    };
-    self.countTag = function(tag) {
-        return gameService.countTag(tag);
     };
 
     self.addClick = function() {
@@ -378,6 +366,15 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             return playtimes;
         };
 
+        var getRatings = function(games) {
+            var ratings = [];
+            angular.forEach(games, function(game) {
+                if(game.hasRating())
+                    ratings.push(game.rating);
+            });
+            return ratings;
+        };
+
         self.chart = {
             instance: null,
             xAxis: null,
@@ -505,16 +502,22 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                 {
                     name: 'Average rating',
                     value: function(games) {
-                        var gamesWithRating = $filter('filter')(games, function(game) {
-                            return game.hasRating();
-                        });
+                        var ratings = getRatings(games);
 
-                        if(!gamesWithRating.length)
+                        if(!ratings.length)
                             return 0;
 
-                        return gamesWithRating.reduce(function(sum, game) {
-                            return sum + game.rating;
-                        }, 0) / gamesWithRating.length;
+                        return ratings.reduce(function(sum, rating) {
+                            return sum + rating;
+                        }, 0) / ratings.length;
+                    }
+                },
+                {
+                    name: 'Maximum rating',
+                    value: function(games) {
+                        return getRatings(games).reduce(function(max, rating) {
+                            return Math.max(rating, max);
+                        }, 0);
                     }
                 }
             ],
@@ -554,7 +557,13 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             }, 'sort_as'] },
             { name: 'Sort by rating, asc.', value: ['rating', 'sort_as'] },
             { name: 'Sort by rating, desc.', value: [function(game) {
-                return game.rating ? -game.rating : Number.MAX_VALUE; // empty rating at end
+                return game.hasRating() ? -game.rating : Number.MAX_VALUE; // empty rating at end
+            }, 'sort_as'] },
+            { name: 'Sort by playtime, asc.', value: [function(game) {
+                return game.hasPlaytime() ? game.playtimeAsInt() : Number.MAX_VALUE; // empty playtime at end
+            }, 'sort_as'] },
+            { name: 'Sort by playtime, desc.', value: [function(game) {
+                return game.hasPlaytime() ? -game.playtimeAsInt() : Number.MAX_VALUE; // empty playtime at end
             }, 'sort_as'] }
         ];
         self.sections = {
@@ -564,7 +573,6 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             statistics: $cookies.statistics == 1
         };
 
-        self.resetFilter();
         self.offset = 0;
         self.itemsPerPage = 18;
         self.currentPage = 1;
@@ -573,6 +581,8 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         self.LIST_VIEW = 2;
         self.view = $cookies.view ? $cookies.view : self.LIST_VIEW;
         self.gameService = gameService;
+        self.resetFilter();
+        self.initChart();
 
         if(!$routeParams.userId) {
             // no user id specified, load default user and redirect
@@ -595,8 +605,9 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                 });
             }
 
-            self.initChart();
-            self.updateChart();
+            $timeout(function() {
+                self.updateChart();
+            });
         };
 
         if(!gameService.initialized) {
