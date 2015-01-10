@@ -2,39 +2,22 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
     var self = this;
 
     self.getYears = function() {
-        var years = [];
-        angular.forEach(gameService.games, function(game) {
-            if(game.year && years.indexOf(game.year) < 0)
-                years.push(game.year);
-        });
-
-        return years;
+        return gameService.getYears();
     };
-
     self.countFinished = function() {
-        return $filter('filter')(gameService.games, {finished: 1}).length;
+        return gameService.countFinished();
     };
     self.countFinishedPct = function() {
-        return Math.round(self.countFinished()/gameService.games.length*100);
+        return gameService.countFinishedPct();
     };
-
     self.countGenre = function(genre) {
-        genre.count = $filter('filter')(gameService.games, function(game) {
-            return game.genre_ids.indexOf(genre.id) > -1;
-        }).length;
-        return genre.count;
+        return gameService.countGenre(genre);
     };
     self.countPlatform = function(platform) {
-        platform.count = $filter('filter')(gameService.games, function(game) {
-            return game.platform_ids.indexOf(platform.id) > -1;
-        }).length;
-        return platform.count;
+        return gameService.countPlatform(platform);
     };
     self.countTag = function(tag) {
-        tag.count = $filter('filter')(gameService.games, function(game) {
-            return game.tag_ids.indexOf(tag.id) > -1;
-        }).length;
-        return tag.count;
+        return gameService.countTag(tag);
     };
 
     self.addClick = function() {
@@ -246,6 +229,10 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
 
         self.view = view;
         $cookies.view = view;
+
+        $timeout(function() {
+            self.updateChart();
+        }, 500); // hack :(
     };
 
     self.gameSelected = function(game, scroll) {
@@ -293,6 +280,10 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
     };
 
     self.scrollToGame = function(game) {
+        // uncollapse all_games section
+        if(self.sections.all_games)
+            self.collapseSection('all_games');
+
         if(self.view == self.GRID_VIEW) {
             // find the page of the game, change to it, and scroll to the game
             for(var i = 0; i < self.filtered.length; i++) {
@@ -315,12 +306,14 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         }
         else if(self.view == self.LIST_VIEW) {
             // scroll to the game
-            var target = $('#game'+game.id);
-            if(!target.length)
-                return;
+            $timeout(function() {
+                var target = $('#game'+game.id);
+                if(!target.length)
+                    return;
 
-            var list = $('#game-list');
-            list.animate({scrollTop: list.scrollTop() + target.position().top + 50 - list.height()/2 + target.height()/2});
+                var list = $('#game-list');
+                list.animate({scrollTop: list.scrollTop() + target.position().top + 50 - list.height()/2 + target.height()/2});
+            });
         }
     };
 
@@ -328,6 +321,222 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         var collapsed = !self.sections[sectionKey];
         self.sections[sectionKey] = collapsed;
         $cookies[sectionKey] = (collapsed ? 1 : 0);
+
+        // fix for when loading the page with statistics collapsed, the chart wouldn't display
+        if(sectionKey == 'statistics' && !collapsed) {
+            $timeout(function() {
+                self.chart.instance.resize(self.chart.instance.render, true);
+            });
+        }
+    };
+
+    self.updateChart = function() {
+        var stats = self.chart.orderBy(self.chart.xAxis(self.chart.yAxis));
+        var labels = [];
+        var values = [];
+        angular.forEach(stats, function(dataPoint) {
+            labels.push(dataPoint.label);
+            values.push(dataPoint.value);
+        });
+
+        var data = {
+            labels: labels,
+            datasets: [
+                {
+                    fillColor: "rgba(151,187,205,0.2)",
+                    strokeColor: "rgba(151,187,205,1)",
+                    pointColor: "rgba(151,187,205,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(151,187,205,1)",
+                    data: values
+                }
+            ]
+        };
+
+        var ctx = document.getElementById('stats-chart').getContext('2d');
+        var options = {
+            animation: false,
+            responsive: true,
+            scaleBeginsAtZero: true,
+            pointHitDetectionRadius: 5
+        };
+
+        if(self.chart.instance)
+            self.chart.instance.destroy();
+
+        self.chart.instance = new Chart(ctx).Line(data, options);
+    };
+
+    self.initChart = function() {
+        var getPlaytimes = function(games) {
+            var playtimes = [];
+            angular.forEach(games, function(game) {
+                if(game.hasPlaytime())
+                    playtimes.push(moment.duration(game.playtime).asHours());
+            });
+            return playtimes;
+        };
+
+        self.chart = {
+            instance: null,
+            xAxis: null,
+            yAxis: null,
+            orderBy: null,
+            xOptions: [
+                {
+                    name: 'Genre',
+                    value: function(valueFn) {
+                        var stats = [];
+                        angular.forEach(gameService.genres, function(genre) {
+                            var gamesInCategory = $filter('filter')(gameService.games, function(game) {
+                                return game.genre_ids.indexOf(genre.id) > -1;
+                            });
+
+                            stats.push({
+                                label: genre.name,
+                                value: valueFn(gamesInCategory)
+                            });
+                        });
+                        return stats;
+                    }
+                },
+                {
+                    name: 'Platform',
+                    value: function(valueFn) {
+                        var stats = [];
+                        angular.forEach(gameService.platforms, function(platform) {
+                            var gamesInCategory = $filter('filter')(gameService.games, function(game) {
+                                return game.platform_ids.indexOf(platform.id) > -1;
+                            });
+
+                            stats.push({
+                                label: platform.name,
+                                value: valueFn(gamesInCategory)
+                            });
+                        });
+                        return stats;
+                    }
+                },
+                {
+                    name: 'Tag',
+                    value: function(valueFn) {
+                        var stats = [];
+                        angular.forEach(gameService.tags, function(tag) {
+                            var gamesInCategory = $filter('filter')(gameService.games, function(game) {
+                                return game.tag_ids.indexOf(tag.id) > -1;
+                            });
+
+                            stats.push({
+                                label: tag.name,
+                                value: valueFn(gamesInCategory)
+                            });
+                        });
+                        return stats;
+                    }
+                },
+                {
+                    name: 'Year',
+                    value: function(valueFn) {
+                        var stats = [];
+                        angular.forEach(gameService.getYears(), function(year) {
+                            var gamesInCategory = $filter('filter')(gameService.games, function(game) {
+                                return game.year == year;
+                            });
+
+                            stats.push({
+                                label: year,
+                                value: valueFn(gamesInCategory)
+                            });
+                        });
+                        return stats;
+                    }
+                }
+            ],
+            yOptions: [
+                {
+                    name: 'Games',
+                    value: function(games) {
+                        return games.length;
+                    }
+                },
+                {
+                    name: 'Completed games',
+                    value: function(games) {
+                        return games.reduce(function(count, game) {
+                            return game.finished == 1 ? count + 1 : count;
+                        }, 0);
+                    }
+                },
+                {
+                    name: 'Average playtime',
+                    value: function(games) {
+                        var playtimes = getPlaytimes(games);
+
+                        if(!playtimes.length)
+                            return 0;
+
+                        return playtimes.reduce(function(sum, playtime) {
+                            return sum + playtime
+                        }, 0) / playtimes.length;
+                    }
+                },
+                {
+                    name: 'Median playtime',
+                    value: function(games) {
+                        var playtimes = getPlaytimes(games);
+
+                        if(!playtimes.length)
+                            return 0;
+
+                        var sorted = $filter('orderBy')(playtimes);
+                        var half = Math.floor(sorted.length/2);
+                        return (sorted.length % 2) ? sorted[half] : (sorted[half-1] + sorted[half]) / 2;
+                    }
+                },
+                {
+                    name: 'Maximum playtime',
+                    value: function(games) {
+                        return getPlaytimes(games).reduce(function(max, playtime) {
+                            return Math.max(playtime, max);
+                        }, 0);
+                    }
+                },
+                {
+                    name: 'Average rating',
+                    value: function(games) {
+                        var gamesWithRating = $filter('filter')(games, function(game) {
+                            return game.hasRating();
+                        });
+
+                        if(!gamesWithRating.length)
+                            return 0;
+
+                        return gamesWithRating.reduce(function(sum, game) {
+                            return sum + game.rating;
+                        }, 0) / gamesWithRating.length;
+                    }
+                }
+            ],
+            orderOptions: [
+                {
+                    name: 'Category',
+                    value: function(stats) {
+                        return $filter('orderBy')(stats, 'label');
+                    }
+                },
+                {
+                    name: 'Value',
+                    value: function(stats) {
+                        return $filter('orderBy')(stats, 'value');
+                    }
+                }
+            ]
+        };
+
+        self.chart.xAxis = self.chart.xOptions[0].value;
+        self.chart.yAxis = self.chart.yOptions[0].value;
+        self.chart.orderBy = self.chart.orderOptions[0].value;
     };
 
     self.init = function() {
@@ -355,7 +564,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             statistics: $cookies.statistics == 1
         };
 
-        self.sorting = self.sortOptions[0].value;
+        self.resetFilter();
         self.offset = 0;
         self.itemsPerPage = 18;
         self.currentPage = 1;
@@ -377,11 +586,17 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         // user id specified, load data and linked game
         self.userId = $routeParams.userId;
 
-        var findGameFn = function() {
-            angular.forEach(gameService.games, function(game) {
-                if(game.id == $routeParams.gameId)
-                    self.gameSelected(game);
-            });
+        var dataLoaded = function() {
+            // select game if specified
+            if($routeParams.gameId) {
+                angular.forEach(gameService.games, function(game) {
+                    if(game.id == $routeParams.gameId)
+                        self.gameSelected(game);
+                });
+            }
+
+            self.initChart();
+            self.updateChart();
         };
 
         if(!gameService.initialized) {
@@ -390,11 +605,10 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
 
             // data not fetched yet, refresh all
             var promise = gameService.refreshAll(self.userId);
-            if($routeParams.gameId)
-                promise.then(findGameFn);
+            promise.then(dataLoaded);
         }
         else {
-            findGameFn();
+            dataLoaded();
         }
 
         // for programmatic page changes to work, instead of ng-change

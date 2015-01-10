@@ -146,4 +146,51 @@
     <div class="col-md-3">
         <stats-panel panel-title="Tags" key="count" value="name" items="ctrl.gameService.tags" order-by="[ctrl.countTag, '-name']" descending="true" on-click="ctrl.query = {tag: item.id}"></stats-panel>
     </div>
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h1 class="panel-title overflow-ellipsis">
+                    <span class="glyphicon glyphicon-stats"></span>
+                    Chart
+                </h1>
+            </div>
+            <div class="panel-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <canvas id="stats-chart"></canvas>
+                        </div>
+                        <div class="col-md-4">
+                            <form class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">X axis</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="ctrl.chart.xAxis" ng-change="ctrl.updateChart()" ng-options="x.value as x.name for x in ctrl.chart.xOptions">
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Y axis</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="ctrl.chart.yAxis" ng-change="ctrl.updateChart()" ng-options="y.value as y.name for y in ctrl.chart.yOptions">
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Order by</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="ctrl.chart.orderBy" ng-change="ctrl.updateChart()" ng-options="o.value as o.name for o in ctrl.chart.orderOptions">
+
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -55,6 +55,52 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
         });
     };
 
+    self.getFinishedGames = function() {
+        return $filter('filter')(self.games, function(game) {
+            return game.finished == 1;
+        });
+    };
+    self.getUnfinishedGames = function() {
+        return $filter('filter')(self.games, function(game) {
+            return game.finished != 1;
+        });
+    };
+    self.getYears = function() {
+        var years = [];
+        angular.forEach(self.games, function(game) {
+            if(game.year && years.indexOf(game.year) < 0)
+                years.push(game.year);
+        });
+
+        return years;
+    };
+    self.countFinished = function() {
+        return self.games.reduce(function(count, game) {
+            return game.finished == 1 ? count + 1 : count;
+        }, 0);
+    };
+    self.countFinishedPct = function() {
+        return Math.round(self.countFinished()/self.games.length*100);
+    };
+    self.countGenre = function(genre) {
+        genre.count = self.games.reduce(function(count, game) {
+            return game.genre_ids.indexOf(genre.id) > -1 ? count + 1 : count;
+        }, 0);
+        return genre.count;
+    };
+    self.countPlatform = function(platform) {
+        platform.count = self.games.reduce(function(count, game) {
+            return game.platform_ids.indexOf(platform.id) > -1 ? count + 1 : count;
+        }, 0);
+        return platform.count;
+    };
+    self.countTag = function(tag) {
+        tag.count = self.games.reduce(function(count, game) {
+            return game.tag_ids.indexOf(tag.id) > -1 ? count + 1 : count;
+        }, 0);
+        return tag.count;
+    };
+
     self.authenticated = false;
     self.authenticatedUser = null;
     self.resetAll();
