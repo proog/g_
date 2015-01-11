@@ -14,22 +14,22 @@
                 <div ng-class="{'col-md-4': ctrl.view == ctrl.GRID_VIEW, 'col-md-12': ctrl.view == ctrl.LIST_VIEW}">
                     <form class="form-horizontal">
                         <div class="form-group">
-                            <label class="col-sm-4 control-label">X axis</label>
-                            <div class="col-sm-8">
+                            <label class="col-sm-6 control-label">Category (X)</label>
+                            <div class="col-sm-6">
                                 <select class="form-control" ng-model="ctrl.chart.xAxis" ng-change="ctrl.updateChart()" ng-options="x.value as x.name for x in ctrl.chart.xOptions">
                                 </select>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-sm-4 control-label">Y axis</label>
-                            <div class="col-sm-8">
+                            <label class="col-sm-6 control-label">Value (Y)</label>
+                            <div class="col-sm-6">
                                 <select class="form-control" ng-model="ctrl.chart.yAxis" ng-change="ctrl.updateChart()" ng-options="y.value as y.name for y in ctrl.chart.yOptions">
                                 </select>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-sm-4 control-label">Order by</label>
-                            <div class="col-sm-8">
+                            <label class="col-sm-6 control-label">Order by</label>
+                            <div class="col-sm-6">
                                 <select class="form-control" ng-model="ctrl.chart.orderBy" ng-change="ctrl.updateChart()" ng-options="o.value as o.name for o in ctrl.chart.orderOptions">
                                 </select>
                             </div>
