@@ -1,4 +1,5 @@
 angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$route', '$http', '$q', '$location', 'upload', '$modal', '$filter', 'Games', 'Genres', 'Platforms', 'Tags', 'Users', 'gameService', '$cookies', 'searchFilter', '$timeout', function($scope, $routeParams, $route, $http, $q, $location, upload, $modal, $filter, Games, Genres, Platforms, Tags, Users, gameService, $cookies, searchFilter, $timeout) {
+    "use strict";
     var self = this;
 
     self.countFinished = function() {
@@ -48,7 +49,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         else if(isNew) {
             // add game
             game = new Games(model);
-            game.$save({userId: self.userId}, function(data) {
+            game.$save({userId: self.userId}, function() {
                 gameService.games.push(game);
                 if(image && image[0].files.length > 0)
                     game.uploadImage(self.userId, image);
@@ -110,7 +111,6 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                 else if(item.updated && item.id) {
                     // update request
                     requests.push(item.$update({userId: self.userId}, function(data) {
-                        var pos = -1;
                         for(var i = 0; i < items.length; i++) {
                             var originalItem = items[i];
                             if(originalItem.id == item.id) {
@@ -188,7 +188,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             controller: 'loginFormCtrl',
             size: 'sm',
             resolve: {
-                loginUrl: function() { return 'api/login' }
+                loginUrl: function() { return 'api/login'; }
             }
         });
         modalInstance.result.then(function(result) {
