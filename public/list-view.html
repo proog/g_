@@ -1,5 +1,5 @@
 <div class="row full-height">
-    <div class="col-sm-5 list-column full-height" id="game-list">
+    <div class="col-sm-4 list-column full-height" id="game-list">
         <div ng-show="ctrl.filtered.length == 0 && queue.length == 0 && currentlyPlaying.length == 0">
             <h3 class="text-center">No results</h3>
         </div>
@@ -72,6 +72,21 @@
                 </a>
             </div>
         </div>
+    </div>
+    <div class="col-sm-8 detail-column full-height">
+        <game game="ctrl.selectedGame"
+              genres="ctrl.gameService.genres"
+              platforms="ctrl.gameService.platforms"
+              tags="ctrl.gameService.tags"
+              link-callback="ctrl.openLinkDialog(ctrl.selectedGame)"
+              edit-callback="ctrl.editClick(ctrl.selectedGame)"
+              show-edit="ctrl.gameService.authenticated && ctrl.selectedGame.user_id == ctrl.gameService.authenticatedUser.id"
+              height="100%"
+              ng-if="ctrl.selectedGame">
+        </game>
+        <div ng-if="!ctrl.selectedGame">
+            <h3 class="text-center">Select a game</h3>
+        </div>
         <h1 class="text-center hand" ng-click="ctrl.collapseSection('statistics')">
             <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.statistics ? 'right' : 'down'}}"></span>
             Statistics
@@ -94,21 +109,6 @@
                 </div>
             </div>
             <ng-include src="'chart.html'"></ng-include>
-        </div>
-    </div>
-    <div class="col-sm-7 detail-column full-height">
-        <game game="ctrl.selectedGame"
-              genres="ctrl.gameService.genres"
-              platforms="ctrl.gameService.platforms"
-              tags="ctrl.gameService.tags"
-              link-callback="ctrl.openLinkDialog(ctrl.selectedGame)"
-              edit-callback="ctrl.editClick(ctrl.selectedGame)"
-              show-edit="ctrl.gameService.authenticated && ctrl.selectedGame.user_id == ctrl.gameService.authenticatedUser.id"
-              height="100%"
-              ng-if="ctrl.selectedGame">
-        </game>
-        <div ng-if="!ctrl.selectedGame">
-            <h3 class="text-center">Select a game</h3>
         </div>
     </div>
 </div>
