@@ -318,6 +318,11 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         }
     };
 
+    self.changeTheme = function() {
+        $scope.changeStyle();
+        self.updateChart();
+    };
+
     self.updateChart = function() {
         var stats = self.chart.orderBy(self.chart.xAxis(self.chart.yAxis));
         var labels = [];
@@ -331,12 +336,12 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             labels: labels,
             datasets: [
                 {
-                    fillColor: "rgba(151,187,205,0.2)",
-                    strokeColor: "rgba(151,187,205,1)",
-                    pointColor: "rgba(151,187,205,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(151,187,205,1)",
+                    fillColor: 'rgba(151,187,205,0.2)',
+                    strokeColor: 'rgba(151,187,205,1)',
+                    pointColor: 'rgba(151,187,205,1)',
+                    pointStrokeColor: '#fff',
+                    pointHighlightFill: '#fff',
+                    pointHighlightStroke: 'rgba(151,187,205,1)',
                     data: values
                 }
             ]
@@ -347,7 +352,8 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             animation: false,
             responsive: true,
             scaleBeginsAtZero: true,
-            pointHitDetectionRadius: 5
+            pointHitDetectionRadius: 5,
+            scaleFontColor: $scope.globalOptions.darkStyle ? '#fff' : '#333'
         };
 
         if(self.chart.instance)

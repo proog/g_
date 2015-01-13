@@ -59,6 +59,12 @@
                                 Grid view
                             </a>
                         </li>
+                        <li>
+                            <a class="hand" ng-click="ctrl.changeTheme()">
+                                <span class="glyphicon glyphicon-eye-open"></span>
+                                {{globalOptions.darkStyle ? 'Light theme' : 'Dark theme'}}
+                            </a>
+                        </li>
                         <li class="divider"></li>
                         <li ng-repeat="user in ctrl.gameService.users | orderBy:'username'">
                             <a class="hand" ng-click="ctrl.changeUser(user)">
