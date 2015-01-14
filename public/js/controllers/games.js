@@ -44,6 +44,9 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                 var pos = gameService.games.indexOf(game);
                 if(pos > -1)
                     gameService.games.splice(pos, 1);
+
+                // reflect deletion in the chart
+                self.updateChart();
             });
         }
         else if(isNew) {
@@ -53,6 +56,9 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                 gameService.games.push(game);
                 if(image && image[0].files.length > 0)
                     game.uploadImage(self.userId, image);
+
+                // reflect the new game in the chart
+                self.updateChart();
             });
         }
         else {
@@ -62,6 +68,9 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                 angular.copy(data, game);
                 if(image && image[0].files.length > 0)
                     game.uploadImage(self.userId, image);
+
+                // reflect any updates in the chart
+                self.updateChart();
             });
         }
     };
@@ -147,6 +156,9 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                             game[ids].splice(i, 1);
                     }
                 });
+
+                // reflect any updates in the chart
+                self.updateChart();
             });
         });
     };
@@ -252,10 +264,6 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
     self.changeUser = function(user) {
         gameService.resetAll();
         $location.path('/' + user.id);
-    };
-
-    self.hasPlaytime = function(game) {
-        return game.hasPlaytime();
     };
 
     self.canShowAuthenticatedMenuItems = function() {
@@ -459,12 +467,14 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             yOptions: [
                 {
                     name: 'Games',
+                    group: 'Quantity',
                     value: function(games) {
                         return games.length;
                     }
                 },
                 {
                     name: 'Completed games',
+                    group: 'Quantity',
                     value: function(games) {
                         return games.reduce(function(count, game) {
                             return game.finished == 1 ? count + 1 : count;
@@ -473,6 +483,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                 },
                 {
                     name: 'Average playtime',
+                    group: 'Playtime',
                     value: function(games) {
                         var playtimes = getPlaytimes(games);
 
@@ -486,6 +497,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                 },
                 {
                     name: 'Median playtime',
+                    group: 'Playtime',
                     value: function(games) {
                         var playtimes = getPlaytimes(games);
 
@@ -499,6 +511,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                 },
                 {
                     name: 'Maximum playtime',
+                    group: 'Playtime',
                     value: function(games) {
                         return getPlaytimes(games).reduce(function(max, playtime) {
                             return Math.max(playtime, max);
@@ -507,6 +520,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                 },
                 {
                     name: 'Average rating',
+                    group: 'Rating',
                     value: function(games) {
                         var ratings = getRatings(games);
 
@@ -520,6 +534,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                 },
                 {
                     name: 'Maximum rating',
+                    group: 'Rating',
                     value: function(games) {
                         return getRatings(games).reduce(function(max, rating) {
                             return Math.max(rating, max);

@@ -23,7 +23,7 @@
                         <div class="form-group">
                             <label class="col-sm-6 control-label">Value (Y)</label>
                             <div class="col-sm-6">
-                                <select class="form-control" ng-model="ctrl.chart.yAxis" ng-change="ctrl.updateChart()" ng-options="y.value as y.name for y in ctrl.chart.yOptions">
+                                <select class="form-control" ng-model="ctrl.chart.yAxis" ng-change="ctrl.updateChart()" ng-options="y.value as y.name group by y.group for y in ctrl.chart.yOptions">
                                 </select>
                             </div>
                         </div>

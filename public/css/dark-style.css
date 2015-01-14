@@ -55,6 +55,9 @@ a.list-group-item:not(.list-group-item-success) {
     color: #fff;
     background-color: #555;
 }
+.dropdown-menu .divider {
+    background-color: #555;
+}
 .modal-content {
     background-color: #333;
 }
