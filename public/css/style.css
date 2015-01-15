@@ -1,6 +1,9 @@
 body {
     padding-top: 50px;
 }
+.filter-panel-column {
+    padding-bottom: 10px;
+}
 .game-pagination {
     margin: 10px 0px;
 }

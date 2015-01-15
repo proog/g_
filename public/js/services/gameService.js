@@ -101,6 +101,14 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
         return tag.count;
     };
 
+    self.FILTER_TITLE = 1;
+    self.FILTER_PLATFORM = 2;
+    self.FILTER_GENRE = 3;
+    self.FILTER_TAG = 4;
+    self.FILTER_YEAR = 5;
+    self.FILTER_RATING = 6;
+    self.FILTER_COMPLETION = 7;
+
     self.authenticated = false;
     self.authenticatedUser = null;
     self.resetAll();

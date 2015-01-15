@@ -96,7 +96,10 @@
             </ul>
             <form class="navbar-form navbar-right">
                 <div class="form-group">
-                    <input type="search" class="form-control" placeholder="Search title" ng-model="ctrl.query.title" ng-model-options="{debounce: 500}">
+                    <input type="search" class="form-control" placeholder="Search" ng-model="ctrl.query.search" ng-model-options="{debounce: 500}">
+                </div>
+                <div class="form-group">
+                    <select class="form-control" ng-model="ctrl.sorting" ng-options="s.value as s.name for s in ctrl.sortOptions"></select>
                 </div>
                 <button type="button" class="btn btn-default" ng-click="ctrl.toggleFilterPanel()">
                     <span class="glyphicon" ng-class="{'glyphicon-chevron-down': !ctrl.showFilters, 'glyphicon-chevron-up': ctrl.showFilters}"></span>
@@ -110,49 +113,7 @@
                 </button>
             </form>
         </div><!--/.nav-collapse -->
-        <div class="text-center" collapse="!ctrl.showFilters">
-            <form class="navbar-form">
-                <div class="form-group">
-                    <input type="search" class="form-control" placeholder="Title" ng-model="ctrl.query.title" ng-model-options="{debounce: 500}">
-                </div>
-                <div class="form-group">
-                    <select class="form-control" ng-model="ctrl.query.platform" ng-options="p.id as p.name for p in ctrl.gameService.platforms | orderBy:'name'">
-                        <option value="">Any platform</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <select class="form-control" ng-model="ctrl.query.genre" ng-options="g.id as g.name for g in ctrl.gameService.genres | orderBy:'name'">
-                        <option value="">Any genre</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <select class="form-control" ng-model="ctrl.query.tag" ng-options="t.id as t.name for t in ctrl.gameService.tags | orderBy:'name'">
-                        <option value="">Any tag</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <select class="form-control" ng-model="ctrl.query.year" ng-options="y for y in ctrl.gameService.getYears() | orderBy:'-valueOf()'">
-                        <option value="">Any year</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <select class="form-control" ng-model="ctrl.query.finished" ng-options="f.value as f.name for f in ctrl.finishedOptions">
-                        <option value="">Any completion</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <select class="form-control" ng-model="ctrl.query.rating" ng-options="r for r in [1,2,3,4,5]">
-                        <option value="">Any rating</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <select class="form-control" ng-model="ctrl.sorting" ng-options="s.value as s.name for s in ctrl.sortOptions"></select>
-                </div>
-                <button type="button" class="btn btn-default" ng-click="ctrl.resetFilter()">
-                    <span class="glyphicon glyphicon-remove"></span>
-                </button>
-            </form>
-        </div>
+        <div collapse="!ctrl.showFilters" ng-include="'filter.html'"></div>
     </div>
 </nav>
 <div class="container-fluid full-height">

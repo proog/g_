@@ -270,8 +270,36 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         return gameService.authenticated && gameService.authenticatedUser.id == self.userId && gameService.initialized;
     };
 
+    self.initFilter = function() {
+        self.filterOptions = [
+            { name: 'Platform is', value: gameService.FILTER_PLATFORM },
+            { name: 'Genre is', value: gameService.FILTER_GENRE },
+            { name: 'Tag is', value: gameService.FILTER_TAG },
+            { name: 'Year is', value: gameService.FILTER_YEAR },
+            { name: 'Completion is', value: gameService.FILTER_COMPLETION },
+            { name: 'Rating is', value: gameService.FILTER_RATING }
+        ];
+    };
+
+    self.addQueryParameter = function() {
+        self.query.parameters.push({
+            type: null,
+            value: null,
+            negate: false
+        });
+    };
+
+    self.removeQueryParameter = function(parameter) {
+        var pos = self.query.parameters.indexOf(parameter);
+        if(pos > -1)
+            self.query.parameters.splice(pos, 1);
+    };
+
     self.resetFilter = function() {
-        self.query = null;
+        if(!self.query)
+            self.query = {};
+
+        self.query.parameters = [];
         self.sorting = self.sortOptions[0].value;
     };
 
@@ -280,14 +308,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
     };
 
     self.isFilterOn = function() {
-        var defaultSorting = self.sorting == self.sortOptions[0].value;
-        var defaultFilters = true;
-        angular.forEach(self.query, function(property) {
-            if(property !== null && property !== '')
-                defaultFilters = false;
-        });
-
-        return !defaultFilters || !defaultSorting;
+        return self.query && self.query.parameters && self.query.parameters.length;
     };
 
     self.scrollToGame = function(game) {
@@ -618,6 +639,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         self.LIST_VIEW = 2;
         self.view = $cookies.view ? $cookies.view : self.LIST_VIEW;
         self.gameService = gameService;
+        self.initFilter();
         self.resetFilter();
         self.initChart();
 
