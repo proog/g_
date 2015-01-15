@@ -271,8 +271,23 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
     };
 
     self.resetFilter = function() {
-        self.query = {};
+        self.query = null;
         self.sorting = self.sortOptions[0].value;
+    };
+
+    self.toggleFilterPanel = function() {
+        self.showFilters = !self.showFilters;
+    };
+
+    self.isFilterOn = function() {
+        var defaultSorting = self.sorting == self.sortOptions[0].value;
+        var defaultFilters = true;
+        angular.forEach(self.query, function(property) {
+            if(property !== null && property !== '')
+                defaultFilters = false;
+        });
+
+        return !defaultFilters || !defaultSorting;
     };
 
     self.scrollToGame = function(game) {
@@ -597,6 +612,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         self.offset = 0;
         self.itemsPerPage = 18;
         self.currentPage = 1;
+        self.showFilters = false;
         self.selectedGame = null;
         self.GRID_VIEW = 1;
         self.LIST_VIEW = 2;

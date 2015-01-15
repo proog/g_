@@ -81,8 +81,37 @@
                         </li>
                     </ul>
                 </li>
+                <li ng-if="ctrl.canShowAuthenticatedMenuItems()">
+                    <a class="hand" ng-click="ctrl.addClick()">
+                        <span class="glyphicon glyphicon-plus"></span>
+                        Add game
+                    </a>
+                </li>
+                <li ng-if="ctrl.canShowAuthenticatedMenuItems()">
+                    <a class="hand" ng-click="ctrl.manageQueueClick()">
+                        <span class="glyphicon glyphicon-sort"></span>
+                        Manage queue
+                    </a>
+                </li>
             </ul>
-            <form class="navbar-form navbar-left">
+            <form class="navbar-form navbar-right">
+                <div class="form-group">
+                    <input type="search" class="form-control" placeholder="Search title" ng-model="ctrl.query.title" ng-model-options="{debounce: 500}">
+                </div>
+                <button type="button" class="btn btn-default" ng-click="ctrl.toggleFilterPanel()">
+                    <span class="glyphicon" ng-class="{'glyphicon-chevron-down': !ctrl.showFilters, 'glyphicon-chevron-up': ctrl.showFilters}"></span>
+                    Filters: {{ctrl.isFilterOn() ? 'on' : 'off'}}
+                </button>
+                <button ng-if="!ctrl.gameService.authenticated" type="button" class="btn btn-default" ng-click="ctrl.loginClick()">
+                    <span class="glyphicon glyphicon-log-in"></span>
+                </button>
+                <button ng-if="ctrl.gameService.authenticated" type="button" class="btn btn-default" ng-click="ctrl.logoutClick()">
+                    <span class="glyphicon glyphicon-log-out"></span>
+                </button>
+            </form>
+        </div><!--/.nav-collapse -->
+        <div class="text-center" collapse="!ctrl.showFilters">
+            <form class="navbar-form">
                 <div class="form-group">
                     <input type="search" class="form-control" placeholder="Title" ng-model="ctrl.query.title" ng-model-options="{debounce: 500}">
                 </div>
@@ -102,22 +131,28 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <select class="form-control" ng-model="ctrl.query.year" ng-options="y for y in ctrl.gameService.getYears() | orderBy:'-valueOf()'">
+                        <option value="">Any year</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <select class="form-control" ng-model="ctrl.query.finished" ng-options="f.value as f.name for f in ctrl.finishedOptions">
                         <option value="">Any completion</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select class="form-control" ng-model="ctrl.query.rating" ng-options="r for r in [1,2,3,4,5]">
+                        <option value="">Any rating</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <select class="form-control" ng-model="ctrl.sorting" ng-options="s.value as s.name for s in ctrl.sortOptions"></select>
                 </div>
                 <button type="button" class="btn btn-default" ng-click="ctrl.resetFilter()">
-                    <span class="glyphicon glyphicon-refresh"></span>
+                    <span class="glyphicon glyphicon-remove"></span>
                 </button>
             </form>
-            <form class="navbar-form navbar-right">
-                <button ng-if="!ctrl.gameService.authenticated" type="button" class="btn btn-default" ng-click="ctrl.loginClick()"><span class="glyphicon glyphicon-log-in"></span></button>
-                <button ng-if="ctrl.gameService.authenticated" type="button" class="btn btn-default" ng-click="ctrl.logoutClick()"><span class="glyphicon glyphicon-log-out"></span></button>
-            </form>
-        </div><!--/.nav-collapse -->
+        </div>
     </div>
 </nav>
 <div class="container-fluid full-height">
