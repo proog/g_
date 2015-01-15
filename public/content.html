@@ -100,7 +100,7 @@
                 </div>
                 <button type="button" class="btn btn-default" ng-click="ctrl.toggleFilterPanel()">
                     <span class="glyphicon" ng-class="{'glyphicon-chevron-down': !ctrl.showFilters, 'glyphicon-chevron-up': ctrl.showFilters}"></span>
-                    Filters: {{ctrl.isFilterOn() ? 'on' : 'off'}}
+                    Filter: {{ctrl.isFilterOn() ? 'on' : 'off'}}
                 </button>
                 <button ng-if="!ctrl.gameService.authenticated" type="button" class="btn btn-default" ng-click="ctrl.loginClick()">
                     <span class="glyphicon glyphicon-log-in"></span>
