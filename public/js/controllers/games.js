@@ -271,13 +271,22 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
     };
 
     self.initFilter = function() {
+        var yearGroup = 'Year';
+        var ratingGroup = 'Rating';
+        var miscGroup = 'Miscellanous';
+
         self.filterOptions = [
-            { name: 'Platform is', value: gameService.FILTER_PLATFORM },
-            { name: 'Genre is', value: gameService.FILTER_GENRE },
-            { name: 'Tag is', value: gameService.FILTER_TAG },
-            { name: 'Year is', value: gameService.FILTER_YEAR },
-            { name: 'Completion is', value: gameService.FILTER_COMPLETION },
-            { name: 'Rating is', value: gameService.FILTER_RATING }
+            { name: 'Title contains', value: gameService.FILTER_TITLE, group: miscGroup },
+            { name: 'Completion is', value: gameService.FILTER_COMPLETION, group: miscGroup },
+            { name: 'Platform is', value: gameService.FILTER_PLATFORM, group: miscGroup },
+            { name: 'Genre is', value: gameService.FILTER_GENRE, group: miscGroup },
+            { name: 'Tag is', value: gameService.FILTER_TAG, group: miscGroup },
+            { name: 'Year is exactly', value: gameService.FILTER_YEAR, group: yearGroup },
+            { name: 'Year is at least', value: gameService.FILTER_YEAR_MIN, group: yearGroup },
+            { name: 'Year is at most', value: gameService.FILTER_YEAR_MAX, group: yearGroup },
+            { name: 'Rating is exactly', value: gameService.FILTER_RATING, group: ratingGroup },
+            { name: 'Rating is at least', value: gameService.FILTER_RATING_MIN, group: ratingGroup },
+            { name: 'Rating is at most', value: gameService.FILTER_RATING_MAX, group: ratingGroup }
         ];
     };
 

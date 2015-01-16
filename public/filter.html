@@ -3,13 +3,13 @@
         <div class="col-md-4 filter-panel-column" ng-repeat="parameter in ctrl.query.parameters">
             <div class="form-inline">
                 <div class="form-group">
-                    <select class="form-control" ng-model="parameter.type" ng-options="fo.value as fo.name for fo in ctrl.filterOptions | orderBy:'name'">
+                    <select class="form-control" ng-model="parameter.type" ng-options="fo.value as fo.name group by fo.group for fo in ctrl.filterOptions">
                         <option value="">Select type</option>
                     </select>
                 </div>
                 <div class="checkbox" ng-if="parameter.type">
                     <label>
-                        <input type="checkbox" ng-model="parameter.negate"> not
+                        <input type="checkbox" ng-model="parameter.negate" ng-disabled="!parameter.value"> not
                     </label>
                 </div>
                 <div class="form-group" ng-if="parameter.type == ctrl.gameService.FILTER_PLATFORM">
@@ -33,7 +33,7 @@
                         <option value="">Any tag</option>
                     </select>
                 </div>
-                <div class="form-group" ng-if="parameter.type == ctrl.gameService.FILTER_YEAR">
+                <div class="form-group" ng-if="parameter.type == ctrl.gameService.FILTER_YEAR || parameter.type == ctrl.gameService.FILTER_YEAR_MIN || parameter.type == ctrl.gameService.FILTER_YEAR_MAX">
                     <select class="form-control"
                             ng-model="parameter.value"
                             ng-options="y for y in ctrl.gameService.getYears() | orderBy:'-valueOf()'">
@@ -47,12 +47,16 @@
                         <option value="">Any completion</option>
                     </select>
                 </div>
-                <div class="form-group" ng-if="parameter.type == ctrl.gameService.FILTER_RATING">
+                <div class="form-group" ng-if="parameter.type == ctrl.gameService.FILTER_RATING || parameter.type == ctrl.gameService.FILTER_RATING_MIN || parameter.type == ctrl.gameService.FILTER_RATING_MAX">
                     <select class="form-control"
                             ng-model="parameter.value"
                             ng-options="r for r in [1,2,3,4,5]">
                         <option value="">Any rating</option>
                     </select>
+                </div>
+
+                <div class="form-group" ng-if="parameter.type == ctrl.gameService.FILTER_TITLE">
+                    <input type="text" class="form-control" placeholder="Any title" ng-model="parameter.value" ng-model-options="{debounce: 500}">
                 </div>
                 <button class="btn btn-default" ng-click="ctrl.removeQueryParameter(parameter)">
                     <span class="glyphicon glyphicon-remove"></span>
@@ -62,6 +66,7 @@
         <div class="col-md-4 filter-panel-column form-inline">
             <button class="btn btn-default" ng-click="ctrl.addQueryParameter()">
                 <span class="glyphicon glyphicon-plus"></span>
+                Add filter
             </button>
             <button type="button" class="btn btn-default" ng-click="ctrl.resetFilter()" ng-if="ctrl.isFilterOn()">
                 <span class="glyphicon glyphicon-remove"></span>

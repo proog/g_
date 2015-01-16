@@ -108,6 +108,11 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
     self.FILTER_YEAR = 5;
     self.FILTER_RATING = 6;
     self.FILTER_COMPLETION = 7;
+    self.FILTER_TITLE = 8;
+    self.FILTER_YEAR_MIN = 9;
+    self.FILTER_YEAR_MAX = 10;
+    self.FILTER_RATING_MIN = 11;
+    self.FILTER_RATING_MAX = 12;
 
     self.authenticated = false;
     self.authenticatedUser = null;

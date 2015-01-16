@@ -32,13 +32,28 @@ angular.module('games').filter('search', ['gameService', function(gameService) {
                 else if(param.type == gameService.FILTER_TAG && game.tag_ids.indexOf(param.value) < 0) {
                     matches = false;
                 }
-                else if(param.type == gameService.FILTER_YEAR && game.year != param.value) {
+                else if(param.type == gameService.FILTER_YEAR && (game.year == null || game.year != param.value)) {
+                    matches = false;
+                }
+                else if(param.type == gameService.FILTER_YEAR_MIN && (game.year == null || game.year < param.value)) {
+                    matches = false;
+                }
+                else if(param.type == gameService.FILTER_YEAR_MAX && (game.year == null || game.year > param.value)) {
                     matches = false;
                 }
                 else if(param.type == gameService.FILTER_COMPLETION && game.finished != param.value) {
                     matches = false;
                 }
-                else if(param.type == gameService.FILTER_RATING && game.rating == param.rating) {
+                else if(param.type == gameService.FILTER_RATING && (game.rating == null || game.rating != param.value)) {
+                    matches = false;
+                }
+                else if(param.type == gameService.FILTER_RATING_MIN && (game.rating == null || game.rating < param.value)) {
+                    matches = false;
+                }
+                else if(param.type == gameService.FILTER_RATING_MAX && (game.rating == null || game.rating > param.value)) {
+                    matches = false;
+                }
+                else if(param.type == gameService.FILTER_TITLE && game.title.toLowerCase().indexOf(param.value) < 0) {
                     matches = false;
                 }
 
