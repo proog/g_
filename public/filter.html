@@ -9,7 +9,7 @@
                 </div>
                 <div class="checkbox" ng-if="parameter.type">
                     <label>
-                        <input type="checkbox" ng-model="parameter.negate" ng-disabled="!parameter.value"> not
+                        <input type="checkbox" ng-model="parameter.negate" ng-disabled="parameter.value == null"> not
                     </label>
                 </div>
                 <div class="form-group" ng-if="parameter.type == ctrl.gameService.FILTER_PLATFORM">
