@@ -52,7 +52,7 @@ function doSetup() {
         $config = new Config();
         $config->default_user = $user->id;
         $config->save();
-    } catch(PDOException $e) {
+    } catch(Exception $e) {
         $app->flashNow('db', 'Could not create tables for g_. The most likely reason for this is an incorrect database login or insufficient permissions for the database user.');
         showSetup();
         return;
