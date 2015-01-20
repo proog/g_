@@ -38,6 +38,8 @@ $app->get('/config', 'getConfig');
 $app->post('/login', 'logIn');
 $app->post('/logout', 'logOut');
 $app->get('/login', 'checkLogin');
+$app->get('/setup', 'showSetup');
+$app->post('/setup', 'doSetup');
 
 // restricted api
 $app->post('/users/:userId/games', 'authenticate', 'addGame');

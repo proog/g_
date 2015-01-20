@@ -13,5 +13,6 @@ require '../api/modules/error.php';
 require '../api/modules/games.php';
 require '../api/modules/genres.php';
 require '../api/modules/platforms.php';
+require '../api/modules/setup.php';
 require '../api/modules/tags.php';
 require '../api/modules/users.php';
