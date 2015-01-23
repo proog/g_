@@ -22,3 +22,10 @@ function deleteDirectoryRecursively($dir) {
     }
     return false;
 }
+
+function isConfigured() {
+    if(file_exists('../config/db.json')) {
+        return true;
+    }
+    return false;
+}

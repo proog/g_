@@ -1,22 +1,24 @@
 <?php
+use Illuminate\Database\Capsule\Manager as Capsule;
 require '../config/require.php';
 
 session_cache_limiter(false);
 session_start();
 
-// load db settings
-$settings = decodeJsonOrFail(file_get_contents('../config/db.json'));
-
-// set up eloquent
-use Illuminate\Database\Capsule\Manager as Capsule;
-$capsule = new Capsule();
-$capsule->addConnection($settings);
-$capsule->setAsGlobal();
-$capsule->bootEloquent();
-
 // set up slim
 $app = new Slim\Slim(['debug' => false]);
 $app->response->headers->set('Content-Type', 'application/json');
+
+if(isConfigured()) {
+    // load db settings
+    $settings = decodeJsonOrFail(file_get_contents('../config/db.json'));
+
+    // set up eloquent
+    $capsule = new Capsule();
+    $capsule->addConnection($settings);
+    $capsule->setAsGlobal();
+    $capsule->bootEloquent();
+}
 
 // public api
 $app->get('/users/:userId/games', 'listGames');

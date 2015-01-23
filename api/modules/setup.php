@@ -1,67 +1,115 @@
 <?php
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 // check if g_ has already been set up, redirect if it has
 function checkAlreadyConfigured() {
-    $app = Slim\Slim::getInstance();
-    if(\Illuminate\Database\Capsule\Manager::schema()->hasTable('users')) {
-        $app->redirect('../');
+    $app = \Slim\Slim::getInstance();
+    if(isConfigured()) {
+        renderSetup(true);
     }
+}
+
+function renderSetup($success = false) {
+    $app = \Slim\Slim::getInstance();
+    $app->response->headers->set('Content-Type', 'text/html');
+    $app->render('setup.php', ['post' => $app->request->post(), 'success' => $success]);
+    $app->stop();
 }
 
 function showSetup() {
     checkAlreadyConfigured();
-
-    $app = Slim\Slim::getInstance();
-    $app->response->headers->set('Content-Type', 'text/html');
-    $app->render('setup.php');
+    renderSetup();
 }
 
 function doSetup() {
     checkAlreadyConfigured();
 
-    $app = Slim\Slim::getInstance();
+    $app = \Slim\Slim::getInstance();
     $post = $app->request->post();
     $username = $post['username'];
     $password = $post['password'];
+    $dbname = $post['dbname'];
+    $dbuser = $post['dbuser'];
+    $dbpass = $post['dbpass'];
+    $dbprefix = $post['dbprefix'] ?: 'g_';
+    $dbhost = $post['dbhost'] ?: 'localhost';
+    $dbport = $post['dbport'] ?: '3306';
+
+    if(!$dbname || !$dbuser || !$dbpass) {
+        $app->flashNow('db', 'You must specify a database name, user, and password.');
+        renderSetup();
+    }
 
     if(!$username || !$password) {
         $app->flashNow('user', 'Username or password invalid. Please enter a valid username and password.');
-        showSetup();
-        return;
+        renderSetup();
     }
 
     if($password === '1234') {
         $app->flashNow('user', 'I said <em>NOT 1234</em>.');
-        showSetup();
-        return;
+        renderSetup();
     }
 
+    $settings = [
+        'host' => $dbhost,
+        'port' => $dbport,
+        'database' => $dbname,
+        'username' => $dbuser,
+        'password' => $dbpass,
+        'prefix' => $dbprefix,
+        'driver' => 'mysql',
+        'collation' => 'utf8_general_ci',
+        'charset' => 'utf8'
+    ];
+
+    // test db connection
+    try {
+        $capsule = new Capsule();
+        $capsule->addConnection($settings);
+        $capsule->setAsGlobal();
+        $capsule->connection();
+        $capsule->bootEloquent();
+    } catch(Exception $e) {
+        $app->flashNow('db', 'Could not connect to the database. Suggestion: Make sure the database name, username and password is correct.');
+        renderSetup();
+    }
+
+    // create tables
     try {
         createTables();
     } catch(Exception $e) {
-        $app->flashNow('db', 'Could not create tables for g_. The most likely reason for this is an incorrect database login or insufficient permissions for the database user.');
-        $app = Slim\Slim::getInstance();
-        $app->response->headers->set('Content-Type', 'text/html');
-        $app->render('setup.php');
-        return;
+        $app->flashNow('db', 'Could not create tables for g_. Suggestion: Make sure the database user has permissions to create tables.');
+        renderSetup();
     }
 
     // create default user
-    $user = new User();
-    $user->username = $username;
-    $user->password = hash('sha256', $password);
-    $user->save();
+    try {
+        $user = new User();
+        $user->username = $username;
+        $user->password = hash('sha256', $password);
+        $user->save();
 
-    $config = new Config();
-    $config->default_user = $user->id;
-    $config->save();
+        $config = new Config();
+        $config->default_user = $user->id;
+        $config->save();
+    } catch(Exception $e) {
+        $app->flashNow('db', 'Could not create the default user. Suggestion: Make sure the database user has permissions to create records.');
+        renderSetup();
+    }
 
-    $app->redirect('../');
+    // write config file
+    $saved = file_put_contents('../config/db.json', json_encode($settings));
+    if(!$saved) {
+        $app->flashNow('db', 'Could not create configuration file. Suggestion: Make sure that PHP has permissions to write to the file system.');
+        renderSetup();
+    }
+
+    // successfully set up
+    renderSetup(true);
 }
 
-function createTables()
-{
+function createTables() {
     $schema = Illuminate\Database\Capsule\Manager::schema();
 
     $schema->create('users', function (Blueprint $table) {
