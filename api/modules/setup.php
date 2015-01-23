@@ -2,14 +2,6 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
-// check if g_ has already been set up, redirect if it has
-function checkAlreadyConfigured() {
-    $app = \Slim\Slim::getInstance();
-    if(isConfigured()) {
-        renderSetup(true);
-    }
-}
-
 function renderSetup($success = false) {
     $app = \Slim\Slim::getInstance();
     $app->response->headers->set('Content-Type', 'text/html');
@@ -18,12 +10,15 @@ function renderSetup($success = false) {
 }
 
 function showSetup() {
-    checkAlreadyConfigured();
+    if(isConfigured())
+        renderSetup(true);
+
     renderSetup();
 }
 
 function doSetup() {
-    checkAlreadyConfigured();
+    if(isConfigured())
+        renderSetup(true);
 
     $app = \Slim\Slim::getInstance();
     $post = $app->request->post();
