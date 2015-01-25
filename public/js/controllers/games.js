@@ -8,6 +8,9 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
     self.countFinishedPct = function() {
         return gameService.countFinishedPct();
     };
+    self.isInSuggestions = function(game) {
+        return gameService.isInSuggestions(game);
+    };
 
     self.addClick = function() {
         self.openGameForm(null);
@@ -262,6 +265,9 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
     };
 
     self.changeUser = function(user) {
+        if(user.id == self.userId)
+            return;
+
         gameService.resetAll();
         $location.path('/' + user.id);
     };
@@ -636,7 +642,8 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             currently_playing: $cookies.currently_playing == 1,
             queue: $cookies.queue == 1,
             all_games: $cookies.all_games == 1,
-            statistics: $cookies.statistics == 1
+            statistics: $cookies.statistics == 1,
+            suggestions: $cookies.suggestions == 1
         };
 
         self.offset = 0;

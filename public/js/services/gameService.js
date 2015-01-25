@@ -26,6 +26,11 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
             self.users = data;
         });
     };
+    self.refreshSuggestions = function(userId) {
+        return $http.get('api/users/'+userId+'/suggestions').success(function(data) {
+            self.suggestions = data;
+        });
+    };
     self.refreshAll = function(userId) {
         self.resetAll();
 
@@ -34,6 +39,7 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
             self.refreshGenres(userId),
             self.refreshPlatforms(userId),
             self.refreshTags(userId),
+            self.refreshSuggestions(userId),
             self.refreshUsers()
         ]).then(function() {
             self.initialized = true;
@@ -45,6 +51,7 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
         self.genres = [];
         self.platforms = [];
         self.tags = [];
+        self.suggestions = [];
         self.users = [];
     };
 
@@ -99,6 +106,14 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
             return game.tag_ids.indexOf(tag.id) > -1 ? count + 1 : count;
         }, 0);
         return tag.count;
+    };
+    self.isInSuggestions = function(game) {
+        var found = false;
+        angular.forEach(self.suggestions, function(suggestion) {
+            if(suggestion.game_id == game.id)
+                found = true;
+        });
+        return found;
     };
 
     self.FILTER_TITLE = 1;

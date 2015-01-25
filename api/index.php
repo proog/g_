@@ -6,7 +6,7 @@ session_cache_limiter(false);
 session_start();
 
 // set up slim
-$app = new Slim\Slim(['debug' => false]);
+$app = new Slim\Slim(['debug' => true]);
 $app->response->headers->set('Content-Type', 'application/json');
 
 if(isConfigured()) {
@@ -35,11 +35,13 @@ $app->get('/users/:userId/tags/:id', 'getTag');
 
 $app->get('/users', 'listUsers');
 $app->get('/users/:id', 'getUser');
+$app->get('/users/:userId/suggestions', 'listSuggestions');
 $app->get('/config', 'getConfig');
 
 $app->post('/login', 'logIn');
 $app->post('/logout', 'logOut');
 $app->get('/login', 'checkLogin');
+
 $app->get('/setup', 'showSetup');
 $app->post('/setup', 'doSetup');
 

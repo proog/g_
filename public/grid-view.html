@@ -25,6 +25,28 @@
         </game>
     </div>
 </div>
+<div class="row text-center" ng-if="!currentlyPlaying.length" ng-show="suggestions.length > 0">
+    <div class="col-lg-12">
+        <div class="page-header">
+            <h1 ng-click="ctrl.collapseSection('suggestions')" class="hand">
+                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.suggestions ? 'right' : 'down'}}"></span>
+                Why not try...
+            </h1>
+        </div>
+    </div>
+</div>
+<div class="row"  ng-show="suggestions.length > 0" collapse="ctrl.sections.suggestions">
+    <div class="col-lg-4" ng-repeat="game in suggestions = (ctrl.gameService.games | filter:ctrl.isInSuggestions | orderBy:ctrl.sorting)">
+        <game game="game"
+              genres="ctrl.gameService.genres"
+              platforms="ctrl.gameService.platforms"
+              tags="ctrl.gameService.tags"
+              link-callback="ctrl.openLinkDialog(game)"
+              edit-callback="ctrl.editClick(game)"
+              show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
+        </game>
+    </div>
+</div>
 <div class="row text-center" ng-show="queue.length > 0">
     <div class="col-lg-12">
         <div class="page-header">

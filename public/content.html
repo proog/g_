@@ -66,7 +66,7 @@
                             </a>
                         </li>
                         <li class="divider"></li>
-                        <li ng-repeat="user in ctrl.gameService.users | orderBy:'username'">
+                        <li ng-repeat="user in ctrl.gameService.users | filter:{'id': '!'+ctrl.userId} | orderBy:'username'">
                             <a class="hand" ng-click="ctrl.changeUser(user)">
                                 <span class="glyphicon glyphicon-user"></span>
                                 {{user.username}}'s collection
