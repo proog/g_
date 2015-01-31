@@ -1,7 +1,7 @@
 <div class="row full-height">
     <div class="col-sm-4 list-column full-height" id="game-list">
-        <div ng-show="ctrl.filtered.length == 0 && queue.length == 0 && currentlyPlaying.length == 0">
-            <h3 class="text-center">No results</h3>
+        <div ng-show="!ctrl.filtered.length && !queue.length && !currentlyPlaying.length && !suggestions.length">
+            <h1 class="text-center">No results</h1>
         </div>
         <div ng-show="currentlyPlaying.length > 0">
             <h1 class="text-center hand" ng-click="ctrl.collapseSection('currently_playing')">
@@ -26,7 +26,7 @@
                 </a>
             </div>
         </div>
-        <div ng-if="!currentlyPlaying.length" ng-show="suggestions.length > 0">
+        <div ng-show="!currentlyPlaying.length && suggestions.length > 0 && ctrl.canShowAuthenticatedMenuItems()">
             <h1 class="text-center hand" ng-click="ctrl.collapseSection('suggestions')">
                 <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.suggestions ? 'right' : 'down'}}"></span>
                 <span class="glyphicon pull-right collapse-icon glyphicon-refresh" ng-click="ctrl.refreshSuggestions($event)"></span>
@@ -34,7 +34,7 @@
             </h1>
             <div class="list-group" collapse="ctrl.sections.suggestions">
                 <a class="list-group-item hand overflow-ellipsis"
-                   ng-repeat="game in suggestions = (ctrl.gameService.games | filter:ctrl.isInSuggestions | orderBy:ctrl.sorting)"
+                   ng-repeat="game in suggestions = (ctrl.gameService.games | search:ctrl.query | filter:ctrl.isInSuggestions | orderBy:ctrl.sorting)"
                    ng-click="ctrl.gameSelected(game)"
                    ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == 1}">
                     <div class="pull-right">

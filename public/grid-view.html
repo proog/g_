@@ -1,125 +1,135 @@
-<div class="row text-center" ng-show="ctrl.filtered.length == 0 && queue.length == 0 && currentlyPlaying.length == 0">
-    <div class="col-lg-12">
-        <h3>No results</h3>
-    </div>
-</div>
-<div class="row text-center" ng-show="currentlyPlaying.length > 0">
+<div class="row text-center" ng-show="!ctrl.filtered.length && !queue.length && !currentlyPlaying.length && !suggestions.length">
     <div class="col-lg-12">
         <div class="page-header">
-            <h1 ng-click="ctrl.collapseSection('currently_playing')" class="hand">
-                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.currently_playing ? 'right' : 'down'}}"></span>
-                Currently Playing
-            </h1>
+            <h1>No results</h1>
         </div>
     </div>
 </div>
-<div class="row" ng-show="currentlyPlaying.length > 0" collapse="ctrl.sections.currently_playing">
-    <div class="col-lg-4" ng-repeat="game in currentlyPlaying = (ctrl.gameService.games | search:ctrl.query | filter:{currently_playing: true} | orderBy:ctrl.sorting)">
-        <game game="game"
-              genres="ctrl.gameService.genres"
-              platforms="ctrl.gameService.platforms"
-              tags="ctrl.gameService.tags"
-              link-callback="ctrl.openLinkDialog(game)"
-              edit-callback="ctrl.editClick(game)"
-              show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
-        </game>
+<div ng-show="currentlyPlaying.length > 0">
+    <div class="row text-center">
+        <div class="col-lg-12">
+            <div class="page-header">
+                <h1 ng-click="ctrl.collapseSection('currently_playing')" class="hand">
+                    <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.currently_playing ? 'right' : 'down'}}"></span>
+                    Currently Playing
+                </h1>
+            </div>
+        </div>
     </div>
-</div>
-<div class="row text-center" ng-if="!currentlyPlaying.length" ng-show="suggestions.length > 0">
-    <div class="col-lg-12">
-        <div class="page-header">
-            <h1 ng-click="ctrl.collapseSection('suggestions')" class="hand">
-                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.suggestions ? 'right' : 'down'}}"></span>
-                <span class="glyphicon pull-right collapse-icon glyphicon-refresh" ng-click="ctrl.refreshSuggestions($event)"></span>
-                Why not try...
-            </h1>
+    <div class="row" collapse="ctrl.sections.currently_playing">
+        <div class="col-lg-4" ng-repeat="game in currentlyPlaying = (ctrl.gameService.games | search:ctrl.query | filter:{currently_playing: true} | orderBy:ctrl.sorting)">
+            <game game="game"
+                  genres="ctrl.gameService.genres"
+                  platforms="ctrl.gameService.platforms"
+                  tags="ctrl.gameService.tags"
+                  link-callback="ctrl.openLinkDialog(game)"
+                  edit-callback="ctrl.editClick(game)"
+                  show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
+            </game>
         </div>
     </div>
 </div>
-<div class="row"  ng-show="suggestions.length > 0" collapse="ctrl.sections.suggestions">
-    <div class="col-lg-4" ng-repeat="game in suggestions = (ctrl.gameService.games | filter:ctrl.isInSuggestions | orderBy:ctrl.sorting)">
-        <game game="game"
-              genres="ctrl.gameService.genres"
-              platforms="ctrl.gameService.platforms"
-              tags="ctrl.gameService.tags"
-              link-callback="ctrl.openLinkDialog(game)"
-              edit-callback="ctrl.editClick(game)"
-              show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
-        </game>
+<div ng-show="!currentlyPlaying.length && suggestions.length > 0 && ctrl.canShowAuthenticatedMenuItems()">
+    <div class="row text-center">
+        <div class="col-lg-12">
+            <div class="page-header">
+                <h1 ng-click="ctrl.collapseSection('suggestions')" class="hand">
+                    <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.suggestions ? 'right' : 'down'}}"></span>
+                    <span class="glyphicon pull-right collapse-icon glyphicon-refresh" ng-click="ctrl.refreshSuggestions($event)"></span>
+                    Why not try...
+                </h1>
+            </div>
+        </div>
     </div>
-</div>
-<div class="row text-center" ng-show="queue.length > 0">
-    <div class="col-lg-12">
-        <div class="page-header">
-            <h1 ng-click="ctrl.collapseSection('queue')" class="hand">
-                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.queue ? 'right' : 'down'}}"></span>
-                Queue
-            </h1>
+    <div class="row" collapse="ctrl.sections.suggestions">
+        <div class="col-lg-4" ng-repeat="game in suggestions = (ctrl.gameService.games | search:ctrl.query | filter:ctrl.isInSuggestions | orderBy:ctrl.sorting)">
+            <game game="game"
+                  genres="ctrl.gameService.genres"
+                  platforms="ctrl.gameService.platforms"
+                  tags="ctrl.gameService.tags"
+                  link-callback="ctrl.openLinkDialog(game)"
+                  edit-callback="ctrl.editClick(game)"
+                  show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
+            </game>
         </div>
     </div>
 </div>
-<div class="row" ng-show="queue.length > 0" collapse="ctrl.sections.queue">
-    <div class="col-lg-4" ng-repeat="game in queue = (ctrl.gameService.games | search:ctrl.query | filter:{queue_position: '!!'} | orderBy:'queue_position')">
-        <game game="game"
-              genres="ctrl.gameService.genres"
-              platforms="ctrl.gameService.platforms"
-              tags="ctrl.gameService.tags"
-              link-callback="ctrl.openLinkDialog(game)"
-              edit-callback="ctrl.editClick(game)"
-              show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
-        </game>
+<div ng-show="queue.length > 0">
+    <div class="row text-center">
+        <div class="col-lg-12">
+            <div class="page-header">
+                <h1 ng-click="ctrl.collapseSection('queue')" class="hand">
+                    <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.queue ? 'right' : 'down'}}"></span>
+                    Queue
+                </h1>
+            </div>
+        </div>
     </div>
-</div>
-<div class="row text-center" ng-show="ctrl.filtered.length > 0">
-    <div class="col-lg-12">
-        <div class="page-header">
-            <h1 ng-click="ctrl.collapseSection('all_games')" class="hand">
-                <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.all_games ? 'right' : 'down'}}"></span>
-                All Games
-            </h1>
+    <div class="row" collapse="ctrl.sections.queue">
+        <div class="col-lg-4" ng-repeat="game in queue = (ctrl.gameService.games | search:ctrl.query | filter:{queue_position: '!!'} | orderBy:'queue_position')">
+            <game game="game"
+                  genres="ctrl.gameService.genres"
+                  platforms="ctrl.gameService.platforms"
+                  tags="ctrl.gameService.tags"
+                  link-callback="ctrl.openLinkDialog(game)"
+                  edit-callback="ctrl.editClick(game)"
+                  show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
+            </game>
         </div>
     </div>
 </div>
-<div class="row" ng-show="ctrl.filtered.length > 0" collapse="ctrl.sections.all_games">
-    <div class="col-lg-12 text-center">
-        <pagination total-items="ctrl.filtered.length"
-                    items-per-page="ctrl.itemsPerPage"
-                    num-pages="ctrl.pageCount"
-                    boundary-links="false"
-                    max-size="30"
-                    rotate="false"
-                    previous-text="&lt;"
-                    next-text="&gt;"
-                    first-text="{{1}}"
-                    last-text="{{ctrl.pageCount}}"
-                    ng-model="ctrl.currentPage"
-                    class="game-pagination">
-        </pagination>
+<div ng-show="ctrl.filtered.length > 0">
+    <div class="row text-center">
+        <div class="col-lg-12">
+            <div class="page-header">
+                <h1 ng-click="ctrl.collapseSection('all_games')" class="hand">
+                    <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.all_games ? 'right' : 'down'}}"></span>
+                    All Games
+                </h1>
+            </div>
+        </div>
     </div>
-    <div class="col-lg-4" ng-repeat="game in ctrl.filtered = (ctrl.gameService.games | search:ctrl.query | orderBy:ctrl.sorting) | offset:ctrl.offset | limitTo:ctrl.itemsPerPage" id="game{{game.id}}">
-        <game game="game"
-              genres="ctrl.gameService.genres"
-              platforms="ctrl.gameService.platforms"
-              tags="ctrl.gameService.tags"
-              link-callback="ctrl.openLinkDialog(game)"
-              edit-callback="ctrl.editClick(game)"
-              show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
-        </game>
-    </div>
-    <div class="col-lg-12 text-center">
-        <pagination total-items="ctrl.filtered.length"
-                    items-per-page="ctrl.itemsPerPage"
-                    num-pages="ctrl.pageCount"
-                    boundary-links="false"
-                    max-size="30"
-                    rotate="false"
-                    previous-text="&lt;"
-                    next-text="&gt;"
-                    first-text="{{1}}"
-                    last-text="{{ctrl.pageCount}}"
-                    ng-model="ctrl.currentPage"
-                    class="game-pagination">
-        </pagination>
+    <div class="row" collapse="ctrl.sections.all_games">
+        <div class="col-lg-12 text-center">
+            <pagination total-items="ctrl.filtered.length"
+                        items-per-page="ctrl.itemsPerPage"
+                        num-pages="ctrl.pageCount"
+                        boundary-links="false"
+                        max-size="30"
+                        rotate="false"
+                        previous-text="&lt;"
+                        next-text="&gt;"
+                        first-text="{{1}}"
+                        last-text="{{ctrl.pageCount}}"
+                        ng-model="ctrl.currentPage"
+                        class="game-pagination">
+            </pagination>
+        </div>
+        <div class="col-lg-4" ng-repeat="game in ctrl.filtered = (ctrl.gameService.games | search:ctrl.query | orderBy:ctrl.sorting) | offset:ctrl.offset | limitTo:ctrl.itemsPerPage" id="game{{game.id}}">
+            <game game="game"
+                  genres="ctrl.gameService.genres"
+                  platforms="ctrl.gameService.platforms"
+                  tags="ctrl.gameService.tags"
+                  link-callback="ctrl.openLinkDialog(game)"
+                  edit-callback="ctrl.editClick(game)"
+                  show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
+            </game>
+        </div>
+        <div class="col-lg-12 text-center">
+            <pagination total-items="ctrl.filtered.length"
+                        items-per-page="ctrl.itemsPerPage"
+                        num-pages="ctrl.pageCount"
+                        boundary-links="false"
+                        max-size="30"
+                        rotate="false"
+                        previous-text="&lt;"
+                        next-text="&gt;"
+                        first-text="{{1}}"
+                        last-text="{{ctrl.pageCount}}"
+                        ng-model="ctrl.currentPage"
+                        class="game-pagination">
+            </pagination>
+        </div>
     </div>
 </div>
 <div class="row text-center">

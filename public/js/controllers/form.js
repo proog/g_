@@ -23,6 +23,7 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
                 rating: null,
                 currently_playing: false,
                 queue_position: null,
+                hidden: false,
                 genre_ids: [],
                 platform_ids: [],
                 tag_ids: []
