@@ -3,7 +3,10 @@
         <div class="col-md-4 filter-panel-column" ng-repeat="parameter in ctrl.query.parameters">
             <div class="form-inline">
                 <div class="form-group">
-                    <select class="form-control" ng-model="parameter.type" ng-options="fo.value as fo.name group by fo.group for fo in ctrl.filterOptions">
+                    <select class="form-control"
+                            ng-model="parameter.type"
+                            ng-options="fo.value as fo.name group by fo.group for fo in ctrl.filterOptions"
+                            ng-change="parameter.value = null; parameter.negate = false">
                         <option value="">Select type</option>
                     </select>
                 </div>
