@@ -382,6 +382,11 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         self.updateChart();
     };
 
+    self.refreshSuggestions = function(event) {
+        event.stopPropagation(); // stop section from getting collapse click event
+        gameService.refreshSuggestions(self.userId);
+    };
+
     self.updateChart = function() {
         var stats = self.chart.orderBy(self.chart.xAxis(self.chart.yAxis));
         var labels = [];

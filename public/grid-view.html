@@ -30,6 +30,7 @@
         <div class="page-header">
             <h1 ng-click="ctrl.collapseSection('suggestions')" class="hand">
                 <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.suggestions ? 'right' : 'down'}}"></span>
+                <span class="glyphicon pull-right collapse-icon glyphicon-refresh" ng-click="ctrl.refreshSuggestions($event)"></span>
                 Why not try...
             </h1>
         </div>
