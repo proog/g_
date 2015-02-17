@@ -533,7 +533,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                     group: 'Quantity',
                     value: function(games) {
                         return games.reduce(function(count, game) {
-                            return game.finished == 1 ? count + 1 : count;
+                            return game.finished == gameService.FINISHED ? count + 1 : count;
                         }, 0);
                     }
                 },
@@ -623,6 +623,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         self.finishedOptions = [
             { name: 'Completed', value: 1 },
             { name: 'Not completed', value: 0 },
+            { name: 'Shelved', value: 3},
             { name: 'N/A', value: 2 }
         ];
         self.sortOptions = [

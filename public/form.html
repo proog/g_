@@ -35,19 +35,25 @@
                     <div class="form-group">
                         <div class="radio">
                             <label>
-                                <input type="radio" ng-model="model.finished" value="0" name="finished">
+                                <input type="radio" ng-model="model.finished" ng-value="gameService.NOT_FINISHED" name="finished">
                                 Not completed
                             </label>
                         </div>
                         <div class="radio">
                             <label>
-                                <input type="radio" ng-model="model.finished" value="1" name="finished">
+                                <input type="radio" ng-model="model.finished" ng-value="gameService.FINISHED" name="finished">
                                 Completed
                             </label>
                         </div>
                         <div class="radio">
                             <label>
-                                <input type="radio" ng-model="model.finished" value="2" name="finished">
+                                <input type="radio" ng-model="model.finished" ng-value="gameService.SHELVED" name="finished">
+                                Shelved
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" ng-model="model.finished" ng-value="gameService.FINISHED_NA" name="finished">
                                 N/A
                             </label>
                         </div>

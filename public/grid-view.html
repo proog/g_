@@ -19,12 +19,8 @@
     <div class="row" collapse="ctrl.sections.currently_playing">
         <div class="col-lg-4" ng-repeat="game in currentlyPlaying = (ctrl.gameService.games | search:ctrl.query | filter:{currently_playing: true} | orderBy:ctrl.sorting)">
             <game game="game"
-                  genres="ctrl.gameService.genres"
-                  platforms="ctrl.gameService.platforms"
-                  tags="ctrl.gameService.tags"
                   link-callback="ctrl.openLinkDialog(game)"
-                  edit-callback="ctrl.editClick(game)"
-                  show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
+                  edit-callback="ctrl.editClick(game)">
             </game>
         </div>
     </div>
@@ -44,12 +40,8 @@
     <div class="row" collapse="ctrl.sections.suggestions">
         <div class="col-lg-4" ng-repeat="game in suggestions = (ctrl.gameService.games | search:ctrl.query | filter:ctrl.isInSuggestions | orderBy:ctrl.sorting)">
             <game game="game"
-                  genres="ctrl.gameService.genres"
-                  platforms="ctrl.gameService.platforms"
-                  tags="ctrl.gameService.tags"
                   link-callback="ctrl.openLinkDialog(game)"
-                  edit-callback="ctrl.editClick(game)"
-                  show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
+                  edit-callback="ctrl.editClick(game)">
             </game>
         </div>
     </div>
@@ -68,12 +60,8 @@
     <div class="row" collapse="ctrl.sections.queue">
         <div class="col-lg-4" ng-repeat="game in queue = (ctrl.gameService.games | search:ctrl.query | filter:{queue_position: '!!'} | orderBy:'queue_position')">
             <game game="game"
-                  genres="ctrl.gameService.genres"
-                  platforms="ctrl.gameService.platforms"
-                  tags="ctrl.gameService.tags"
                   link-callback="ctrl.openLinkDialog(game)"
-                  edit-callback="ctrl.editClick(game)"
-                  show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
+                  edit-callback="ctrl.editClick(game)">
             </game>
         </div>
     </div>
@@ -107,12 +95,8 @@
         </div>
         <div class="col-lg-4" ng-repeat="game in ctrl.filtered = (ctrl.gameService.games | search:ctrl.query | orderBy:ctrl.sorting) | offset:ctrl.offset | limitTo:ctrl.itemsPerPage" id="game{{game.id}}">
             <game game="game"
-                  genres="ctrl.gameService.genres"
-                  platforms="ctrl.gameService.platforms"
-                  tags="ctrl.gameService.tags"
                   link-callback="ctrl.openLinkDialog(game)"
-                  edit-callback="ctrl.editClick(game)"
-                  show-edit="ctrl.gameService.authenticated && game.user_id == ctrl.gameService.authenticatedUser.id">
+                  edit-callback="ctrl.editClick(game)">
             </game>
         </div>
         <div class="col-lg-12 text-center">

@@ -4,6 +4,11 @@ class Game extends Illuminate\Database\Eloquent\Model {
     protected $hidden = ['private_comment', 'genres', 'platforms', 'tags'];
     protected $appends = ['genre_ids', 'platform_ids', 'tag_ids'];
     
+    const NOT_FINISHED = 0;
+    const FINISHED = 1;
+    const FINISHED_NA = 2;
+    const SHELVED = 3;
+    
     public function genres() {
         return $this->belongsToMany('Genre');
     }

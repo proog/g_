@@ -88,7 +88,7 @@ function listSuggestions($userId) {
     $user = User::findOrFail($userId);
     $applicableGames = $user->games()
         ->with('genres', 'platforms', 'tags')
-        ->where('finished', 0)
+        ->where('finished', Game::NOT_FINISHED)
         ->where('rating', null)
         ->where('playtime', null)
         ->where('queue_position', null)

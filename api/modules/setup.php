@@ -128,7 +128,7 @@ function createTables() {
         $table->string('publisher')->nullable()->default(null);
         $table->integer('year')->nullable()->default(null);
         $table->string('image')->nullable()->default(null);
-        $table->tinyInteger('finished')->default(0);
+        $table->tinyInteger('finished')->default(Game::NOT_FINISHED);
         $table->text('comment')->nullable()->default(null);
         $table->string('sort_as')->nullable()->default(null);
         $table->text('private_comment')->nullable()->default(null);

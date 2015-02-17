@@ -64,12 +64,12 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
 
     self.getFinishedGames = function() {
         return $filter('filter')(self.games, function(game) {
-            return game.finished == 1;
+            return game.finished == self.FINISHED;
         });
     };
     self.getUnfinishedGames = function() {
         return $filter('filter')(self.games, function(game) {
-            return game.finished != 1;
+            return game.finished != self.FINISHED;
         });
     };
     self.getYears = function() {
@@ -83,7 +83,7 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
     };
     self.countFinished = function() {
         return self.games.reduce(function(count, game) {
-            return game.finished == 1 ? count + 1 : count;
+            return game.finished == self.FINISHED ? count + 1 : count;
         }, 0);
     };
     self.countFinishedPct = function() {
@@ -128,6 +128,11 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
     self.FILTER_YEAR_MAX = 10;
     self.FILTER_RATING_MIN = 11;
     self.FILTER_RATING_MAX = 12;
+
+    self.NOT_FINISHED = 0;
+    self.FINISHED = 1;
+    self.FINISHED_NA = 2;
+    self.SHELVED = 3;
 
     self.authenticated = false;
     self.authenticatedUser = null;

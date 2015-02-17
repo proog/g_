@@ -1,9 +1,10 @@
-angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'game', 'genres', 'platforms', 'tags', 'games', function($scope, $modalInstance, game, genres, platforms, tags, games) {
+angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'game', 'genres', 'platforms', 'tags', 'games', 'gameService', function($scope, $modalInstance, game, genres, platforms, tags, games, gameService) {
     $scope.initialize = function() {
         $scope.genres = genres;
         $scope.platforms = platforms;
         $scope.tags = tags;
         $scope.games = games;
+        $scope.gameService = gameService;
 
         if(game) {
             $scope.isNew = false;
@@ -18,7 +19,7 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
                 year: null,
                 comment: null,
                 sort_as: null,
-                finished: 0,
+                finished: gameService.NOT_FINISHED,
                 playtime: null,
                 rating: null,
                 currently_playing: false,

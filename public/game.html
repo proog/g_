@@ -1,10 +1,10 @@
-<div class="panel" ng-class="{'panel-success': game.finished == 1, 'panel-default': game.finished != 1}">
+<div class="panel" ng-class="{'panel-success': game.finished == gameService.FINISHED, 'panel-default': game.finished != gameService.FINISHED}">
     <div class="panel-heading">
         <div class="btn-group btn-group-xs pull-right">
             <button type="button" class="btn btn-default" ng-click="linkCallback({game:game})">
                 <span class="glyphicon glyphicon-link"></span>
             </button>
-            <button type="button" class="btn btn-default" ng-if="showEdit" ng-click="editCallback({game:game})">
+            <button type="button" class="btn btn-default" ng-if="gameService.authenticated && game.user_id == gameService.authenticatedUser.id" ng-click="editCallback({game:game})">
                 <span class="glyphicon glyphicon-pencil"></span>
             </button>
         </div>
@@ -38,10 +38,11 @@
             <strong ng-if="game.genre_ids.length > 0" ng-repeat="id in game.genre_ids" title="{{genre.name != genre.short_name ? genre.name : ''}}">
                 {{(genre = getGenre(id)).short_name}}<span ng-if="!$last">, </span>
             </strong><br><br>
-            <strong ng-if="game.finished == 0">Not completed</strong>
-            <strong ng-if="game.finished == 1">Completed</strong>
+            <strong ng-if="game.finished == gameService.NOT_FINISHED">Not completed</strong>
+            <strong ng-if="game.finished == gameService.FINISHED">Completed</strong>
+            <strong ng-if="game.finished == gameService.SHELVED">Shelved</strong>
             <span ng-if="game.hasPlaytime()">
-                <span ng-if="game.finished == 0 || game.finished == 1">in</span>
+                <span ng-if="game.finished != gameService.FINISHED_NA">in</span>
                 <strong>{{game.getPlaytimeDisplay()}}</strong>
             </span><br>
             <rating ng-model="game.rating" max="5" readonly="true" ng-if="game.hasRating()"></rating>

@@ -12,7 +12,7 @@
                 <a class="list-group-item hand overflow-ellipsis"
                    ng-repeat="game in currentlyPlaying = (ctrl.gameService.games | search:ctrl.query | filter:{currently_playing: true} | orderBy:ctrl.sorting)"
                    ng-click="ctrl.gameSelected(game)"
-                   ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == 1}">
+                   ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == ctrl.gameService.FINISHED}">
                     <div class="pull-right">
                         <span ng-style="{visibility: game.year ? 'visible' : 'hidden'}">({{game.year}})</span>
                         <span class="glyphicon glyphicon-time" ng-style="{visibility: game.hasPlaytime() ? 'visible' : 'hidden'}"></span>
@@ -36,7 +36,7 @@
                 <a class="list-group-item hand overflow-ellipsis"
                    ng-repeat="game in suggestions = (ctrl.gameService.games | search:ctrl.query | filter:ctrl.isInSuggestions | orderBy:ctrl.sorting)"
                    ng-click="ctrl.gameSelected(game)"
-                   ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == 1}">
+                   ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == ctrl.gameService.FINISHED}">
                     <div class="pull-right">
                         <span ng-style="{visibility: game.year ? 'visible' : 'hidden'}">({{game.year}})</span>
                         <span class="glyphicon glyphicon-time" ng-style="{visibility: game.hasPlaytime() ? 'visible' : 'hidden'}"></span>
@@ -59,7 +59,7 @@
                 <a class="list-group-item hand overflow-ellipsis"
                    ng-repeat="game in queue = (ctrl.gameService.games | search:ctrl.query | filter:{queue_position: '!!'} | orderBy:'queue_position')"
                    ng-click="ctrl.gameSelected(game)"
-                   ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == 1}">
+                   ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == ctrl.gameService.FINISHED}">
                     <div class="pull-right">
                         <span ng-style="{visibility: game.year ? 'visible' : 'hidden'}">({{game.year}})</span>
                         <span class="glyphicon glyphicon-time" ng-style="{visibility: game.hasPlaytime() ? 'visible' : 'hidden'}"></span>
@@ -82,7 +82,7 @@
                 <a class="list-group-item hand overflow-ellipsis" id="game{{game.id}}"
                    ng-repeat="game in ctrl.filtered = (ctrl.gameService.games | search:ctrl.query | orderBy:ctrl.sorting)"
                    ng-click="ctrl.gameSelected(game)"
-                   ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == 1}">
+                   ng-class="{active: game == ctrl.selectedGame, 'list-group-item-success': game.finished == ctrl.gameService.FINISHED}">
                     <div class="pull-right">
                         <span ng-style="{visibility: game.year ? 'visible' : 'hidden'}">({{game.year}})</span>
                         <span class="glyphicon glyphicon-time" ng-style="{visibility: game.hasPlaytime() ? 'visible' : 'hidden'}"></span>
@@ -99,12 +99,8 @@
     </div>
     <div class="col-sm-8 detail-column full-height">
         <game game="ctrl.selectedGame"
-              genres="ctrl.gameService.genres"
-              platforms="ctrl.gameService.platforms"
-              tags="ctrl.gameService.tags"
               link-callback="ctrl.openLinkDialog(ctrl.selectedGame)"
               edit-callback="ctrl.editClick(ctrl.selectedGame)"
-              show-edit="ctrl.gameService.authenticated && ctrl.selectedGame.user_id == ctrl.gameService.authenticatedUser.id"
               height="100%"
               ng-if="ctrl.selectedGame">
         </game>
