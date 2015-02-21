@@ -30,13 +30,13 @@
             </div>
             <span ng-if="game.platform_ids.length > 0">
                 for
-                <strong ng-repeat="id in game.platform_ids" title="{{platform.name != platform.short_name ? platform.name : ''}}">
-                    {{(platform = getPlatform(id)).short_name}}<span ng-if="!$last">, </span>
+                <strong ng-repeat="p in getPlatforms() | orderBy:'short_name'" title="{{p.name != p.short_name ? p.name : ''}}">
+                    {{p.short_name}}<span ng-if="!$last">, </span>
                 </strong>
             </span>
             <span ng-if="game.year">in <strong>{{game.year}}</strong></span><br>
-            <strong ng-if="game.genre_ids.length > 0" ng-repeat="id in game.genre_ids" title="{{genre.name != genre.short_name ? genre.name : ''}}">
-                {{(genre = getGenre(id)).short_name}}<span ng-if="!$last">, </span>
+            <strong ng-if="game.genre_ids.length > 0" ng-repeat="g in getGenres() | orderBy:'short_name'" title="{{g.name != g.short_name ? g.name : ''}}">
+                {{g.short_name}}<span ng-if="!$last">, </span>
             </strong><br><br>
             <strong ng-if="game.finished == gameService.NOT_FINISHED">Not completed</strong>
             <strong ng-if="game.finished == gameService.FINISHED">Completed</strong>
@@ -47,8 +47,8 @@
             </span><br>
             <rating ng-model="game.rating" max="5" readonly="true" ng-if="game.hasRating()"></rating>
             <br>
-            <strong ng-if="game.tag_ids.length > 0" ng-repeat="id in game.tag_ids" title="{{tag.name != tag.short_name ? tag.name : ''}}">
-                {{(tag = getTag(id)).short_name}}<span ng-if="!$last">, </span>
+            <strong ng-if="game.tag_ids.length > 0" ng-repeat="t in getTags()" title="{{t.name != t.short_name ? t.name : ''}}">
+                {{t.short_name}}<span ng-if="!$last">, </span>
             </strong>
             <p ng-if="game.comment">
                 {{game.comment}}

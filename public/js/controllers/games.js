@@ -456,7 +456,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                     value: function(valueFn) {
                         var stats = [];
                         angular.forEach(gameService.genres, function(genre) {
-                            var gamesInCategory = $filter('filter')(gameService.games, function(game) {
+                            var gamesInCategory = $filter('filter')(gameService.getVisibleGames(), function(game) {
                                 return game.genre_ids.indexOf(genre.id) > -1;
                             });
 
@@ -473,7 +473,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                     value: function(valueFn) {
                         var stats = [];
                         angular.forEach(gameService.platforms, function(platform) {
-                            var gamesInCategory = $filter('filter')(gameService.games, function(game) {
+                            var gamesInCategory = $filter('filter')(gameService.getVisibleGames(), function(game) {
                                 return game.platform_ids.indexOf(platform.id) > -1;
                             });
 
@@ -490,7 +490,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                     value: function(valueFn) {
                         var stats = [];
                         angular.forEach(gameService.tags, function(tag) {
-                            var gamesInCategory = $filter('filter')(gameService.games, function(game) {
+                            var gamesInCategory = $filter('filter')(gameService.getVisibleGames(), function(game) {
                                 return game.tag_ids.indexOf(tag.id) > -1;
                             });
 
@@ -507,7 +507,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                     value: function(valueFn) {
                         var stats = [];
                         angular.forEach(gameService.getYears(), function(year) {
-                            var gamesInCategory = $filter('filter')(gameService.games, function(game) {
+                            var gamesInCategory = $filter('filter')(gameService.getVisibleGames(), function(game) {
                                 return game.year == year;
                             });
 
@@ -680,7 +680,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         var dataLoaded = function() {
             // select game if specified
             if($routeParams.gameId) {
-                angular.forEach(gameService.games, function(game) {
+                angular.forEach(gameService.getVisibleGames(), function(game) {
                     if(game.id == $routeParams.gameId)
                         self.gameSelected(game);
                 });

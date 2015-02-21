@@ -17,7 +17,7 @@
         </div>
     </div>
     <div class="row" collapse="ctrl.sections.currently_playing">
-        <div class="col-lg-4" ng-repeat="game in currentlyPlaying = (ctrl.gameService.games | search:ctrl.query | filter:{currently_playing: true} | orderBy:ctrl.sorting)">
+        <div class="col-lg-4" ng-repeat="game in currentlyPlaying = (ctrl.gameService.getVisibleGames() | search:ctrl.query | filter:{currently_playing: true} | orderBy:ctrl.sorting)">
             <game game="game"
                   link-callback="ctrl.openLinkDialog(game)"
                   edit-callback="ctrl.editClick(game)">
@@ -38,7 +38,7 @@
         </div>
     </div>
     <div class="row" collapse="ctrl.sections.suggestions">
-        <div class="col-lg-4" ng-repeat="game in suggestions = (ctrl.gameService.games | search:ctrl.query | filter:ctrl.isInSuggestions | orderBy:ctrl.sorting)">
+        <div class="col-lg-4" ng-repeat="game in suggestions = (ctrl.gameService.getVisibleGames() | search:ctrl.query | filter:ctrl.isInSuggestions | orderBy:ctrl.sorting)">
             <game game="game"
                   link-callback="ctrl.openLinkDialog(game)"
                   edit-callback="ctrl.editClick(game)">
@@ -58,7 +58,7 @@
         </div>
     </div>
     <div class="row" collapse="ctrl.sections.queue">
-        <div class="col-lg-4" ng-repeat="game in queue = (ctrl.gameService.games | search:ctrl.query | filter:{queue_position: '!!'} | orderBy:'queue_position')">
+        <div class="col-lg-4" ng-repeat="game in queue = (ctrl.gameService.getVisibleGames() | search:ctrl.query | filter:{queue_position: '!!'} | orderBy:'queue_position')">
             <game game="game"
                   link-callback="ctrl.openLinkDialog(game)"
                   edit-callback="ctrl.editClick(game)">
@@ -93,7 +93,7 @@
                         class="game-pagination">
             </pagination>
         </div>
-        <div class="col-lg-4" ng-repeat="game in ctrl.filtered = (ctrl.gameService.games | search:ctrl.query | orderBy:ctrl.sorting) | offset:ctrl.offset | limitTo:ctrl.itemsPerPage" id="game{{game.id}}">
+        <div class="col-lg-4" ng-repeat="game in ctrl.filtered = (ctrl.gameService.getVisibleGames() | search:ctrl.query | orderBy:ctrl.sorting) | offset:ctrl.offset | limitTo:ctrl.itemsPerPage" id="game{{game.id}}">
             <game game="game"
                   link-callback="ctrl.openLinkDialog(game)"
                   edit-callback="ctrl.editClick(game)">
@@ -137,7 +137,7 @@
             </div>
             <div class="panel-body">
                 <dl class="dl-horizontal">
-                    <dt style="width: 100px;">{{ctrl.gameService.games.length}}</dt>
+                    <dt style="width: 100px;">{{ctrl.gameService.getVisibleGames().length}}</dt>
                     <dd style="margin-left: 120px;" class="overflow-ellipsis">games</dd>
                     <dt style="width: 100px;">{{ctrl.countFinished()}}</dt>
                     <dd style="margin-left: 120px;" class="overflow-ellipsis">completed ({{ctrl.countFinishedPct()}}%)</dd>

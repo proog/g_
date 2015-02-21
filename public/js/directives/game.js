@@ -1,4 +1,4 @@
-angular.module('games').directive('game', ['gameService', function(gameService) {
+angular.module('games').directive('game', ['gameService', '$filter', function(gameService, $filter) {
     return {
         restrict: 'E',
         templateUrl: 'game.html',
@@ -12,28 +12,22 @@ angular.module('games').directive('game', ['gameService', function(gameService) 
             $scope.heightStyle = $scope.height ? {height: $scope.height} : {};
             $scope.gameService = gameService;
 
-            $scope.getGenre = function(id) {
-                for(var i = 0; i < gameService.genres.length; i++) {
-                    var genre = gameService.genres[i];
-                    if(id == genre.id)
-                        return genre;
-                }
+            $scope.getGenres = function() {
+                return $filter('filter')(gameService.genres, function(genre) {
+                    return $scope.game.genre_ids.indexOf(genre.id) > -1;
+                });
             };
 
-            $scope.getPlatform = function(id) {
-                for(var i = 0; i < gameService.platforms.length; i++) {
-                    var platform = gameService.platforms[i];
-                    if(id == platform.id)
-                        return platform;
-                }
+            $scope.getPlatforms = function() {
+                return $filter('filter')(gameService.platforms, function(platform) {
+                    return $scope.game.platform_ids.indexOf(platform.id) > -1;
+                });
             };
 
-            $scope.getTag = function(id) {
-                for(var i = 0; i < gameService.tags.length; i++) {
-                    var tag = gameService.tags[i];
-                    if(id == tag.id)
-                        return tag;
-                }
+            $scope.getTags = function() {
+                return $filter('filter')(gameService.tags, function(tag) {
+                    return $scope.game.tag_ids.indexOf(tag.id) > -1;
+                });
             };
         }
     };

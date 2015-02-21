@@ -5,10 +5,6 @@ angular.module('games').filter('search', ['gameService', function(gameService) {
         var filtered = [];
 
         angular.forEach(games, function(game) {
-            // hidden games only match if the authenticated user is the game's owner
-            if(game.hidden && (!gameService.authenticated || gameService.authenticated && game.user_id != gameService.authenticatedUser.id))
-                return;
-
             if(search) {
                 var title = game.title && game.title.toLowerCase().indexOf(search) >= 0;
                 var sort = game.sort_as && game.sort_as.toLowerCase().indexOf(search) >= 0;
