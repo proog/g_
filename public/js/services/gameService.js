@@ -66,7 +66,7 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
         return $filter('filter')(self.games, function(game) {
             if(game.hidden)
                 return self.authenticated && self.authenticatedUser.id == game.user_id;
-            return game;
+            return true;
         });
     };
     self.getFinishedGames = function() {
@@ -97,30 +97,24 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
         return Math.round(self.countFinished()/self.getVisibleGames().length*100);
     };
     self.countGenre = function(genre) {
-        genre.count = self.getVisibleGames().reduce(function(count, game) {
+        return self.getVisibleGames().reduce(function(count, game) {
             return game.genre_ids.indexOf(genre.id) > -1 ? count + 1 : count;
         }, 0);
-        return genre.count;
     };
     self.countPlatform = function(platform) {
-        platform.count = self.getVisibleGames().reduce(function(count, game) {
+        return self.getVisibleGames().reduce(function(count, game) {
             return game.platform_ids.indexOf(platform.id) > -1 ? count + 1 : count;
         }, 0);
-        return platform.count;
     };
     self.countTag = function(tag) {
-        tag.count = self.getVisibleGames().reduce(function(count, game) {
+        return self.getVisibleGames().reduce(function(count, game) {
             return game.tag_ids.indexOf(tag.id) > -1 ? count + 1 : count;
         }, 0);
-        return tag.count;
     };
     self.isInSuggestions = function(game) {
-        var found = false;
-        angular.forEach(self.suggestions, function(suggestion) {
-            if(suggestion.game_id == game.id)
-                found = true;
-        });
-        return found;
+        return self.suggestions.reduce(function(ret, suggestion) {
+            return ret || suggestion.game_id == game.id;
+        }, false);
     };
 
     self.FILTER_TITLE = 1;
