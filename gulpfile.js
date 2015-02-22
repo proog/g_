@@ -5,14 +5,19 @@ var concat = require('gulp-concat');
 var input = './public/js/**/!(*.min).js';
 var output = './public/js/g.min.js';
 
-gulp.task('js', function() {
+function js() {
     gulp.src(input)
         .pipe(uglify())
+        .on('error', function(error) {
+            console.log(error);
+            this.emit('end');
+        })
         .pipe(concat(output))
         .pipe(gulp.dest('./'));
-});
+}
+gulp.task('js', js);
 
 gulp.task('default', function() {
-    gulp.run('js');
+    js();
     gulp.watch(input, ['js']);
 });

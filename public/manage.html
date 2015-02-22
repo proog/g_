@@ -20,16 +20,16 @@
             <div class="row" ng-repeat="item in items | filter:{deleted: false}">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <input type="text" class="form-control input-sm" placeholder="Name" ng-model="item.name" ng-change="nameChange(item)">
+                        <input type="text" class="form-control" placeholder="Name" ng-model="item.name" ng-change="nameChange(item)">
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <input type="text" class="form-control input-sm" placeholder="Short name" ng-model="item.short_name" ng-change="shortNameChange(item)">
+                        <input type="text" class="form-control" placeholder="Short name" ng-model="item.short_name" ng-change="shortNameChange(item)">
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <button class="btn btn-danger btn-sm" type="button" ng-click="deleteClick(item)">
+                    <button class="btn btn-danger" type="button" ng-click="deleteClick(item)">
                         <span class="glyphicon glyphicon-remove"></span>
                     </button>
                 </div>
@@ -37,16 +37,16 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <input type="text" class="form-control input-sm" placeholder="Name" ng-model="form.name" ng-change="nameChange(form)">
+                        <input type="text" class="form-control" placeholder="Name" ng-model="form.name" ng-change="nameChange(form)">
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <input type="text" class="form-control input-sm" placeholder="Short name" ng-model="form.short_name" ng-change="shortNameChange(form)">
+                        <input type="text" class="form-control" placeholder="Short name" ng-model="form.short_name" ng-change="shortNameChange(form)">
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <button class="btn btn-primary btn-sm" type="button" ng-click="addClick()" ng-disabled="!form.name || !form.short_name">
+                    <button class="btn btn-primary" type="button" ng-click="addClick()" ng-disabled="!form.name || !form.short_name">
                         <span class="glyphicon glyphicon-plus"></span>
                     </button>
                 </div>

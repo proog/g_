@@ -6,12 +6,27 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
         $scope.games = games;
         $scope.gameService = gameService;
 
+        $scope.STATE_DEFAULT = 0;
+        $scope.STATE_ON_WISHLIST = 1;
+        $scope.STATE_IN_QUEUE = 2;
+        $scope.STATE_CURRENTLY_PLAYING = 3;
+
         if(game) {
             $scope.isNew = false;
             $scope.model = angular.copy(game);
+
+            if($scope.model.currently_playing)
+                $scope.state = $scope.STATE_CURRENTLY_PLAYING;
+            else if($scope.model.queue_position != null)
+                $scope.state = $scope.STATE_IN_QUEUE;
+            else if($scope.model.wishlist_position != null)
+                $scope.state = $scope.STATE_ON_WISHLIST;
+            else
+                $scope.state = $scope.STATE_DEFAULT;
         }
         else {
             $scope.isNew = true;
+            $scope.state = $scope.STATE_DEFAULT;
             $scope.model = {
                 title: null,
                 developer: null,
@@ -25,11 +40,14 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
                 currently_playing: false,
                 queue_position: null,
                 hidden: false,
+                wishlist_position: null,
                 genre_ids: [],
                 platform_ids: [],
                 tag_ids: []
             };
         }
+
+        var maxPos;
 
         // set up the queue position to toggle between this and null when queue checkbox is checked
         if($scope.model.queue_position != null) {
@@ -37,12 +55,22 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
         }
         else {
             // find the potential queue position
-            var maxPos = -1;
-            angular.forEach($scope.games, function(game) {
-                if(game.queue_position != null && game.queue_position > maxPos)
-                    maxPos = game.queue_position;
-            });
+            maxPos = $scope.games.reduce(function(ret, game) {
+                return game.queue_position != null ? Math.max(game.queue_position, ret) : ret;
+            }, -1);
             $scope.originalQueuePosition = maxPos + 1;
+        }
+
+        // set up the wishlist position to toggle between this and null when wishlist checkbox is checked
+        if($scope.model.wishlist_position != null) {
+            $scope.originalWishlistPosition = $scope.model.wishlist_position;
+        }
+        else {
+            // find the potential wishlist position
+            maxPos = $scope.games.reduce(function(ret, game) {
+                return game.wishlist_position != null ? Math.max(game.wishlist_position, ret) : ret;
+            }, -1);
+            $scope.originalWishlistPosition = maxPos + 1;
         }
     };
 
@@ -86,11 +114,32 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
         $scope.model.sort_as = $scope.model.title.replace(/^The\s|A\s|An\s/, '');
     };
 
+    $scope.currentlyPlayingClicked = function() {
+        $scope.model.currently_playing = true;
+        $scope.model.queue_position = null;
+        $scope.model.wishlist_position = null;
+    };
+
     $scope.inQueueClicked = function() {
-        if($scope.model.queue_position == null)
-            $scope.model.queue_position = $scope.originalQueuePosition;
-        else
-            $scope.model.queue_position = null;
+        $scope.model.currently_playing = false;
+        $scope.model.queue_position = $scope.originalQueuePosition;
+        $scope.model.wishlist_position = null;
+    };
+
+    $scope.onWishlistClicked = function() {
+        $scope.model.currently_playing = false;
+        $scope.model.queue_position = null;
+        $scope.model.wishlist_position = $scope.originalWishlistPosition;
+
+        $scope.model.finished = gameService.NOT_FINISHED;
+        $scope.model.rating = null;
+        $scope.model.playtime = null;
+    };
+
+    $scope.defaultClicked = function() {
+        $scope.model.currently_playing = false;
+        $scope.model.queue_position = null;
+        $scope.model.wishlist_position = null;
     };
 
     $scope.formSubmit = function() {

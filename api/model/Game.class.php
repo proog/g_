@@ -1,6 +1,6 @@
 <?php
 class Game extends Illuminate\Database\Eloquent\Model {
-    protected $fillable = ['title', 'developer', 'publisher', 'year', 'image', 'finished', 'comment', 'sort_as', 'playtime', 'rating', 'currently_playing', 'queue_position', 'hidden'];
+    protected $fillable = ['title', 'developer', 'publisher', 'year', 'image', 'finished', 'comment', 'sort_as', 'playtime', 'rating', 'currently_playing', 'queue_position', 'hidden', 'wishlist_position'];
     protected $hidden = ['private_comment', 'genres', 'platforms', 'tags'];
     protected $appends = ['genre_ids', 'platform_ids', 'tag_ids'];
     

@@ -1,7 +1,8 @@
 angular.module('games')
 .factory('Genres', ['$resource', function($resource) {
     var Genres = $resource('api/users/:userId/genres/:id', {
-        id: '@id'
+        id: '@id',
+        userId: '@user_id'
     }, {
         update: {
             method: 'PUT'
@@ -15,7 +16,8 @@ angular.module('games')
 }])
 .factory('Platforms', ['$resource', function($resource) {
     var Platforms = $resource('api/users/:userId/platforms/:id', {
-        id: '@id'
+        id: '@id',
+        userId: '@user_id'
     }, {
         update: {
             method: 'PUT'
@@ -29,7 +31,8 @@ angular.module('games')
 }])
 .factory('Tags', ['$resource', function($resource) {
     var Tags = $resource('api/users/:userId/tags/:id', {
-        id: '@id'
+        id: '@id',
+        userId: '@user_id'
     }, {
         update: {
             method: 'PUT'

@@ -62,26 +62,43 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
         });
     };
 
-    self.getVisibleGames = function() {
+    self.isGameVisible = function(game) {
+        return !game.hidden || (self.authenticated && self.authenticatedUser.id == game.user_id);
+    };
+    self.getOwnedGames = function() {
         return $filter('filter')(self.games, function(game) {
-            if(game.hidden)
-                return self.authenticated && self.authenticatedUser.id == game.user_id;
-            return true;
+            if(game.isOnWishlist())
+                return false;
+
+            return self.isGameVisible(game);
+        });
+    };
+    self.getWishlistGames = function() {
+        return $filter('filter')(self.games, function(game) {
+            if(!game.isOnWishlist())
+                return false;
+
+            return self.isGameVisible(game);
+        });
+    };
+    self.getQueuedGames = function() {
+        return $filter('filter')(self.getOwnedGames(), function(game) {
+            return game.isInQueue();
         });
     };
     self.getFinishedGames = function() {
-        return $filter('filter')(self.getVisibleGames(), function(game) {
+        return $filter('filter')(self.getOwnedGames(), function(game) {
             return game.finished == self.FINISHED;
         });
     };
     self.getUnfinishedGames = function() {
-        return $filter('filter')(self.getVisibleGames(), function(game) {
+        return $filter('filter')(self.getOwnedGames(), function(game) {
             return game.finished != self.FINISHED;
         });
     };
     self.getYears = function() {
         var years = [];
-        angular.forEach(self.getVisibleGames(), function(game) {
+        angular.forEach(self.getOwnedGames(), function(game) {
             if(game.year && years.indexOf(game.year) < 0)
                 years.push(game.year);
         });
@@ -89,25 +106,25 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
         return years;
     };
     self.countFinished = function() {
-        return self.getVisibleGames().reduce(function(count, game) {
+        return self.getOwnedGames().reduce(function(count, game) {
             return game.finished == self.FINISHED ? count + 1 : count;
         }, 0);
     };
     self.countFinishedPct = function() {
-        return Math.round(self.countFinished()/self.getVisibleGames().length*100);
+        return Math.round(self.countFinished()/self.getOwnedGames().length*100);
     };
     self.countGenre = function(genre) {
-        return self.getVisibleGames().reduce(function(count, game) {
+        return self.getOwnedGames().reduce(function(count, game) {
             return game.genre_ids.indexOf(genre.id) > -1 ? count + 1 : count;
         }, 0);
     };
     self.countPlatform = function(platform) {
-        return self.getVisibleGames().reduce(function(count, game) {
+        return self.getOwnedGames().reduce(function(count, game) {
             return game.platform_ids.indexOf(platform.id) > -1 ? count + 1 : count;
         }, 0);
     };
     self.countTag = function(tag) {
-        return self.getVisibleGames().reduce(function(count, game) {
+        return self.getOwnedGames().reduce(function(count, game) {
             return game.tag_ids.indexOf(tag.id) > -1 ? count + 1 : count;
         }, 0);
     };

@@ -1,59 +1,66 @@
-angular.module('games').controller('queueFormCtrl', ['$scope', '$modalInstance', '$filter', 'games', function($scope, $modalInstance, $filter, games) {
+angular.module('games').controller('queueFormCtrl', ['$scope', '$modalInstance', '$filter', 'games', 'property', function($scope, $modalInstance, $filter, games, property) {
     $scope.initialize = function() {
         $scope.games = angular.copy(games);
+        $scope.property = property;
+        $scope.filterObject = {};
+        $scope.filterObject[property] = '!!';
         $scope.rewriteQueue();
     };
 
     $scope.rewriteQueue = function() {
-        // just in case of duplicate or missing positions, set all queue positions starting from 0 at the first item
-        $scope.games = $filter('orderBy')($scope.games, ['queue_position', 'sort_as']);
-        for(var i = 0; i < $scope.games.length; i++)
-            $scope.games[i].queue_position = i;
+        // just in case of duplicate or missing positions, set all positions starting from 0 at the first item, skipping nulled positions
+        $scope.games = $filter('orderBy')($scope.games, [$scope.property, 'sort_as']);
+
+        var position = 0;
+        angular.forEach($scope.games, function(game) {
+            if(game[property] != null)
+                game[property] = position++;
+        });
     };
 
     $scope.getMaxPosition = function() {
         return $scope.games.reduce(function(ret, item) {
-            return item.queue_position == null ? ret : ret + 1;
+            return item[property] == null ? ret : ret + 1;
         }, 0) - 1;
     };
 
     $scope.move = function(game, position) {
         angular.forEach($scope.games, function(item) {
-            if(item == game || item.queue_position == null)
+            if(item == game || item[property] == null)
                 return;
 
-            if(item.queue_position > game.queue_position)
-                item.queue_position--;
+            if(item[property] > game[property])
+                item[property]--;
 
-            if(item.queue_position >= position)
-                item.queue_position++;
+            if(item[property] >= position)
+                item[property]++;
         });
 
-        game.queue_position = position;
+        game[property] = position;
     };
 
     $scope.moveUpClick = function(game) {
-        if(game.queue_position == 0)
+        if(game[property] == 0)
             $scope.move(game, $scope.getMaxPosition());
         else
-            $scope.move(game, game.queue_position - 1);
+            $scope.move(game, game[property] - 1);
     };
 
     $scope.moveDownClick = function(game) {
-        if(game.queue_position == $scope.getMaxPosition())
+        if(game[property] == $scope.getMaxPosition())
             $scope.move(game, 0);
         else
-            $scope.move(game, game.queue_position + 1);
+            $scope.move(game, game[property] + 1);
     };
 
     $scope.removeClick = function(game) {
-        // move following items one up
+        // move subsequent items one position up
         angular.forEach($scope.games, function(item) {
-            if(item != game && item.queue_position >= game.queue_position)
-                item.queue_position--;
+            if(item != game && item[property] != null && item[property] >= game[property])
+                item[property]--;
         });
 
-        game.queue_position = null;
+        game[property] = null;
     };
 
     $scope.saveClick = function() {

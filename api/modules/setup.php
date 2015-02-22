@@ -108,6 +108,7 @@ function createTables() {
     $schema = Illuminate\Database\Capsule\Manager::schema();
 
     $schema->create('users', function (Blueprint $table) {
+        $table->engine = 'InnoDB';
         $table->increments('id');
         $table->string('username');
         $table->string('password');
@@ -116,12 +117,14 @@ function createTables() {
     });
 
     $schema->create('config', function (Blueprint $table) {
+        $table->engine = 'InnoDB';
         $table->increments('id');
         $table->integer('default_user')->unsigned();
         $table->foreign('default_user')->references('id')->on('users');
     });
 
     $schema->create('games', function (Blueprint $table) {
+        $table->engine = 'InnoDB';
         $table->increments('id');
         $table->string('title');
         $table->string('developer')->nullable()->default(null);
@@ -137,6 +140,7 @@ function createTables() {
         $table->boolean('currently_playing')->default(false);
         $table->integer('queue_position')->nullable()->default(null);
         $table->boolean('hidden')->default(false);
+        $table->integer('wishlist_position')->nullable()->default(null);
         $table->integer('user_id')->unsigned();
         $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         $table->timestamps();
@@ -160,6 +164,7 @@ function createTables() {
 
     foreach ($entities as $entity) {
         $schema->create($entity['table'], function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->increments('id');
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
@@ -169,10 +174,11 @@ function createTables() {
         });
 
         $schema->create($entity['junctionTable'], function (Blueprint $table) use ($entity) {
+            $table->engine = 'InnoDB';
             $table->integer('game_id')->unsigned();
             $table->foreign('game_id')->references('id')->on('games')->onDelete('cascade');
             $table->integer($entity['junctionColumn'])->unsigned();
-            $table->foreign($entity['junctionColumn'])->references('id')->on('games')->onDelete('cascade');
+            $table->foreign($entity['junctionColumn'])->references('id')->on($entity['table'])->onDelete('cascade');
         });
     }
 }

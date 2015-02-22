@@ -43,7 +43,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
 
         if(del && model.id) {
             // delete game
-            game.$delete({userId: self.userId}, function() {
+            game.$delete(function() {
                 var pos = gameService.games.indexOf(game);
                 if(pos > -1)
                     gameService.games.splice(pos, 1);
@@ -58,7 +58,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             game.$save({userId: self.userId}, function() {
                 gameService.games.push(game);
                 if(image && image[0].files.length > 0)
-                    game.uploadImage(self.userId, image);
+                    game.uploadImage(image);
 
                 // reflect the new game in the chart
                 self.updateChart();
@@ -67,10 +67,10 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         else {
             // update game
             var g = new Games(model);
-            g.$update({userId: self.userId}, function(data) {
+            g.$update(function(data) {
                 angular.copy(data, game);
                 if(image && image[0].files.length > 0)
-                    game.uploadImage(self.userId, image);
+                    game.uploadImage(image);
 
                 // reflect any updates in the chart
                 self.updateChart();
@@ -106,7 +106,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             angular.forEach(result, function(item) {
                 if(item.deleted && item.id) {
                     // delete request
-                    requests.push(item.$delete({userId: self.userId}, function() {
+                    requests.push(item.$delete(function() {
                         var pos = -1;
                         for(var i = 0; i < items.length; i++) {
                             var originalItem = items[i];
@@ -122,7 +122,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                 }
                 else if(item.updated && item.id) {
                     // update request
-                    requests.push(item.$update({userId: self.userId}, function(data) {
+                    requests.push(item.$update(function(data) {
                         for(var i = 0; i < items.length; i++) {
                             var originalItem = items[i];
                             if(originalItem.id == item.id) {
@@ -132,7 +132,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                         }
                     }));
                 }
-                else if(item.added && !item.id) {
+                else if(item.added) {
                     // add request
                     requests.push(item.$save({userId: self.userId}, function(data) {
                         items.push(data);
@@ -167,28 +167,47 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
     };
 
     self.manageQueueClick = function() {
+        self.openReorderForm('queue_position');
+    };
+
+    self.manageWishlistClick = function() {
+        self.openReorderForm('wishlist_position');
+    };
+
+    self.openReorderForm = function(property) {
         var modalInstance = $modal.open({
             templateUrl: 'queue.html',
             controller: 'queueFormCtrl',
             size: 'sm',
             resolve: {
                 games: function() {
-                    return $filter('filter')(gameService.games, { queue_position: '!!' });
+                    var filterObject = {};
+                    filterObject[property] = '!!';
+                    return $filter('filter')(gameService.games, filterObject);
+                },
+                property: function() {
+                    return property;
                 }
             }
         });
         modalInstance.result.then(function(result) {
-            // handle game queue list
+            // handle reordered list
+            var promises = [];
             angular.forEach(result, function(game) {
                 for(var i = 0; i < gameService.games.length; i++) {
                     var original = gameService.games[i];
 
                     if(original.id == game.id) {
-                        original.queue_position = game.queue_position;
-                        original.$update({userId: self.userId});
+                        original[property] = game[property];
+                        promises.push(original.$update().$promise);
                         break;
                     }
                 }
+            });
+
+            // update chart to reflect changes e.g. due to wishlist removals
+            $q.all(promises, function() {
+                self.updateChart();
             });
         });
     };
@@ -456,7 +475,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                     value: function(valueFn) {
                         var stats = [];
                         angular.forEach(gameService.genres, function(genre) {
-                            var gamesInCategory = $filter('filter')(gameService.getVisibleGames(), function(game) {
+                            var gamesInCategory = $filter('filter')(gameService.getOwnedGames(), function(game) {
                                 return game.genre_ids.indexOf(genre.id) > -1;
                             });
 
@@ -473,7 +492,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                     value: function(valueFn) {
                         var stats = [];
                         angular.forEach(gameService.platforms, function(platform) {
-                            var gamesInCategory = $filter('filter')(gameService.getVisibleGames(), function(game) {
+                            var gamesInCategory = $filter('filter')(gameService.getOwnedGames(), function(game) {
                                 return game.platform_ids.indexOf(platform.id) > -1;
                             });
 
@@ -490,7 +509,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                     value: function(valueFn) {
                         var stats = [];
                         angular.forEach(gameService.tags, function(tag) {
-                            var gamesInCategory = $filter('filter')(gameService.getVisibleGames(), function(game) {
+                            var gamesInCategory = $filter('filter')(gameService.getOwnedGames(), function(game) {
                                 return game.tag_ids.indexOf(tag.id) > -1;
                             });
 
@@ -507,7 +526,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                     value: function(valueFn) {
                         var stats = [];
                         angular.forEach(gameService.getYears(), function(year) {
-                            var gamesInCategory = $filter('filter')(gameService.getVisibleGames(), function(game) {
+                            var gamesInCategory = $filter('filter')(gameService.getOwnedGames(), function(game) {
                                 return game.year == year;
                             });
 
@@ -680,7 +699,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         var dataLoaded = function() {
             // select game if specified
             if($routeParams.gameId) {
-                angular.forEach(gameService.getVisibleGames(), function(game) {
+                angular.forEach(gameService.getOwnedGames(), function(game) {
                     if(game.id == $routeParams.gameId)
                         self.gameSelected(game);
                 });

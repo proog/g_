@@ -21,10 +21,16 @@
                                 Add game
                             </a>
                         </li>
-                        <li ng-if="ctrl.canShowAuthenticatedMenuItems()">
+                        <li ng-if="ctrl.canShowAuthenticatedMenuItems() && ctrl.gameService.getQueuedGames().length">
                             <a class="hand" ng-click="ctrl.manageQueueClick()">
                                 <span class="glyphicon glyphicon-sort"></span>
                                 Manage queue
+                            </a>
+                        </li>
+                        <li ng-if="ctrl.canShowAuthenticatedMenuItems() && ctrl.gameService.getWishlistGames().length">
+                            <a class="hand" ng-click="ctrl.manageWishlistClick()">
+                                <span class="glyphicon glyphicon-sort"></span>
+                                Manage wishlist
                             </a>
                         </li>
                         <li ng-if="ctrl.canShowAuthenticatedMenuItems()" class="divider"></li>
@@ -87,10 +93,16 @@
                         Add game
                     </a>
                 </li>
-                <li ng-if="ctrl.canShowAuthenticatedMenuItems()">
+                <li ng-if="ctrl.canShowAuthenticatedMenuItems() && ctrl.gameService.getQueuedGames().length">
                     <a class="hand" ng-click="ctrl.manageQueueClick()">
                         <span class="glyphicon glyphicon-sort"></span>
                         Manage queue
+                    </a>
+                </li>
+                <li ng-if="ctrl.canShowAuthenticatedMenuItems() && ctrl.gameService.getWishlistGames().length">
+                    <a class="hand" ng-click="ctrl.manageWishlistClick()">
+                        <span class="glyphicon glyphicon-sort"></span>
+                        Manage wishlist
                     </a>
                 </li>
             </ul>

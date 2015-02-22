@@ -27,7 +27,7 @@
                         <input type="number" class="form-control" placeholder="Release year" ng-model="model.year" name="year" validate-year>
                     </div>
                     <div class="form-group" ng-class="{'has-error': form.playtime.$invalid}">
-                        <input type="text" class="form-control" placeholder="Playtime" ng-model="model.playtime" name="playtime" validate-timespan>
+                        <input type="text" class="form-control" placeholder="Playtime" ng-model="model.playtime" name="playtime" ng-disabled="state == STATE_ON_WISHLIST" validate-timespan>
                     </div>
                     <div class="form-group">
                         <textarea class="form-control" placeholder="Comment" ng-model="model.comment" name="comment"></textarea>
@@ -35,31 +35,31 @@
                     <div class="form-group">
                         <div class="radio">
                             <label>
-                                <input type="radio" ng-model="model.finished" ng-value="gameService.NOT_FINISHED" name="finished">
+                                <input type="radio" ng-model="model.finished" ng-value="gameService.NOT_FINISHED" name="finished" ng-disabled="state == STATE_ON_WISHLIST">
                                 Not completed
                             </label>
                         </div>
                         <div class="radio">
                             <label>
-                                <input type="radio" ng-model="model.finished" ng-value="gameService.FINISHED" name="finished">
+                                <input type="radio" ng-model="model.finished" ng-value="gameService.FINISHED" name="finished" ng-disabled="state == STATE_ON_WISHLIST">
                                 Completed
                             </label>
                         </div>
                         <div class="radio">
                             <label>
-                                <input type="radio" ng-model="model.finished" ng-value="gameService.SHELVED" name="finished">
+                                <input type="radio" ng-model="model.finished" ng-value="gameService.SHELVED" name="finished" ng-disabled="state == STATE_ON_WISHLIST">
                                 Shelved
                             </label>
                         </div>
                         <div class="radio">
                             <label>
-                                <input type="radio" ng-model="model.finished" ng-value="gameService.FINISHED_NA" name="finished">
+                                <input type="radio" ng-model="model.finished" ng-value="gameService.FINISHED_NA" name="finished" ng-disabled="state == STATE_ON_WISHLIST">
                                 N/A
                             </label>
                         </div>
                     </div>
                     <div class="form-group">
-                        <rating ng-model="model.rating" max="5"></rating>
+                        <rating ng-model="model.rating" max="5" readonly="state == STATE_ON_WISHLIST"></rating>
                         <span class="glyphicon glyphicon-remove hand pull-right" ng-click="model.rating = null"></span>
                     </div>
                     <div class="form-group">
@@ -67,18 +67,32 @@
                         <span class="glyphicon glyphicon-remove hand pull-right" ng-click="clearImageInput()"></span>
                     </div>
                     <div class="form-group">
-                        <div class="checkbox">
+                        <div class="radio">
                             <label>
-                                <input type="checkbox" ng-model="model.currently_playing">
+                                <input type="radio" ng-model="state" ng-value="STATE_DEFAULT" ng-change="defaultClicked()">
+                                Default
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" ng-model="state" ng-value="STATE_CURRENTLY_PLAYING" ng-change="currentlyPlayingClicked()">
                                 Currently playing
                             </label>
                         </div>
-                        <div class="checkbox">
+                        <div class="radio">
                             <label>
-                                <input type="checkbox" ng-click="inQueueClicked()" ng-checked="model.queue_position != null">
+                                <input type="radio" ng-model="state" ng-value="STATE_IN_QUEUE" ng-change="inQueueClicked()">
                                 In queue
                             </label>
                         </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" ng-model="state" ng-value="STATE_ON_WISHLIST" ng-change="onWishlistClicked()">
+                                On wishlist
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <div class="checkbox">
                             <label>
                                 <input type="checkbox" ng-model="model.hidden">

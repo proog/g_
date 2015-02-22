@@ -17,6 +17,10 @@ function addGame($userId) {
     $user = User::findOrFail($userId);
     $metadata = decodeJsonOrFail($app->request->getBody());
     $game = new Game($metadata);
+
+    if(!in_array($game->finished, [Game::NOT_FINISHED, Game::FINISHED, Game::FINISHED_NA, Game::SHELVED]))
+        $game->finished = Game::NOT_FINISHED;
+
     $game->user()->associate($user);
     $game->save();
     
@@ -43,6 +47,9 @@ function updateGame($userId, $id) {
     $user = User::findOrFail($userId);
     $game = $user->games()->findOrFail($id);
     $metadata = decodeJsonOrFail($app->request->getBody());
+
+    if(!in_array($metadata['finished'], [Game::NOT_FINISHED, Game::FINISHED, Game::FINISHED_NA, Game::SHELVED]))
+        $metadata['finished'] = Game::NOT_FINISHED;
     
     $game->update($metadata);
     $game->genres()->detach();
@@ -93,6 +100,7 @@ function listSuggestions($userId) {
         ->where('playtime', null)
         ->where('queue_position', null)
         ->where('currently_playing', false)
+        ->where('wishlist_position', false)
         ->get();
     $topGames = $user->games()
         ->with('genres', 'platforms', 'tags')

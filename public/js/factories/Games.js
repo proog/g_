@@ -1,6 +1,7 @@
 angular.module('games').factory('Games', ['$resource', 'upload', function($resource, upload) {
     var Games = $resource('api/users/:userId/games/:id', {
-        id: '@id'
+        id: '@id',
+        userId: '@user_id'
     }, {
         query: {
             method: 'GET',
@@ -42,6 +43,7 @@ angular.module('games').factory('Games', ['$resource', 'upload', function($resou
     var initializeGame = function(game) {
         game.decachedImage = game.image;
         game.currently_playing = (game.currently_playing == 1);
+        game.hidden = (game.hidden == 1);
 
         if(game.title) {
             var splitter = ': ';
@@ -56,10 +58,10 @@ angular.module('games').factory('Games', ['$resource', 'upload', function($resou
         return game;
     };
 
-    Games.prototype.uploadImage = function(userId, image) {
+    Games.prototype.uploadImage = function(image) {
         var self = this;
         return upload({
-            url: 'api/users/' + userId + '/games/' + this.id + '/image',
+            url: 'api/users/' + self.user_id + '/games/' + self.id + '/image',
             method: 'POST',
             data: {
                 image: image
@@ -84,6 +86,14 @@ angular.module('games').factory('Games', ['$resource', 'upload', function($resou
 
     Games.prototype.hasRating = function() {
         return this.rating != null;
+    };
+
+    Games.prototype.isOnWishlist = function() {
+        return this.wishlist_position !== null;
+    };
+
+    Games.prototype.isInQueue = function() {
+        return this.queue_position !== null;
     };
 
     Games.prototype.getPlaytimeDisplay = function() {

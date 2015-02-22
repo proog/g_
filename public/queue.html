@@ -1,18 +1,20 @@
 <div class="modal-header">
     <button type="button" class="close"></button>
-    <h4 class="modal-title">
-        Manage Queue
+    <h4 class="modal-title" ng-switch="property">
+        <span ng-switch-when="queue_position">Manage Queue</span>
+        <span ng-switch-when="wishlist_position">Manage Wishlist</span>
     </h4>
 </div>
 <form>
     <div class="modal-body">
         <div class="container-fluid">
-            <div class="row" ng-if="games.length == 0">
-                <div class="col-md-12">
-                    The queue is empty
+            <div class="row" ng-if="!filteredGames.length">
+                <div class="col-md-12" ng-switch="property">
+                    <span ng-switch-when="queue_position">The queue is empty</span>
+                    <span ng-switch-when="wishlist_position">The wishlist is empty</span>
                 </div>
             </div>
-            <div class="row" ng-repeat="game in games | filter:{queue_position: '!!'} | orderBy:'queue_position'">
+            <div class="row" ng-repeat="game in filteredGames = (games | filter:filterObject | orderBy:property)">
                 <div class="col-md-12">
                     <div class="form-group btn-group btn-group-xs pull-right">
                         <button class="btn btn-default" type="button" ng-click="moveUpClick(game)">
@@ -26,7 +28,7 @@
                         </button>
                     </div>
                     <div class="overflow-ellipsis" title="{{game.title}}">
-                        {{game.queue_position + 1}}. {{game.title}}
+                        {{game[property] + 1}}. {{game.title}}
                     </div>
                 </div>
             </div>
