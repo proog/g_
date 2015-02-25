@@ -5,19 +5,24 @@ var concat = require('gulp-concat');
 var input = './public/js/**/!(*.min).js';
 var output = './public/js/g.min.js';
 
-function js() {
-    gulp.src(input)
-        .pipe(uglify())
-        .on('error', function(error) {
-            console.log(error);
-            this.emit('end');
-        })
+function js(productionMode) {
+    var src = gulp.src(input);
+
+    if(productionMode)
+        src = src.pipe(uglify());
+
+    src.on('error', function(error) {
+        console.log(error);
+        this.emit('end');
+    })
         .pipe(concat(output))
         .pipe(gulp.dest('./'));
 }
-gulp.task('js', js);
+gulp.task('js', function() {
+    js(true);
+});
 
 gulp.task('default', function() {
-    js();
+    js(true);
     gulp.watch(input, ['js']);
 });

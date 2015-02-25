@@ -25,57 +25,12 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             controller: 'formCtrl',
             size: 'lg',
             resolve: {
-                game: function() { return game; },
-                genres: function() { return gameService.genres; },
-                platforms: function() { return gameService.platforms; },
-                tags: function() { return gameService.tags; },
-                games: function() { return gameService.games; }
+                game: function() { return game; }
             }
         });
-        modalInstance.result.then(function(result) {
-            self.formSubmit(game, result.model, result.image, result.delete, result.isNew);
+        modalInstance.result.then(function() {
+            self.updateChart();
         });
-    };
-
-    self.formSubmit = function(game, model, image, del, isNew) {
-        if(!model.rating || model.rating.length == 0)
-            model.rating = null;
-
-        if(del && model.id) {
-            // delete game
-            game.$delete(function() {
-                var pos = gameService.games.indexOf(game);
-                if(pos > -1)
-                    gameService.games.splice(pos, 1);
-
-                // reflect deletion in the chart
-                self.updateChart();
-            });
-        }
-        else if(isNew) {
-            // add game
-            game = new Games(model);
-            game.$save({userId: self.userId}, function() {
-                gameService.games.push(game);
-                if(image && image[0].files.length > 0)
-                    game.uploadImage(image);
-
-                // reflect the new game in the chart
-                self.updateChart();
-            });
-        }
-        else {
-            // update game
-            var g = new Games(model);
-            g.$update(function(data) {
-                angular.copy(data, game);
-                if(image && image[0].files.length > 0)
-                    game.uploadImage(image);
-
-                // reflect any updates in the chart
-                self.updateChart();
-            });
-        }
     };
 
     self.manageGenresClick = function() {
@@ -99,70 +54,8 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                 items: function() { return items; }
             }
         });
-        modalInstance.result.then(function(result) {
-            var requests = [];
-
-            // handle modified genre/platform/tag list
-            angular.forEach(result, function(item) {
-                if(item.deleted && item.id) {
-                    // delete request
-                    requests.push(item.$delete(function() {
-                        var pos = -1;
-                        for(var i = 0; i < items.length; i++) {
-                            var originalItem = items[i];
-                            if(originalItem.id == item.id) {
-                                pos = i;
-                                break;
-                            }
-                        }
-
-                        if(pos > -1)
-                            items.splice(pos, 1);
-                    }));
-                }
-                else if(item.updated && item.id) {
-                    // update request
-                    requests.push(item.$update(function(data) {
-                        for(var i = 0; i < items.length; i++) {
-                            var originalItem = items[i];
-                            if(originalItem.id == item.id) {
-                                angular.copy(data, originalItem);
-                                break;
-                            }
-                        }
-                    }));
-                }
-                else if(item.added) {
-                    // add request
-                    requests.push(item.$save({userId: self.userId}, function(data) {
-                        items.push(data);
-                    }));
-                }
-            });
-
-            // remove deleted genres/platforms/tags from games that reference them
-            $q.all(requests).then(function() {
-                var ids = Entities.prototype.ids;
-
-                angular.forEach(gameService.games, function (game) {
-                    for(var i = 0; i < game[ids].length; i++) {
-                        var id = game[ids][i];
-                        var found = false;
-
-                        angular.forEach(items, function(item) {
-                            if(id == item.id)
-                                found = true;
-                        });
-
-                        // if not found in updated list, delete id from game's list
-                        if(!found)
-                            game[ids].splice(i, 1);
-                    }
-                });
-
-                // reflect any updates in the chart
-                self.updateChart();
-            });
+        modalInstance.result.then(function() {
+            self.updateChart();
         });
     };
 
@@ -190,25 +83,9 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
                 }
             }
         });
-        modalInstance.result.then(function(result) {
-            // handle reordered list
-            var promises = [];
-            angular.forEach(result, function(game) {
-                for(var i = 0; i < gameService.games.length; i++) {
-                    var original = gameService.games[i];
-
-                    if(original.id == game.id) {
-                        original[property] = game[property];
-                        promises.push(original.$update().$promise);
-                        break;
-                    }
-                }
-            });
-
+        modalInstance.result.then(function() {
             // update chart to reflect changes e.g. due to wishlist removals
-            $q.all(promises, function() {
-                self.updateChart();
-            });
+            self.updateChart();
         });
     };
 

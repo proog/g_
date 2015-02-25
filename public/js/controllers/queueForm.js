@@ -1,4 +1,4 @@
-angular.module('games').controller('queueFormCtrl', ['$scope', '$modalInstance', '$filter', 'games', 'property', function($scope, $modalInstance, $filter, games, property) {
+angular.module('games').controller('queueFormCtrl', ['$scope', '$modalInstance', '$filter', 'games', 'property', 'gameService', '$q', function($scope, $modalInstance, $filter, games, property, gameService, $q) {
     $scope.initialize = function() {
         $scope.games = angular.copy(games);
         $scope.property = property;
@@ -65,7 +65,21 @@ angular.module('games').controller('queueFormCtrl', ['$scope', '$modalInstance',
 
     $scope.saveClick = function() {
         $scope.rewriteQueue();
-        $modalInstance.close($scope.games);
+
+        // update original games
+        var promises = [];
+        angular.forEach($scope.games, function(game) {
+            angular.forEach(gameService.games, function(originalGame) {
+                if(originalGame.id == game.id) {
+                    originalGame[property] = game[property];
+                    promises.push(originalGame.$update());
+                }
+            });
+        });
+
+        $q.all(promises).then(function() {
+            $modalInstance.close();
+        });
     };
 
     $scope.cancelClick = function() {

@@ -1,9 +1,8 @@
-angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'game', 'genres', 'platforms', 'tags', 'games', 'gameService', function($scope, $modalInstance, game, genres, platforms, tags, games, gameService) {
+angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'game', 'gameService', 'Games', function($scope, $modalInstance, game, gameService, Games) {
     $scope.initialize = function() {
-        $scope.genres = genres;
-        $scope.platforms = platforms;
-        $scope.tags = tags;
-        $scope.games = games;
+        $scope.genres = gameService.genres;
+        $scope.platforms = gameService.platforms;
+        $scope.tags = gameService.tags;
         $scope.gameService = gameService;
 
         $scope.STATE_DEFAULT = 0;
@@ -55,7 +54,7 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
         }
         else {
             // find the potential queue position
-            maxPos = $scope.games.reduce(function(ret, game) {
+            maxPos = gameService.games.reduce(function(ret, game) {
                 return game.queue_position != null ? Math.max(game.queue_position, ret) : ret;
             }, -1);
             $scope.originalQueuePosition = maxPos + 1;
@@ -67,7 +66,7 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
         }
         else {
             // find the potential wishlist position
-            maxPos = $scope.games.reduce(function(ret, game) {
+            maxPos = gameService.games.reduce(function(ret, game) {
                 return game.wishlist_position != null ? Math.max(game.wishlist_position, ret) : ret;
             }, -1);
             $scope.originalWishlistPosition = maxPos + 1;
@@ -108,10 +107,30 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
                 }
             } catch(e){}
         }
+
+        $scope.filename = null;
     };
 
     $scope.titleChanged = function() {
-        $scope.model.sort_as = $scope.model.title.replace(/^The\s|A\s|An\s/, '');
+        if($scope.model.title)
+            $scope.model.sort_as = $scope.model.title.replace(/^The\s|A\s|An\s/, '');
+        else
+            $scope.model.sort_as = null;
+    };
+
+    $scope.yearButtonClicked = function() {
+        $scope.model.year = new Date().getFullYear();
+    };
+
+    $scope.fileChanged = function() {
+        $scope.$apply(function() {
+            if($scope.image && $scope.image[0] && $scope.image[0].files && $scope.image[0].files.length > 0) {
+                $scope.filename = $scope.image[0].files[0].name;
+            }
+            else {
+                $scope.filename = null;
+            }
+        });
     };
 
     $scope.currentlyPlayingClicked = function() {
@@ -143,30 +162,36 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
     };
 
     $scope.formSubmit = function() {
-        if($scope.isNew)
-            $scope.addClick();
-        else if(!$scope.isNew)
-            $scope.saveClick();
-    };
-
-    $scope.addClick = function() {
-        var result = {
-            model: $scope.model,
-            image: $scope.image,
-            delete: false,
-            isNew: true
+        var handleImage = function() {
+            if($scope.image && $scope.image[0].files.length > 0) {
+                game.uploadImage($scope.image).then(function() {
+                    $modalInstance.close();
+                });
+            }
+            else {
+                $modalInstance.close();
+            }
         };
-        $modalInstance.close(result);
-    };
 
-    $scope.saveClick = function() {
-        var result = {
-            model: $scope.model,
-            image: $scope.image,
-            delete: false,
-            isNew: false
-        };
-        $modalInstance.close(result);
+        if(!$scope.model.rating || $scope.model.rating.length == 0)
+            $scope.model.rating = null;
+
+        if($scope.isNew) {
+            game = new Games($scope.model);
+            game.$save({userId: gameService.authenticatedUser.id}, function() {
+                // add saved game to games list
+                gameService.games.push(game);
+                handleImage();
+            });
+        }
+        else {
+            var g = new Games($scope.model);
+            g.$update(function(data) {
+                // copy data back to original game
+                angular.copy(data, game);
+                handleImage();
+            });
+        }
     };
 
     $scope.deleteClick = function() {
@@ -174,13 +199,13 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
         if(!dialog)
             return;
 
-        var result = {
-            model: $scope.model,
-            image: $scope.image,
-            delete: true,
-            isNew: false
-        };
-        $modalInstance.close(result);
+        game.$delete(function() {
+            var pos = gameService.games.indexOf(game);
+            if(pos > -1)
+                gameService.games.splice(pos, 1);
+
+            $modalInstance.close();
+        });
     };
 
     $scope.cancelClick = function() {

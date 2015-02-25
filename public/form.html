@@ -11,11 +11,8 @@
             <div class="row">
                 <div class="col-md-4">
                     <h4>Details</h4>
-                    <div class="form-group" ng-class="{'has-error': form.title.$invalid}">
-                        <input type="text" class="form-control input-lg" placeholder="Title" ng-model="model.title" ng-change="titleChanged()" name="title" required>
-                    </div>
-                    <div class="form-group" ng-class="{'has-error': form.sort_as.$invalid}">
-                        <input type="text" class="form-control" placeholder="Sort as" ng-model="model.sort_as" name="sort_as" required>
+                    <div class="form-group">
+                        <input type="text" class="form-control input-lg" placeholder="Title (required)" ng-model="model.title" ng-change="titleChanged()" name="title" required>
                     </div>
                     <div class="form-group">
                         <input type="text" class="form-control" placeholder="Developer" ng-model="model.developer" name="developer">
@@ -23,49 +20,61 @@
                     <div class="form-group">
                         <input type="text" class="form-control" placeholder="Publisher" ng-model="model.publisher" name="publisher">
                     </div>
-                    <div class="form-group" ng-class="{'has-error': form.year.$invalid}">
+                    <div class="form-group input-group" ng-class="{'has-error': form.year.$invalid}">
                         <input type="number" class="form-control" placeholder="Release year" ng-model="model.year" name="year" validate-year>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="yearButtonClicked()">
+                                <span class="glyphicon glyphicon-calendar"></span> Now
+                            </button>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Sort as (required)" ng-model="model.sort_as" name="sort_as" required>
                     </div>
                     <div class="form-group" ng-class="{'has-error': form.playtime.$invalid}">
-                        <input type="text" class="form-control" placeholder="Playtime" ng-model="model.playtime" name="playtime" ng-disabled="state == STATE_ON_WISHLIST" validate-timespan>
+                        <input type="text" class="form-control" placeholder="Playtime (hh:mm:ss)" ng-model="model.playtime" name="playtime" ng-disabled="state == STATE_ON_WISHLIST" validate-timespan>
                     </div>
                     <div class="form-group">
                         <textarea class="form-control" placeholder="Comment" ng-model="model.comment" name="comment"></textarea>
                     </div>
                     <div class="form-group">
-                        <div class="radio">
-                            <label>
-                                <input type="radio" ng-model="model.finished" ng-value="gameService.NOT_FINISHED" name="finished" ng-disabled="state == STATE_ON_WISHLIST">
-                                Not completed
-                            </label>
-                        </div>
-                        <div class="radio">
-                            <label>
-                                <input type="radio" ng-model="model.finished" ng-value="gameService.FINISHED" name="finished" ng-disabled="state == STATE_ON_WISHLIST">
-                                Completed
-                            </label>
-                        </div>
-                        <div class="radio">
-                            <label>
-                                <input type="radio" ng-model="model.finished" ng-value="gameService.SHELVED" name="finished" ng-disabled="state == STATE_ON_WISHLIST">
-                                Shelved
-                            </label>
-                        </div>
-                        <div class="radio">
-                            <label>
-                                <input type="radio" ng-model="model.finished" ng-value="gameService.FINISHED_NA" name="finished" ng-disabled="state == STATE_ON_WISHLIST">
-                                N/A
-                            </label>
+                        <span class="input-group">
+                            <input type="text" class="form-control" ng-model="filename" placeholder="Cover image" readonly>
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default btn-file">
+                                    <input type="file" id="image" accept="image/*" bind-element="image" onchange="angular.element(this).scope().fileChanged()">
+                                    <span class="glyphicon glyphicon-picture"></span>
+                                    Browse
+                                </button>
+                                <button type="button" class="btn btn-default" ng-click="clearImageInput()">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                </button>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="panel panel-default form-control">
+                                <div class="panel-body" style="padding: 0;">
+                                    <rating ng-model="model.rating" max="5" readonly="state == STATE_ON_WISHLIST"></rating>
+                                </div>
+                            </div>
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-default pull-right" ng-click="model.rating = null">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <rating ng-model="model.rating" max="5" readonly="state == STATE_ON_WISHLIST"></rating>
-                        <span class="glyphicon glyphicon-remove hand pull-right" ng-click="model.rating = null"></span>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="model.hidden">
+                                Hidden from public
+                            </label>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <input type="file" id="image" accept="image/*" style="width: 70%; display: inline-block;" bind-element="image">
-                        <span class="glyphicon glyphicon-remove hand pull-right" ng-click="clearImageInput()"></span>
-                    </div>
+                    <h4>State</h4>
                     <div class="form-group">
                         <div class="radio">
                             <label>
@@ -92,11 +101,30 @@
                             </label>
                         </div>
                     </div>
+                    <h4>Completion</h4>
                     <div class="form-group">
-                        <div class="checkbox">
+                        <div class="radio">
                             <label>
-                                <input type="checkbox" ng-model="model.hidden">
-                                Hidden from public
+                                <input type="radio" ng-model="model.finished" ng-value="gameService.NOT_FINISHED" name="finished" ng-disabled="state == STATE_ON_WISHLIST">
+                                Not completed
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" ng-model="model.finished" ng-value="gameService.FINISHED" name="finished" ng-disabled="state == STATE_ON_WISHLIST">
+                                Completed
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" ng-model="model.finished" ng-value="gameService.SHELVED" name="finished" ng-disabled="state == STATE_ON_WISHLIST">
+                                Shelved
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" ng-model="model.finished" ng-value="gameService.FINISHED_NA" name="finished" ng-disabled="state == STATE_ON_WISHLIST">
+                                N/A
                             </label>
                         </div>
                     </div>

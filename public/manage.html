@@ -17,15 +17,15 @@
                     <label>Short name</label>
                 </div>
             </div>
-            <div class="row" ng-repeat="item in items | filter:{deleted: false}">
+            <div class="row" ng-repeat="item in items | filter:{state: '!'+STATE_DELETED}">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Name" ng-model="item.name" ng-change="nameChange(item)">
+                        <input type="text" class="form-control" placeholder="Name" ng-model="item.name" ng-change="nameChange(item)" required>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Short name" ng-model="item.short_name" ng-change="shortNameChange(item)">
+                        <input type="text" class="form-control" placeholder="Short name" ng-model="item.short_name" ng-change="shortNameChange(item)" required>
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -54,7 +54,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary" ng-click="saveClick()" ng-disabled="!canSave()">OK</button>
+        <button type="submit" class="btn btn-primary" ng-click="saveClick()" ng-disabled="form.$invalid">OK</button>
         <button type="button" class="btn btn-default" ng-click="cancelClick()">Cancel</button>
     </div>
 </form>
