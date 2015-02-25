@@ -24,6 +24,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             templateUrl: 'form.html',
             controller: 'formCtrl',
             size: 'lg',
+            backdrop: 'static',
             resolve: {
                 game: function() { return game; }
             }
@@ -49,6 +50,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         var modalInstance = $modal.open({
             templateUrl: 'manage.html',
             controller: 'manageFormCtrl',
+            backdrop: 'static',
             resolve: {
                 Entities: function() { return Entities; },
                 items: function() { return items; }
@@ -72,6 +74,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             templateUrl: 'queue.html',
             controller: 'queueFormCtrl',
             size: 'sm',
+            backdrop: 'static',
             resolve: {
                 games: function() {
                     var filterObject = {};
@@ -98,6 +101,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             templateUrl: 'login.html',
             controller: 'loginFormCtrl',
             size: 'sm',
+            backdrop: 'static',
             resolve: {
                 loginUrl: function() { return 'api/login'; }
             }
@@ -118,7 +122,8 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
     self.aboutClick = function() {
         $modal.open({
             templateUrl: 'about.html',
-            size: 'sm'
+            size: 'sm',
+            backdrop: 'static',
         });
     };
 
@@ -146,6 +151,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             templateUrl: 'link.html',
             controller: 'linkCtrl',
             size: 'sm',
+            backdrop: 'static',
             resolve: {
                 url: function() {
                     var protocol = $location.protocol() + '://';
