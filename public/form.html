@@ -54,13 +54,13 @@
                     </div>
                     <div class="form-group">
                         <div class="input-group">
-                            <div class="panel panel-default form-control">
+                            <div class="panel panel-default form-control" ng-disabled="state == STATE_ON_WISHLIST">
                                 <div class="panel-body" style="padding: 0;">
                                     <rating ng-model="model.rating" max="5" readonly="state == STATE_ON_WISHLIST"></rating>
                                 </div>
                             </div>
                             <div class="input-group-btn">
-                                <button type="button" class="btn btn-default pull-right" ng-click="model.rating = null">
+                                <button type="button" class="btn btn-default pull-right" ng-click="model.rating = null" ng-disabled="state == STATE_ON_WISHLIST">
                                     <span class="glyphicon glyphicon-remove"></span>
                                 </button>
                             </div>
