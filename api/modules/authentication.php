@@ -7,12 +7,12 @@ function logIn() {
     
     $_SESSION['authenticated'] = true;
     $_SESSION['user_id'] = $user->id;
-    echo $user->toJson(JSON_NUMERIC_CHECK);
+    echo $user->toJson();
 }
 
 function checkLogin() {
     $user = User::findOrFail($_SESSION['user_id']);
-    echo $user->toJson(JSON_NUMERIC_CHECK);
+    echo $user->toJson();
 }
 
 function logOut() {

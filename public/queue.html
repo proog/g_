@@ -8,6 +8,13 @@
 <form>
     <div class="modal-body">
         <div class="container-fluid">
+            <div class="row" ng-if="error">
+                <div class="col-md-12">
+                    <alert type="danger" close="closeAlert()">
+                        {{error}}
+                    </alert>
+                </div>
+            </div>
             <div class="row" ng-if="!filteredGames.length">
                 <div class="col-md-12" ng-switch="property">
                     <span ng-switch-when="queue_position">The queue is empty</span>

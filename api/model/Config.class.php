@@ -6,4 +6,12 @@ class Config extends Illuminate\Database\Eloquent\Model {
     public function defaultUser() {
         return $this->hasOne('User', 'id', 'default_user');
     }
+
+    public function getIdAttribute($value) {
+        return (int) $value;
+    }
+
+    public function getDefaultUserAttribute($value) {
+        return (int) $value;
+    }
 }

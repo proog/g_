@@ -6,7 +6,7 @@ session_cache_limiter(false);
 session_start();
 
 // set up slim
-$app = new Slim\Slim(['debug' => true]);
+$app = new Slim\Slim(['debug' => false]);
 $app->response->headers->set('Content-Type', 'application/json');
 
 if(isConfigured()) {

@@ -4,6 +4,7 @@ angular.module('games').controller('manageFormCtrl', ['$scope', '$modalInstance'
         $scope.originalItems = items;
         $scope.items = angular.copy(items);
         $scope.type = Entities.prototype.type;
+        $scope.error = null;
         $scope.STATE_UNCHANGED = 1;
         $scope.STATE_ADDED = 2;
         $scope.STATE_UPDATED = 3;
@@ -95,6 +96,8 @@ angular.module('games').controller('manageFormCtrl', ['$scope', '$modalInstance'
 
         $q.all(requests).then(function() {
             $modalInstance.close();
+        }, function() {
+            $scope.error = 'Could not save all items. Please check that all fields are filled out.';
         });
     };
 
@@ -109,6 +112,10 @@ angular.module('games').controller('manageFormCtrl', ['$scope', '$modalInstance'
                 return false;
         }
         return true;
+    };
+
+    $scope.closeAlert = function() {
+        $scope.error = null;
     };
 
     $scope.initialize();

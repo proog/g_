@@ -42,8 +42,6 @@ angular.module('games').factory('Games', ['$resource', 'upload', function($resou
 
     var initializeGame = function(game) {
         game.decachedImage = game.image;
-        game.currently_playing = (game.currently_playing == 1);
-        game.hidden = (game.hidden == 1);
 
         if(game.title) {
             var splitter = ': ';

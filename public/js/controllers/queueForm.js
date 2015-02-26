@@ -4,6 +4,7 @@ angular.module('games').controller('queueFormCtrl', ['$scope', '$modalInstance',
         $scope.property = property;
         $scope.filterObject = {};
         $scope.filterObject[property] = '!!';
+        $scope.error = null;
         $scope.rewriteQueue();
     };
 
@@ -79,11 +80,17 @@ angular.module('games').controller('queueFormCtrl', ['$scope', '$modalInstance',
 
         $q.all(promises).then(function() {
             $modalInstance.close();
+        }, function() {
+            $scope.error = 'Could not save all positions. Please try again.';
         });
     };
 
     $scope.cancelClick = function() {
         $modalInstance.dismiss();
+    };
+
+    $scope.closeAlert = function() {
+        $scope.error = null;
     };
 
     $scope.initialize();

@@ -1,12 +1,4 @@
 <?php
-class Platform extends Illuminate\Database\Eloquent\Model {
-    protected $fillable = ['name', 'short_name'];
-    
-    public function games() {
-        return $this->belongsToMany('Game');
-    }
+class Platform extends CategoryEntity {
 
-    public function user() {
-        return $this->belongsTo('User');
-    }
 }

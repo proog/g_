@@ -4,6 +4,7 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
         $scope.platforms = gameService.platforms;
         $scope.tags = gameService.tags;
         $scope.gameService = gameService;
+        $scope.error = null;
 
         $scope.STATE_DEFAULT = 0;
         $scope.STATE_ON_WISHLIST = 1;
@@ -166,6 +167,8 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
             if($scope.image && $scope.image[0].files.length > 0) {
                 game.uploadImage($scope.image).then(function() {
                     $modalInstance.close();
+                }, function(response) {
+                    $scope.error = response.data.message;
                 });
             }
             else {
@@ -182,6 +185,8 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
                 // add saved game to games list
                 gameService.games.push(game);
                 handleImage();
+            }, function(response) {
+                $scope.error = response.data.message;
             });
         }
         else {
@@ -190,6 +195,8 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
                 // copy data back to original game
                 angular.copy(data, game);
                 handleImage();
+            }, function(response) {
+                $scope.error = response.data.message;
             });
         }
     };
@@ -205,11 +212,17 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
                 gameService.games.splice(pos, 1);
 
             $modalInstance.close();
+        }, function(response) {
+            $scope.error = response.data.message;
         });
     };
 
     $scope.cancelClick = function() {
         $modalInstance.dismiss();
+    };
+
+    $scope.closeAlert = function() {
+        $scope.error = null;
     };
 
     $scope.initialize();

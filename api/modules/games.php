@@ -3,13 +3,13 @@
 function listGames($userId) {
     $user = User::findOrFail($userId);
     $games = $user->games()->with('genres', 'platforms', 'tags')->get();
-    echo $games->toJson(JSON_NUMERIC_CHECK);
+    echo $games->toJson();
 }
 
 function getGame($userId, $id) {
     $user = User::findOrFail($userId);
     $game = $user->games()->with('genres', 'platforms', 'tags')->findOrFail($id);
-    echo $game->toJson(JSON_NUMERIC_CHECK);
+    echo $game->toJson();
 }
 
 function addGame($userId) {
@@ -17,11 +17,8 @@ function addGame($userId) {
     $user = User::findOrFail($userId);
     $metadata = decodeJsonOrFail($app->request->getBody());
     $game = new Game($metadata);
-
-    if(!in_array($game->finished, [Game::NOT_FINISHED, Game::FINISHED, Game::FINISHED_NA, Game::SHELVED]))
-        $game->finished = Game::NOT_FINISHED;
-
     $game->user()->associate($user);
+    $game->validOrThrow();
     $game->save();
     
     foreach($metadata['genre_ids'] as $gid) {
@@ -39,7 +36,7 @@ function addGame($userId) {
         $game->tags()->attach($tag);
     }
     
-    echo $game->toJson(JSON_NUMERIC_CHECK);
+    echo $game->toJson();
 }
 
 function updateGame($userId, $id) {
@@ -47,11 +44,11 @@ function updateGame($userId, $id) {
     $user = User::findOrFail($userId);
     $game = $user->games()->findOrFail($id);
     $metadata = decodeJsonOrFail($app->request->getBody());
-
-    if(!in_array($metadata['finished'], [Game::NOT_FINISHED, Game::FINISHED, Game::FINISHED_NA, Game::SHELVED]))
-        $metadata['finished'] = Game::NOT_FINISHED;
     
-    $game->update($metadata);
+    $game->fill($metadata);
+    $game->validOrThrow();
+    $game->save();
+
     $game->genres()->detach();
     $game->platforms()->detach();
     $game->tags()->detach();
@@ -71,7 +68,7 @@ function updateGame($userId, $id) {
         $game->tags()->attach($tag);
     }
     
-    echo $game->toJson(JSON_NUMERIC_CHECK);
+    echo $game->toJson();
 }
 
 function deleteGame($userId, $id) {
@@ -88,7 +85,7 @@ function uploadImage($userId, $id) {
     $game = $user->games()->findOrFail($id);
     $image = $_FILES['image'];
     $game->addImage($image);
-    echo $game->toJson(JSON_NUMERIC_CHECK);
+    echo $game->toJson();
 }
 
 function listSuggestions($userId) {
@@ -100,7 +97,7 @@ function listSuggestions($userId) {
         ->where('playtime', null)
         ->where('queue_position', null)
         ->where('currently_playing', false)
-        ->where('wishlist_position', false)
+        ->where('wishlist_position', null)
         ->get();
     $topGames = $user->games()
         ->with('genres', 'platforms', 'tags')
@@ -156,5 +153,5 @@ function listSuggestions($userId) {
             return -1;
         return 0;
     });
-    echo json_encode(array_slice($suggestions, 0, 5), JSON_NUMERIC_CHECK);
+    echo json_encode(array_slice($suggestions, 0, 5));
 }

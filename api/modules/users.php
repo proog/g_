@@ -2,19 +2,21 @@
 
 function listUsers() {
     $users = User::all();
-    echo $users->toJson(JSON_NUMERIC_CHECK);
+    echo $users->toJson();
 }
 
 function getUser($id) {
     $user = User::findOrFail($id);
-    echo $user->toJson(JSON_NUMERIC_CHECK);
+    echo $user->toJson();
 }
 
 function updateUser($id) {
     $app = Slim\Slim::getInstance();
     $user = User::findOrFail($id);
     $json = decodeJsonOrFail($app->request->getBody());
-    $user->update($json);
+    $user->fill($json);
+    $user->validOrThrow();
+    $user->save();
 
-    echo $user->toJson(JSON_NUMERIC_CHECK);
+    echo $user->toJson();
 }

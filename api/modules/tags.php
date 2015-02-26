@@ -3,13 +3,13 @@
 function listTags($userId) {
     $user = User::findOrFail($userId);
     $tags = $user->tags;
-    echo $tags->toJson(JSON_NUMERIC_CHECK);
+    echo $tags->toJson();
 }
 
 function getTag($userId, $id) {
     $user = User::findOrFail($userId);
     $tag = $user->findOrFail($id);
-    echo $tag->toJson(JSON_NUMERIC_CHECK);
+    echo $tag->toJson();
 }
 
 function addTag($userId) {
@@ -18,10 +18,11 @@ function addTag($userId) {
     $json = decodeJsonOrFail($app->request->getBody());
     $tag = new Tag($json);
     $tag->user()->associate($user);
+    $tag->validOrThrow();
     $tag->save();
 
     $app->response->setStatus(201);
-    echo $tag->toJson(JSON_NUMERIC_CHECK);
+    echo $tag->toJson();
 }
 
 function updateTag($userId, $id) {
@@ -29,9 +30,11 @@ function updateTag($userId, $id) {
     $user = User::findOrFail($userId);
     $tag = $user->tags()->findOrFail($id);
     $json = decodeJsonOrFail($app->request->getBody());
-    $tag->update($json);
+    $tag->fill($json);
+    $tag->validOrThrow();
+    $tag->save();
 
-    echo $tag->toJson(JSON_NUMERIC_CHECK);
+    echo $tag->toJson();
 }
 
 function deleteTag($userId, $id) {

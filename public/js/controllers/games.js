@@ -123,7 +123,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         $modal.open({
             templateUrl: 'about.html',
             size: 'sm',
-            backdrop: 'static',
+            backdrop: 'static'
         });
     };
 

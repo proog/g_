@@ -1,5 +1,6 @@
 <?php
 require '../vendor/autoload.php';
+require '../api/model/CategoryEntity.class.php';
 require '../api/model/Config.class.php';
 require '../api/model/Game.class.php';
 require '../api/model/Genre.class.php';

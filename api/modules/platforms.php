@@ -3,13 +3,13 @@
 function listPlatforms($userId) {
     $user = User::findOrFail($userId);
     $platforms = $user->platforms;
-    echo $platforms->toJson(JSON_NUMERIC_CHECK);
+    echo $platforms->toJson();
 }
 
 function getPlatform($userId, $id) {
     $user = User::findOrFail($userId);
     $platform = $user->findOrFail($id);
-    echo $platform->toJson(JSON_NUMERIC_CHECK);
+    echo $platform->toJson();
 }
 
 function addPlatform($userId) {
@@ -18,10 +18,11 @@ function addPlatform($userId) {
     $json = decodeJsonOrFail($app->request->getBody());
     $platform = new Platform($json);
     $platform->user()->associate($user);
+    $platform->validOrThrow();
     $platform->save();
     
     $app->response->setStatus(201);
-    echo $platform->toJson(JSON_NUMERIC_CHECK);
+    echo $platform->toJson();
 }
 
 function updatePlatform($userId, $id) {
@@ -29,9 +30,11 @@ function updatePlatform($userId, $id) {
     $user = User::findOrFail($userId);
     $platform = $user->platforms()->findOrFail($id);
     $json = decodeJsonOrFail($app->request->getBody());
-    $platform->update($json);
+    $platform->fill($json);
+    $platform->validOrThrow();
+    $platform->save();
 
-    echo $platform->toJson(JSON_NUMERIC_CHECK);
+    echo $platform->toJson();
 }
 
 function deletePlatform($userId, $id) {
