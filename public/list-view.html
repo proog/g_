@@ -7,6 +7,7 @@
             <h1 class="text-center hand" ng-click="ctrl.collapseSection('currently_playing')">
                 <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.currently_playing ? 'right' : 'down'}}"></span>
                 Currently Playing
+                <span class="badge section-badge">{{currentlyPlaying.length}}</span>
             </h1>
             <div class="list-group" collapse="ctrl.sections.currently_playing">
                 <a class="list-group-item hand overflow-ellipsis"
@@ -54,6 +55,7 @@
             <h1 class="text-center hand" ng-click="ctrl.collapseSection('queue')">
                 <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.queue ? 'right' : 'down'}}"></span>
                 Queue
+                <span class="badge section-badge">{{queue.length}}</span>
             </h1>
             <div class="list-group" collapse="ctrl.sections.queue">
                 <a class="list-group-item hand overflow-ellipsis"
@@ -77,6 +79,7 @@
             <h1 class="text-center hand" ng-click="ctrl.collapseSection('all_games')">
                 <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.all_games ? 'right' : 'down'}}"></span>
                 All Games
+                <span class="badge section-badge">{{ctrl.filtered.length}}</span>
             </h1>
             <div class="list-group" collapse="ctrl.sections.all_games">
                 <a class="list-group-item hand overflow-ellipsis" id="game{{game.id}}"
@@ -100,6 +103,7 @@
             <h1 class="text-center hand" ng-click="ctrl.collapseSection('wishlist')">
                 <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.wishlist ? 'right' : 'down'}}"></span>
                 Wishlist
+                <span class="badge section-badge">{{wishlist.length}}</span>
             </h1>
             <div class="list-group" collapse="ctrl.sections.wishlist">
                 <a class="list-group-item hand overflow-ellipsis"

@@ -12,6 +12,7 @@
                 <h1 ng-click="ctrl.collapseSection('currently_playing')" class="hand">
                     <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.currently_playing ? 'right' : 'down'}}"></span>
                     Currently Playing
+                    <span class="badge section-badge">{{currentlyPlaying.length}}</span>
                 </h1>
             </div>
         </div>
@@ -53,6 +54,7 @@
                 <h1 ng-click="ctrl.collapseSection('queue')" class="hand">
                     <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.queue ? 'right' : 'down'}}"></span>
                     Queue
+                    <span class="badge section-badge">{{queue.length}}</span>
                 </h1>
             </div>
         </div>
@@ -73,6 +75,7 @@
                 <h1 ng-click="ctrl.collapseSection('all_games')" class="hand">
                     <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.all_games ? 'right' : 'down'}}"></span>
                     All Games
+                    <span class="badge section-badge">{{ctrl.filtered.length}}</span>
                 </h1>
             </div>
         </div>
@@ -123,6 +126,7 @@
                 <h1 ng-click="ctrl.collapseSection('wishlist')" class="hand">
                     <span class="glyphicon pull-left collapse-icon glyphicon-chevron-{{ctrl.sections.wishlist ? 'right' : 'down'}}"></span>
                     Wishlist
+                    <span class="badge section-badge">{{wishlist.length}}</span>
                 </h1>
             </div>
         </div>

@@ -82,3 +82,6 @@ body {
     cursor: inherit;
     display: block;
 }
+.section-badge {
+    vertical-align: middle;
+}
