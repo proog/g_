@@ -50,6 +50,7 @@ $app->post('/users/:userId/games', 'authenticate', 'addGame');
 $app->put('/users/:userId/games/:id', 'authenticate', 'updateGame');
 $app->delete('/users/:userId/games/:id', 'authenticate', 'deleteGame');
 $app->post('/users/:userId/games/:id/image', 'authenticate', 'uploadImage');
+$app->delete('/users/:userId/games/:id/image', 'authenticate', 'deleteImage');
 
 $app->post('/users/:userId/genres', 'authenticate', 'addGenre');
 $app->put('/users/:userId/genres/:id', 'authenticate', 'updateGenre');

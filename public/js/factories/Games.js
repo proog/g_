@@ -1,4 +1,4 @@
-angular.module('games').factory('Games', ['$resource', 'upload', function($resource, upload) {
+angular.module('games').factory('Games', ['$resource', 'upload', '$http', function($resource, upload, $http) {
     var Games = $resource('api/users/:userId/games/:id', {
         id: '@id',
         userId: '@user_id'
@@ -68,6 +68,14 @@ angular.module('games').factory('Games', ['$resource', 'upload', function($resou
             var data = response.data;
             self.image = data.image;
             self.decachedImage = self.image + '?q=' + new Date().getTime();
+        });
+    };
+
+    Games.prototype.deleteImage = function() {
+        var self = this;
+        return $http.delete('api/users/' + self.user_id + '/games/' + self.id + '/image').success(function() {
+            self.image = null;
+            self.decachedImage = null;
         });
     };
 

@@ -88,6 +88,14 @@ function uploadImage($userId, $id) {
     echo $game->toJson();
 }
 
+function deleteImage($userId, $id) {
+    $app = \Slim\Slim::getInstance();
+    $user = User::findOrFail($userId);
+    $game = $user->games()->findOrFail($id);
+    $game->deleteImage();
+    $app->response->setStatus(204);
+}
+
 function listSuggestions($userId) {
     $user = User::findOrFail($userId);
     $applicableGames = $user->games()

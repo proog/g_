@@ -109,8 +109,10 @@ class Game extends Illuminate\Database\Eloquent\Model {
     public function deleteImage() {
         if(!$this->id)
             return;
-        
+
         deleteDirectoryRecursively('../public/images/'.$this->id);
+        $this->image = null;
+        $this->save();
     }
 
     public function isValid()  {

@@ -99,17 +99,27 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
     };
 
     $scope.clearImageInput = function() {
-        for(var i = 0; i < $scope.image.length; i++) {
-            try{
-                $scope.image[i].value = '';
-                if($scope.image[i].value){
-                    $scope.image[i].type = "text";
-                    $scope.image[i].type = "file";
-                }
-            } catch(e){}
-        }
+        if($scope.image && $scope.image[0].files.length > 0) {
+            for(var i = 0; i < $scope.image.length; i++) {
+                try{
+                    $scope.image[i].value = '';
+                    if($scope.image[i].value){
+                        $scope.image[i].type = "text";
+                        $scope.image[i].type = "file";
+                    }
+                } catch(e){}
+            }
 
-        $scope.filename = null;
+            $scope.filename = null;
+        }
+        else if(!$scope.isNew) {
+            var dialog = confirm('Do you want to deleted the image for ' + $scope.model.title + '? This cannot be undone.');
+            if(!dialog)
+                return;
+
+            // delete associated cover image
+            game.deleteImage();
+        }
     };
 
     $scope.titleChanged = function() {
