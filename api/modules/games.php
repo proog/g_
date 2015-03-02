@@ -81,10 +81,33 @@ function deleteGame($userId, $id) {
 }
 
 function uploadImage($userId, $id) {
+    $app = Slim\Slim::getInstance();
     $user = User::findOrFail($userId);
     $game = $user->games()->findOrFail($id);
-    $image = $_FILES['image'];
-    $game->addImage($image);
+
+    if($_FILES['image']) {
+        $image = $_FILES['image'];
+        $game->addUploadedImage($image);
+    }
+    else {
+        $url = decodeJsonOrFail($app->request->getBody())['image_url'];
+
+        if(!$url) {
+            throw new Exception($url . ' is not a valid url');
+        }
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'g_');
+        $put = file_put_contents($tempFile, fopen($url, 'r'));
+        if($put === false) {
+            throw new Exception('Failed to add image');
+        }
+
+        $split = explode('.', $url);
+        $extension = $split[count($split) - 1]; // .ext
+
+        $game->addExternalImage($tempFile, $extension);
+    }
+
     echo $game->toJson();
 }
 

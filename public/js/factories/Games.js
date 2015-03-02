@@ -71,6 +71,15 @@ angular.module('games').factory('Games', ['$resource', 'upload', '$http', functi
         });
     };
 
+    Games.prototype.uploadExternalImage = function(url) {
+        var self = this;
+        return $http.post('api/users/' + self.user_id + '/games/' + self.id + '/image', { image_url: url }).then(function(response) {
+            var data = response.data;
+            self.image = data.image;
+            self.decachedImage = self.image + '?q=' + new Date().getTime();
+        });
+    };
+
     Games.prototype.deleteImage = function() {
         var self = this;
         return $http.delete('api/users/' + self.user_id + '/games/' + self.id + '/image').success(function() {

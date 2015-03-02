@@ -85,8 +85,8 @@ class Game extends Illuminate\Database\Eloquent\Model {
         return $ids;
     }
     
-    public function addImage($image) {
-        if(!is_uploaded_file($image['tmp_name']))
+    public function addUploadedImage($image) {
+        if(!is_uploaded_file($image['tmp_name']) || !$this->id)
             return false;
 
         $split = explode('.', $image['name']);
@@ -103,6 +103,26 @@ class Game extends Illuminate\Database\Eloquent\Model {
         $this->image = 'images/'.$this->id.'/'.$filename;
         $this->save();
         
+        return true;
+    }
+
+    public function addExternalImage($tempFile, $extension) {
+        if(!file_exists($tempFile) || !$this->id)
+            return false;
+
+        $filename = 'image.' . $extension; // image.ext
+        $dir = '../public/images/'.$this->id;
+        if(file_exists($dir))
+            deleteDirectoryRecursively($dir);
+        mkdir($dir);
+
+        $fullpath = $dir.'/'.$filename;
+
+        rename($tempFile, $fullpath);
+
+        $this->image = 'images/'.$this->id.'/'.$filename;
+        $this->save();
+
         return true;
     }
     

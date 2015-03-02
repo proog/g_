@@ -1,10 +1,11 @@
-angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'game', 'gameService', 'Games', function($scope, $modalInstance, game, gameService, Games) {
+angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'game', 'gameService', 'Games', '$http', function($scope, $modalInstance, game, gameService, Games, $http) {
     $scope.initialize = function() {
         $scope.genres = gameService.genres;
         $scope.platforms = gameService.platforms;
         $scope.tags = gameService.tags;
         $scope.gameService = gameService;
         $scope.error = null;
+        $scope.externalImageUrl = null;
 
         $scope.STATE_DEFAULT = 0;
         $scope.STATE_ON_WISHLIST = 1;
@@ -99,7 +100,7 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
     };
 
     $scope.clearImageInput = function() {
-        if($scope.image && $scope.image[0].files.length > 0) {
+        if($scope.image && $scope.image[0].files.length > 0 || $scope.externalImageUrl) {
             for(var i = 0; i < $scope.image.length; i++) {
                 try{
                     $scope.image[i].value = '';
@@ -111,8 +112,9 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
             }
 
             $scope.filename = null;
+            $scope.externalImageUrl = null;
         }
-        else if(!$scope.isNew) {
+        else if(!$scope.isNew && $scope.model.image) {
             var dialog = confirm('Do you want to deleted the image for ' + $scope.model.title + '? This cannot be undone.');
             if(!dialog)
                 return;
@@ -175,13 +177,23 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
     $scope.formSubmit = function() {
         var handleImage = function() {
             if($scope.image && $scope.image[0].files.length > 0) {
+                // image from upload form
                 game.uploadImage($scope.image).then(function() {
                     $modalInstance.close();
                 }, function(response) {
                     $scope.error = response.data.message;
                 });
             }
+            else if($scope.externalImageUrl) {
+                // image from suggestion api
+                game.uploadExternalImage($scope.externalImageUrl).then(function() {
+                    $modalInstance.close();
+                }, function(response) {
+                    $scope.error = response.data.message;
+                });
+            }
             else {
+                // no image specified
                 $modalInstance.close();
             }
         };
@@ -233,6 +245,38 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
 
     $scope.closeAlert = function() {
         $scope.error = null;
+    };
+
+    $scope.getSuggestions = function(search) {
+        return $http.get('api/gb/search/'+search).then(function(response) {
+            return response.data;
+        });
+    };
+
+    $scope.suggestionSelected = function(id) {
+        $http.get('api/gb/game/'+id).then(function(response) {
+            var data = response.data;
+
+            $scope.model.title = data.title;
+            $scope.titleChanged();
+
+            $scope.model.developer = data.developer;
+            $scope.model.publisher = data.publisher;
+            $scope.model.year = data.year;
+
+            if(data.genre_ids.length > 0) {
+                $scope.model.genre_ids = data.genre_ids;
+            }
+
+            if(data.platform_ids.length > 0) {
+                $scope.model.platform_ids = data.platform_ids;
+            }
+
+            if(data.image_url) {
+                $scope.externalImageUrl = data.image_url;
+                $scope.filename = data.image_url;
+            }
+        });
     };
 
     $scope.initialize();

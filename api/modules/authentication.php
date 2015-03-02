@@ -11,8 +11,11 @@ function logIn() {
 }
 
 function checkLogin() {
-    $user = User::findOrFail($_SESSION['user_id']);
-    echo $user->toJson();
+    echo getLoggedInUserOrFail()->toJson();
+}
+
+function getLoggedInUserOrFail() {
+    return User::findOrFail($_SESSION['user_id']);
 }
 
 function logOut() {
@@ -21,16 +24,22 @@ function logOut() {
 }
 
 function authenticate(\Slim\Route $route) {
-    $id = $route->getParam('userId');
-    if(!isAuthenticated($id))
+    $params = $route->getParams();
+    $id = $params['userId'];
+
+    // general authentication
+    if(!isAuthenticated())
+        throw new NotAuthenticatedException();
+
+    // authentication for user-specific route, e.g. someone's collection
+    if($id && $id != $_SESSION['user_id'])
         throw new NotAuthenticatedException();
 }
 
-function isAuthenticated($id) {
+function isAuthenticated() {
     return $_SESSION['authenticated']
-        && $id
-        && $id == $_SESSION['user_id']
-        && User::find($id);
+        && $_SESSION['user_id']
+        && User::find($_SESSION['user_id']);
 }
 
 class NotAuthenticatedException extends Exception {

@@ -18,7 +18,11 @@
             <div class="row">
                 <div class="col-md-4">
                     <h4>Details</h4>
-                    <div class="form-group">
+                    <div class="form-group" ng-if="isNew">
+                        <input type="text" class="form-control input-lg" placeholder="Title (required)" ng-model="model.title" ng-change="titleChanged()" name="title" required typeahead="item as item.title for item in getSuggestions($viewValue)" typeahead-min-length="3" typeahead-editable="true" typeahead-on-select="suggestionSelected($item.id)" typeahead-wait-ms="500">
+                    </div>
+                    <!-- don't use typeahead if we are editing -->
+                    <div class="form-group" ng-if="!isNew">
                         <input type="text" class="form-control input-lg" placeholder="Title (required)" ng-model="model.title" ng-change="titleChanged()" name="title" required>
                     </div>
                     <div class="form-group">
@@ -53,7 +57,7 @@
                                     <span class="glyphicon glyphicon-picture"></span>
                                     Browse
                                 </button>
-                                <button type="button" class="btn btn-default" ng-click="clearImageInput()" ng-disabled="!filename && !model.image">
+                                <button type="button" class="btn btn-default" ng-click="clearImageInput()">
                                     <span class="glyphicon glyphicon-remove"></span>
                                 </button>
                             </span>
