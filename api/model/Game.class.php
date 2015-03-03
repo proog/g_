@@ -119,6 +119,7 @@ class Game extends Illuminate\Database\Eloquent\Model {
         $fullpath = $dir.'/'.$filename;
 
         rename($tempFile, $fullpath);
+        chmod($fullpath, 0755);
 
         $this->image = 'images/'.$this->id.'/'.$filename;
         $this->save();

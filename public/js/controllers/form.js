@@ -248,7 +248,7 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
     };
 
     $scope.getSuggestions = function(search) {
-        return $http.get('api/gb/search/'+search).then(function(response) {
+        return $http.get('api/gb/search/'+encodeURIComponent(search)).then(function(response) {
             return response.data;
         });
     };

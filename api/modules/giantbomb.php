@@ -5,7 +5,7 @@ function gbBuildUrl($resource, array $queries) {
     $url = 'http://www.giantbomb.com/api/'.$resource.'/?format=json&api_key='.$apiKey;
 
     foreach($queries as $key => $value) {
-        $url .= "&$key=$value";
+        $url .= "&$key=".rawurlencode($value);
     }
 
     return $url;
@@ -77,6 +77,7 @@ function gbGetGameById($id) {
 }
 
 function gbGetGamesByTitle($search) {
+    $search = urldecode($search);
     $url = gbBuildUrl('games', [
         'filter' => 'name:'.$search,
         'field_list' => 'name,original_release_date,id',
