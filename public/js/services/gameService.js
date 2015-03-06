@@ -31,6 +31,11 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
             self.suggestions = data;
         });
     };
+    self.refreshConfig = function() {
+        return $http.get('api/config').success(function(data) {
+            self.config = data;
+        })
+    };
     self.refreshAll = function(userId) {
         self.resetAll();
 
@@ -40,7 +45,8 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
             self.refreshPlatforms(userId),
             self.refreshTags(userId),
             self.refreshSuggestions(userId),
-            self.refreshUsers()
+            self.refreshUsers(),
+            self.refreshConfig()
         ]).then(function() {
             self.initialized = true;
         });
@@ -53,6 +59,7 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
         self.tags = [];
         self.suggestions = [];
         self.users = [];
+        self.config = null;
     };
 
     self.checkLogin = function() {

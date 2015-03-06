@@ -24,6 +24,7 @@ function doSetup() {
     $post = $app->request->post();
     $username = $post['username'];
     $password = $post['password'];
+    $apikey = $post['apikey'];
     $dbname = $post['dbname'];
     $dbuser = $post['dbuser'];
     $dbpass = $post['dbpass'];
@@ -45,6 +46,13 @@ function doSetup() {
         $app->flashNow('user', 'I said <em>NOT 1234</em>.');
         renderSetup();
     }
+
+    if($apikey && strlen($apikey) != 40) {
+        $app->flashNow('other', 'The Giant Bomb API key you entered doesn\'t look like a valid key.');
+        renderSetup();
+    }
+
+    renderSetup();
 
     $settings = [
         'host' => $dbhost,
@@ -87,6 +95,11 @@ function doSetup() {
 
         $config = new Config();
         $config->default_user = $user->id;
+
+        if($apikey) {
+            $config->giant_bomb_api_key = $apikey;
+        }
+
         $config->save();
     } catch(Exception $e) {
         $app->flashNow('db', 'Could not create the default user. Suggestion: Make sure the database user has permissions to create records.');
@@ -121,6 +134,7 @@ function createTables() {
         $table->increments('id');
         $table->integer('default_user')->unsigned();
         $table->foreign('default_user')->references('id')->on('users');
+        $table->string('giant_bomb_api_key')->nullable()->default(null);
     });
 
     $schema->create('games', function (Blueprint $table) {

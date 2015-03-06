@@ -1,7 +1,12 @@
 <?php
 
 function gbBuildUrl($resource, array $queries) {
-    $apiKey = '***REMOVED***';
+    $apiKey = Config::query()->firstOrFail()->giant_bomb_api_key;
+
+    if(!$apiKey) {
+        throw new Exception('No Giant Bomb API key specified. Please request an API key and update the giant_bomb_api_key attribute in the config table.');
+    }
+
     $url = 'http://www.giantbomb.com/api/'.$resource.'/?format=json&api_key='.$apiKey;
 
     foreach($queries as $key => $value) {

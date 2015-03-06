@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="favicon.ico">
     <title>g_</title>
-    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container" style="width: 500px; padding-bottom: 50px;">
@@ -88,6 +88,21 @@
             <div class="form-group">
                 <label>Password</label>
                 <input type="password" class="form-control" placeholder="Something that's not 1234" name="password" required value="<?= $post['password'] ?>">
+            </div>
+            <h2>Other settings</h2>
+            <?php if($flash['other']): ?>
+                <div class="alert alert-danger">
+                    <?php echo $flash['other']; ?>
+                </div>
+            <?php endif; ?>
+            <div class="form-group">
+                <label>Giant Bomb API key</label>
+                <input type="text" class="form-control" placeholder="Your API key" name="apikey" value="<?= $post['apikey'] ?>">
+                <p class="help-block">
+                    g_ relies on the Giant Bomb game wiki for assisted game creation, making it possible to automatically retrieve most information when adding games to your collection.<br>
+                    If you want to use this feature, you need to create a free Giant Bomb account and <a href="http://www.giantbomb.com/api/" target="_blank">request an API key</a>.
+                    Without an API key, assisted game creation will be unavailable.
+                </p>
             </div>
             <div class="jumbotron">
                 <h2>Install g_</h2>
