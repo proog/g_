@@ -1,4 +1,4 @@
-angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'game', 'gameService', 'Games', '$http', function($scope, $modalInstance, game, gameService, Games, $http) {
+angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'game', 'gameService', 'Games', function($scope, $modalInstance, game, gameService, Games) {
     $scope.initialize = function() {
         $scope.genres = gameService.genres;
         $scope.platforms = gameService.platforms;

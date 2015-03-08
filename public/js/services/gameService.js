@@ -62,10 +62,32 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
         self.config = null;
     };
 
-    self.checkLogin = function() {
-        return $http.get('api/login').success(function(data) {
-            self.authenticated = true;
-            self.authenticatedUser = data;
+    // if username is not specified, use a get to see if we have an active session
+    self.logIn = function(username, password) {
+        var url = 'api/login';
+
+        if(!username && !password) {
+            return $http.get(url).then(function(response) {
+                var data = response.data;
+                self.authenticated = true;
+                self.authenticatedUser = data;
+                return data;
+            });
+        }
+
+        return $http.post(url, { username: username, password: password })
+            .then(function(response) {
+                var data = response.data;
+                self.authenticated = true;
+                self.authenticatedUser = data;
+                return data;
+            });
+    };
+
+    self.logOut = function() {
+        return $http.post('api/logout').then(function() {
+            self.authenticated = false;
+            self.authenticatedUser = null;
         });
     };
 

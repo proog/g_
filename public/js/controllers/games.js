@@ -1,4 +1,4 @@
-angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$route', '$http', '$q', '$location', 'upload', '$modal', '$filter', 'Games', 'Genres', 'Platforms', 'Tags', 'Users', 'gameService', '$cookies', 'searchFilter', '$timeout', function($scope, $routeParams, $route, $http, $q, $location, upload, $modal, $filter, Games, Genres, Platforms, Tags, Users, gameService, $cookies, searchFilter, $timeout) {
+angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$route', '$q', '$location', 'upload', '$modal', '$filter', 'Games', 'Genres', 'Platforms', 'Tags', 'Users', 'gameService', '$cookies', 'searchFilter', '$timeout', function($scope, $routeParams, $route, $q, $location, upload, $modal, $filter, Games, Genres, Platforms, Tags, Users, gameService, $cookies, searchFilter, $timeout) {
     "use strict";
     var self = this;
 
@@ -97,26 +97,16 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
     };
 
     self.loginClick = function() {
-        var modalInstance = $modal.open({
+        $modal.open({
             templateUrl: 'login.html',
             controller: 'loginFormCtrl',
             size: 'sm',
-            backdrop: 'static',
-            resolve: {
-                loginUrl: function() { return 'api/login'; }
-            }
-        });
-        modalInstance.result.then(function(result) {
-            gameService.authenticated = true;
-            gameService.authenticatedUser = result;
+            backdrop: 'static'
         });
     };
 
     self.logoutClick = function() {
-        $http.post('api/logout').success(function() {
-            gameService.authenticated = false;
-            gameService.authenticatedUser = null;
-        });
+        gameService.logOut();
     };
 
     self.aboutClick = function() {
@@ -595,7 +585,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
 
         if(!gameService.initialized) {
             // check if session is active
-            gameService.checkLogin();
+            gameService.logIn();
 
             // data not fetched yet, refresh all
             var promise = gameService.refreshAll(self.userId);

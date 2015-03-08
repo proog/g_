@@ -8,7 +8,7 @@ angular.module('games').directive('game', ['gameService', '$filter', function(ga
             linkCallback: '&',
             height: '@'
         },
-        link: function($scope, element, attributes) {
+        link: function($scope) {
             $scope.heightStyle = $scope.height ? {height: $scope.height} : {};
             $scope.gameService = gameService;
 

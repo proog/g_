@@ -1,11 +1,11 @@
-angular.module('games').controller('loginFormCtrl', ['$scope', '$modalInstance', '$http', 'loginUrl', function($scope, $modalInstance, $http, loginUrl) {
+angular.module('games').controller('loginFormCtrl', ['$scope', '$modalInstance', 'gameService', function($scope, $modalInstance, gameService) {
     $scope.loginClick = function() {
         $scope.loginError = false;
-        $http.post($scope.loginUrl, $scope.loginForm)
-            .success(function(data) {
+        gameService.logIn($scope.loginForm.username, $scope.loginForm.password)
+            .then(function() {
                 $scope.resetForm();
-                $modalInstance.close(data);
-            }).error(function() {
+                $modalInstance.close();
+            }, function() {
                 $scope.loginError = true;
             });
     };
@@ -23,6 +23,5 @@ angular.module('games').controller('loginFormCtrl', ['$scope', '$modalInstance',
         };
     };
 
-    $scope.loginUrl = loginUrl;
     $scope.resetForm();
 }]);
