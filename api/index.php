@@ -66,8 +66,8 @@ $app->delete('/users/:userId/tags/:id', 'authenticate', 'deleteTag');
 
 $app->put('/users/:userId', 'authenticate', 'updateUser');
 
-$app->get('/gb/search/:search', 'authenticate', 'gbGetGamesByTitle');
-$app->get('/gb/game/:id', 'authenticate', 'gbGetGameById');
+$app->get('/assisted/search/:search', 'authenticate', 'gbGetGamesByTitle');
+$app->get('/assisted/game/:id', 'authenticate', 'gbGetGameById');
 
 // misc api
 $app->notFound('showNotFound');

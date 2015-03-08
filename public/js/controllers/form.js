@@ -248,15 +248,11 @@ angular.module('games').controller('formCtrl', ['$scope', '$modalInstance', 'gam
     };
 
     $scope.getSuggestions = function(search) {
-        return $http.get('api/gb/search/'+encodeURIComponent(search)).then(function(response) {
-            return response.data;
-        });
+        return gameService.assistedCreationSearch(search);
     };
 
     $scope.suggestionSelected = function(id) {
-        $http.get('api/gb/game/'+id).then(function(response) {
-            var data = response.data;
-
+        gameService.assistedCreationGetGame(id).then(function(data) {
             $scope.model.title = data.title;
             $scope.titleChanged();
 

@@ -2,7 +2,7 @@
 class Config extends Illuminate\Database\Eloquent\Model {
     protected $table = 'config';
     protected $hidden = ['giant_bomb_api_key'];
-    protected $appends = ['is_giant_bomb_enabled'];
+    protected $appends = ['is_assisted_creation_enabled'];
     public $timestamps = false;
 
     public function defaultUser() {
@@ -17,7 +17,7 @@ class Config extends Illuminate\Database\Eloquent\Model {
         return (int) $value;
     }
 
-    public function getIsGiantBombEnabledAttribute() {
+    public function getIsAssistedCreationEnabledAttribute() {
         return (bool) $this->giant_bomb_api_key;
     }
 }

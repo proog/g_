@@ -69,6 +69,18 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
         });
     };
 
+    self.assistedCreationSearch = function(search) {
+        return $http.get('api/assisted/search/'+encodeURIComponent(search)).then(function(response) {
+            return response.data;
+        });
+    };
+
+    self.assistedCreationGetGame = function(id) {
+        return $http.get('api/assisted/game/'+id).then(function(response) {
+            return response.data;
+        });
+    };
+
     self.isGameVisible = function(game) {
         return !game.hidden || (self.authenticated && self.authenticatedUser.id == game.user_id);
     };
