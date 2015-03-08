@@ -2,7 +2,7 @@ angular.module('games').directive('validateTimespan', function() {
     return {
         require: 'ngModel',
         link: function(scope, element, attributes, modelCtrl) {
-            var regex = /^\d{1,2}:\d{2}(:\d{2})?$/;
+            var regex = /^\d*:\d{2}:\d{2}$/;
             modelCtrl.$validators.timespan = function(modelValue, viewValue) {
                 if(modelCtrl.$isEmpty(viewValue))
                     return true;
