@@ -1,4 +1,4 @@
-angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 'Tags', 'Users', '$q', '$routeParams', '$http', '$filter', function(Games, Genres, Platforms, Tags, Users, $q, $routeParams, $http, $filter) {
+angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 'Tags', 'Users', '$q', '$routeParams', '$http', '$filter', 'Config', function(Games, Genres, Platforms, Tags, Users, $q, $routeParams, $http, $filter, Config) {
     var self = this;
 
     self.refreshGames = function(userId) {
@@ -32,9 +32,9 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
         });
     };
     self.refreshConfig = function() {
-        return $http.get('api/config').success(function(data) {
+        return Config.get().$promise.then(function(data) {
             self.config = data;
-        })
+        });
     };
     self.refreshAll = function(userId) {
         self.resetAll();

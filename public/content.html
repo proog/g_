@@ -79,6 +79,12 @@
                             </a>
                         </li>
                         <li class="divider"></li>
+                        <li ng-if="ctrl.canShowAuthenticatedMenuItems()">
+                            <a class="hand" ng-click="ctrl.settingsClick()">
+                                <span class="glyphicon glyphicon-cog"></span>
+                                Settings
+                            </a>
+                        </li>
                         <li>
                             <a class="hand" ng-click="ctrl.aboutClick()">
                                 <span class="glyphicon glyphicon-info-sign"></span>

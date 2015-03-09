@@ -6,7 +6,7 @@ session_cache_limiter(false);
 session_start();
 
 // set up slim
-$app = new Slim\Slim(['debug' => true]);
+$app = new Slim\Slim(['debug' => false]);
 $app->response->headers->set('Content-Type', 'application/json');
 
 if(isConfigured()) {
@@ -65,6 +65,9 @@ $app->put('/users/:userId/tags/:id', 'authenticate', 'updateTag');
 $app->delete('/users/:userId/tags/:id', 'authenticate', 'deleteTag');
 
 $app->put('/users/:userId', 'authenticate', 'updateUser');
+
+$app->get('/settings', 'authenticate', 'getSettings');
+$app->put('/settings', 'authenticate', 'updateSettings');
 
 $app->get('/assisted/search/:search', 'authenticate', 'gbGetGamesByTitle');
 $app->get('/assisted/game/:id', 'authenticate', 'gbGetGameById');

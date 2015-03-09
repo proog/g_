@@ -43,4 +43,18 @@ angular.module('games')
     Tags.prototype.ids = 'tag_ids';
 
     return Tags;
+}])
+.factory('Config', ['$resource', function($resource) {
+    var Config = $resource('api/config');
+
+    return Config;
+}])
+.factory('Settings', ['$resource', function($resource) {
+    var Settings = $resource('api/settings', {}, {
+        update: {
+            method: 'PUT'
+        }
+    });
+
+    return Settings;
 }]);
