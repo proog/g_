@@ -118,7 +118,7 @@ function doSetup() {
 }
 
 function createTables() {
-    $schema = Illuminate\Database\Capsule\Manager::schema();
+    $schema = Capsule::schema();
 
     $schema->create('users', function (Blueprint $table) {
         $table->engine = 'InnoDB';
@@ -193,6 +193,7 @@ function createTables() {
             $table->foreign('game_id')->references('id')->on('games')->onDelete('cascade');
             $table->integer($entity['junctionColumn'])->unsigned();
             $table->foreign($entity['junctionColumn'])->references('id')->on($entity['table'])->onDelete('cascade');
+            $table->primary(['game_id', $entity['junctionColumn']]);
         });
     }
 }
