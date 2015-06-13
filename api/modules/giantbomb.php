@@ -44,7 +44,9 @@ function gbGetGameById($id) {
             $lc3 = strtolower(str_replace(' ', '', $genre->short_name));
 
             if(strstr($lc1, $lc2) !== false || strstr($lc1, $lc3) !== false || strstr($lc2, $lc1) !== false) {
-                $genreIds[] = $genre->id;
+                if(!in_array($genre->id, $genreIds)) {
+                    $genreIds[] = $genre->id;
+                }
             }
         }
     }
@@ -59,7 +61,9 @@ function gbGetGameById($id) {
             $lc3 = strtolower(str_replace(' ', '', $platform->short_name));
 
             if(strstr($lc1, $lc2) !== false || strstr($lc1, $lc3) !== false || strstr($lc2, $lc1) !== false) {
-                $platformIds[] = $platform->id;
+                if(!in_array($platform->id, $platformIds)) {
+                    $platformIds[] = $platform->id;
+                }
             }
         }
     }
