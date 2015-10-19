@@ -52,8 +52,6 @@ function doSetup() {
         renderSetup();
     }
 
-    renderSetup();
-
     $settings = [
         'host' => $dbhost,
         'port' => $dbport,

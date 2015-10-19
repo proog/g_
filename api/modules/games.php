@@ -164,7 +164,7 @@ function listSuggestions($userId) {
             similar_text(strtolower($game->title), strtolower($topGame->title), $pct);
             $titleSimilarity += $pct;
         }
-        $score += (int)($titleSimilarity/count($topGames));
+        $score += count($topGames) > 0 ? (int)($titleSimilarity/count($topGames)) : 0;
 
         // 30% chance of getting score boosted by 33%
         $rand = rand(0, 10);
