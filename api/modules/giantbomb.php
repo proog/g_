@@ -16,11 +16,21 @@ function gbBuildUrl($resource, array $queries) {
     return $url;
 }
 
+function gbGetResults($url) {
+    $context = stream_context_create([
+        'http' => [
+            'method' => 'GET',
+            'header' => "User-Agent: permortensen.com g_ 0.1\r\n"
+        ]
+    ]);
+    return json_decode(file_get_contents($url, null, $context))->results;
+}
+
 function gbGetGameById($id) {
     $url = gbBuildUrl('game/'.$id, [
         'field_list' => 'name,original_release_date,genres,platforms,image,developers,publishers'
     ]);
-    $gb = json_decode(file_get_contents($url))->results;
+    $gb = gbGetResults($url);
 
     $year = null;
     if($gb->original_release_date) {
@@ -92,7 +102,7 @@ function gbGetGamesByTitle($search) {
         'field_list' => 'name,original_release_date,id',
         'limit' => 5
     ]);
-    $results = json_decode(file_get_contents($url))->results;
+    $results = gbGetResults($url);
 
     echo json_encode(array_map(function($result) {
         return [
