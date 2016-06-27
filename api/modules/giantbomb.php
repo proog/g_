@@ -100,7 +100,7 @@ function gbGetGamesByTitle($search) {
     $url = gbBuildUrl('games', [
         'filter' => 'name:'.$search,
         'field_list' => 'name,original_release_date,id',
-        'limit' => 5
+        'limit' => 20
     ]);
     $results = gbGetResults($url);
 
