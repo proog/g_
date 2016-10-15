@@ -97,7 +97,8 @@ function uploadImage($userId, $id) {
         }
 
         $tempFile = tempnam(sys_get_temp_dir(), 'g_');
-        $put = file_put_contents($tempFile, fopen($url, 'r'));
+        $get = file_get_contents($url, null, getHttpStreamContext());
+        $put = file_put_contents($tempFile, $get);
         if($put === false) {
             throw new Exception('Failed to add image');
         }

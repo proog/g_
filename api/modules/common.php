@@ -29,3 +29,12 @@ function isConfigured() {
     }
     return false;
 }
+
+function getHttpStreamContext($method = 'GET') {
+    return stream_context_create([
+        'http' => [
+            'method' => $method,
+            'header' => "User-Agent: permortensen.com g_ 0.1\r\n"
+        ]
+    ]);
+}

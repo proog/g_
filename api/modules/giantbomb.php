@@ -17,13 +17,8 @@ function gbBuildUrl($resource, array $queries) {
 }
 
 function gbGetResults($url) {
-    $context = stream_context_create([
-        'http' => [
-            'method' => 'GET',
-            'header' => "User-Agent: permortensen.com g_ 0.1\r\n"
-        ]
-    ]);
-    return json_decode(file_get_contents($url, null, $context))->results;
+    $json = file_get_contents($url, null, getHttpStreamContext());
+    return json_decode($json)->results;
 }
 
 function gbGetGameById($id) {
