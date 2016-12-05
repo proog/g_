@@ -1,5 +1,10 @@
 public/images
 config/db.json
+api2/appsettings.json
+api2/bin/
+api2/obj/
+
+.vscode
 
 # Created by https://www.gitignore.io
 
