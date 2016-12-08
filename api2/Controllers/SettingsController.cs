@@ -1,10 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Games.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Games {
+namespace Games.Controllers {
+    [Route("api")]
     public class SettingsController : Controller {
         private GamesContext db;
         private AuthenticationService auth;

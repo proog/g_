@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Games {
+namespace Games.Models {
     [Table("g_platforms")]
     public class Platform : Descriptor {
 

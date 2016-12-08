@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
-namespace Games {
+namespace Games.Models {
     public abstract class BaseModel {
         public int Id { get; set; }
 

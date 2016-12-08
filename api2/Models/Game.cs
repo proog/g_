@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace Games {
+namespace Games.Models {
     [Table("g_games")]
     public class Game : BaseModel {
         public const int NOT_FINISHED = 0;
@@ -78,15 +78,21 @@ namespace Games {
         public void DeserializeDescriptors(IEnumerable<Genre> genres, IEnumerable<Platform> platforms, IEnumerable<Tag> tags) {
             GameGenres = genres
                 .Where(it => GenreIds.Contains(it.Id))
-                .Select(it => new GameGenre() { Game = this, Genre = it})
+                .Select(it =>
+                    GameGenres?.FirstOrDefault(gg => gg.GenreId == it.Id)
+                    ?? new GameGenre { Game = this, Genre = it})
                 .ToList();
             GamePlatforms = platforms
                 .Where(it => PlatformIds.Contains(it.Id))
-                .Select(it => new GamePlatform() { Game = this, Platform = it})
+                .Select(it =>
+                    GamePlatforms?.FirstOrDefault(gp => gp.PlatformId == it.Id)
+                    ?? new GamePlatform { Game = this, Platform = it})
                 .ToList();
             GameTags = tags
                 .Where(it => TagIds.Contains(it.Id))
-                .Select(it => new GameTag() { Game = this, Tag = it})
+                .Select(it =>
+                    GameTags?.FirstOrDefault(gt => gt.TagId == it.Id)
+                    ?? new GameTag { Game = this, Tag = it})
                 .ToList();
         }
     }

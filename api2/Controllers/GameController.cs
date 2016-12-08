@@ -1,18 +1,16 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Games.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Games {
-    [Route("users/{userId}")]
+namespace Games.Controllers {
+    [Route("api/users/{userId}")]
     public class GameController : Controller {
         private GamesContext db;
         private GameService service;
@@ -171,6 +169,10 @@ namespace Games {
                 return NotFound();
             }
 
+            db.Entry(game).Collection(g => g.GameGenres).Load();
+            db.Entry(game).Collection(g => g.GamePlatforms).Load();
+            db.Entry(game).Collection(g => g.GameTags).Load();
+
             game.Title = update.Title;
             game.Developer = update.Developer;
             game.Publisher = update.Publisher;
@@ -263,18 +265,25 @@ namespace Games {
                 }
 
                 var client = service.GetHttpClient();
-                imageStream = await client.GetStreamAsync(url);
+                var response = await client.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode) {
+                    return BadRequest("Giant Bomb returned non-success status code");
+                }
+
+                imageStream = await response.Content.ReadAsStreamAsync();
             }
 
             var path = $"images/{game.Id}/image.jpg";
             var absPath = Path.Combine(environment.WebRootPath, path);
-            Directory.CreateDirectory(Path.GetDirectoryName(absPath));
 
-            using (var stream = new FileStream(absPath, FileMode.Create)) {
-                imageStream.CopyTo(stream);
+            using (imageStream) {
+                Directory.CreateDirectory(Path.GetDirectoryName(absPath));
+
+                using (var stream = new FileStream(absPath, FileMode.Create)) {
+                    imageStream.CopyTo(stream);
+                }
             }
-
-            imageStream.Dispose();
 
             game.Image = path;
             db.SaveChanges();

@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
+using Games.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
-namespace Games {
-    [Route("assisted")]
+namespace Games.Controllers {
+    [Route("api/assisted")]
     public class GiantBombController : Controller {
         private GamesContext db;
         private Config config;

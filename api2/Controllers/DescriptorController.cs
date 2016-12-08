@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Games.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Games {
-    [Route("users/{userId}")]
+namespace Games.Controllers {
+    [Route("api/users/{userId}")]
     public class DescriptorController : Controller {
         private GamesContext db;
         private GameService service;

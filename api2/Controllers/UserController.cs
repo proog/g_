@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using Games.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Games {
+namespace Games.Controllers {
+    [Route("api")]
     public class UserController : Controller {
         private GamesContext db;
         private GameService service;

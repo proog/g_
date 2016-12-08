@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
-namespace Games {
+namespace Games.Models {
     [Table("g_users")]
     public class User : BaseModel {
         public string Username { get; set; }

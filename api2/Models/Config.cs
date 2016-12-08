@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
-namespace Games {
+namespace Games.Models {
     [Table("g_config")]
     public class Config {
         public int Id { get; set; }

@@ -3,7 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Games {
+namespace Games.Controllers {
+    [Route("api")]
     public class AuthenticationController : Controller {
         private GamesContext db;
         private AuthenticationService service;
@@ -26,7 +27,7 @@ namespace Games {
             }
 
             await service.Authenticate(user);
-            return Ok();
+            return Ok(user);
         }
 
         [HttpPost("logout")]
