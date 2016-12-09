@@ -199,8 +199,8 @@ namespace Games.Controllers {
             public string AnyUrl {
                 get {
                     return new List<string> {
-                        ScreenUrl, MediumUrl, SuperUrl, SmallUrl,
-                        TinyUrl, ThumbUrl, IconUrl
+                        SuperUrl, MediumUrl, SmallUrl,
+                        TinyUrl, ThumbUrl, ScreenUrl, IconUrl
                     }.FirstOrDefault(it => it != null);
                 }
             }

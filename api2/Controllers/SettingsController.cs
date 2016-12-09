@@ -5,31 +5,43 @@ using Games.Models;
 using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Games.Controllers {
     [Route("api")]
     public class SettingsController : Controller {
         private GamesContext db;
+        private GameService service;
         private AuthenticationService auth;
 
-        public SettingsController(GamesContext db, AuthenticationService auth) {
+        public SettingsController(GamesContext db, GameService service, AuthenticationService auth) {
             this.db = db;
+            this.service = service;
             this.auth = auth;
         }
 
         [HttpGet("config")]
-        public Config GetConfig() {
-            return db.Configs.Single();
+        public IActionResult GetConfig() {
+            var config = db.Configs
+                .Include(c => c.DefaultUser)
+                .SingleOrDefault();
+
+            if (config == null) {
+                return NotFound();
+            }
+
+            return Ok(config);
         }
 
         [Authorize]
         [HttpGet("settings")]
-        public AuthorizedSettings GetSettings() {
-            var config = GetConfig();
-            return new AuthorizedSettings {
+        public IActionResult GetSettings() {
+            var config = db.Configs.SingleOrDefault();
+            var settings = new AuthorizedSettings {
                 DefaultUserId = config.DefaultUserId,
                 GiantBombApiKey = config.GiantBombApiKey
             };
+            return Ok(settings);
         }
 
         [Authorize]
@@ -43,13 +55,13 @@ namespace Games.Controllers {
                 return Unauthorized();
             }
 
-            var defaultUser = db.Users.Find(settings.DefaultUserId);
+            var defaultUser = service.GetUser(settings.DefaultUserId);
 
             if (defaultUser == null) {
                 return BadRequest();
             }
 
-            var config = GetConfig();
+            var config = db.Configs.Single();
             config.DefaultUser = defaultUser;
             config.GiantBombApiKey = settings.GiantBombApiKey;
 
@@ -58,7 +70,7 @@ namespace Games.Controllers {
             }
 
             db.SaveChanges();
-            return Ok(GetSettings());
+            return GetSettings();
         }
 
         public class AuthorizedSettings {

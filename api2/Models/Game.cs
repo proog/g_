@@ -63,11 +63,11 @@ namespace Games.Models {
         public List<GameTag> GameTags { get; set; }
 
         [NotMapped]
-        public List<int> GenreIds { get; set; }
+        public List<int> GenreIds { get; set; } = new List<int>();
         [NotMapped]
-        public List<int> PlatformIds { get; set; }
+        public List<int> PlatformIds { get; set; } = new List<int>();
         [NotMapped]
-        public List<int> TagIds { get; set; }
+        public List<int> TagIds { get; set; } = new List<int>();
 
         public void SerializeDescriptors() {
             GenreIds = GameGenres.Select(g => g.GenreId).ToList();
