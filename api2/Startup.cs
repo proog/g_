@@ -2,9 +2,10 @@ using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using Games.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -41,6 +42,7 @@ namespace Games {
         }
 
         public void ConfigureServices(IServiceCollection services) {
+            services.Configure<AppSettings>(config);
             services.AddMvc().AddJsonOptions(options => {
                 options.SerializerSettings.ReferenceLoopHandling =
                     ReferenceLoopHandling.Ignore;
@@ -52,8 +54,6 @@ namespace Games {
             services.AddDbContext<GamesContext>();
             services.AddTransient<GameService>();
             services.AddTransient<AuthenticationService>();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.Configure<AppSettings>(config);
         }
     }
 }

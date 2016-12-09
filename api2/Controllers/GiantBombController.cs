@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Games.Models;
+using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -10,7 +11,6 @@ using Newtonsoft.Json;
 namespace Games.Controllers {
     [Route("api/assisted")]
     public class GiantBombController : Controller {
-        private GamesContext db;
         private Config config;
         private GameService service;
         private AuthenticationService auth;
@@ -18,14 +18,13 @@ namespace Games.Controllers {
         private const string NotFoundMessage = "No Giant Bomb API key specified. Please request an API key and update the giant_bomb_api_key attribute in the config table.";
 
         public GiantBombController(GamesContext db, GameService service, AuthenticationService auth) {
-            this.db = db;
             this.service = service;
             this.auth = auth;
             config = db.Configs.SingleOrDefault();
             jsonSettings = service.GetJsonSettings();
             // sometimes GB returns results as an object instead of an
             // array on error conditions. We just squelch errors about
-            // those since the response is unusable anyway
+            // those since the response will be unusable anyway
             jsonSettings.Error = (sender, args) => {
                 if (args.ErrorContext.Path == "results") {
                     args.ErrorContext.Handled = true;
@@ -68,7 +67,7 @@ namespace Games.Controllers {
                 return NotFound(NotFoundMessage);
             }
 
-            var user = service.GetUser((await auth.GetCurrentUser()).Id);
+            var user = await auth.GetCurrentUser(HttpContext);
             var uri = GetUri($"game/{id}", new Dictionary<string, string> {
                 { "field_list", "name,original_release_date,genres,platforms,image,developers,publishers" }
             });
@@ -135,17 +134,19 @@ namespace Games.Controllers {
                 || name.Contains(gbName);
         }
 
-        private Uri GetUri(string resource, Dictionary<string, string> queries) {
-            var builder = new UriBuilder();
-            queries.Add("format", "json");
-            queries.Add("api_key", config.GiantBombApiKey);
-            builder.Scheme = "http";
-            builder.Host = "www.giantbomb.com";
-            builder.Path = $"api/{resource}";
-            builder.Query = string.Join(
-                "&", queries.Select(it => $"{it.Key}={it.Value}")
-            );
-            return builder.Uri;
+        private Uri GetUri(string resource, IDictionary<string, string> queries) {
+            return new UriBuilder {
+                Scheme = "http",
+                Host = "www.giantbomb.com",
+                Path = $"api/{resource}",
+                Query = string.Join("&",
+                    queries.Concat(new [] {
+                        new KeyValuePair<string, string>("format", "json"),
+                        new KeyValuePair<string, string>("api_key", config.GiantBombApiKey)
+                    })
+                    .Select(it => $"{it.Key}={it.Value}")
+                )
+            }.Uri;
         }
 
         public class GBResponse<T> {

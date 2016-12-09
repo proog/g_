@@ -2,7 +2,7 @@ using Games.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace Games {
+namespace Games.Services {
     public class GamesContext : DbContext {
         public DbSet<Game> Games { get; set; }
         public DbSet<Genre> Genres { get; set; }

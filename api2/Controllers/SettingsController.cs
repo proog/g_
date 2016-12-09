@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Games.Models;
+using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,7 +36,7 @@ namespace Games.Controllers {
         [ValidateModel]
         [HttpPut("settings")]
         public async Task<IActionResult> UpdateSettings([FromBody] AuthorizedSettingsInput settings) {
-            var user = await auth.GetCurrentUser();
+            var user = await auth.GetCurrentUser(HttpContext);
             var hash = auth.HashPassword(settings.OldPassword);
 
             if (hash != user.Password) {

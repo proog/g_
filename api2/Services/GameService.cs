@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Games {
+namespace Games.Services {
     public class GameService {
         private GamesContext db;
 

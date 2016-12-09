@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Games.Models;
+using Games.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers {

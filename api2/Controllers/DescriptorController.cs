@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Games.Models;
+using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -106,13 +107,10 @@ namespace Games.Controllers {
 
         private async Task<IActionResult> Add<T>(int userId, T descriptor, Func<DbSet<T>> getter) where T : Descriptor {
             var user = service.GetUser(userId);
+            var invalid = await auth.VerifyUserIsCurrent(user, HttpContext);
 
-            if (user == null) {
-                return NotFound();
-            }
-
-            if (!await auth.IsCurrentUser(user)) {
-                return Unauthorized();
+            if (invalid != null) {
+                return invalid;
             }
 
             descriptor.Id = 0;
@@ -127,13 +125,10 @@ namespace Games.Controllers {
 
         private async Task<IActionResult> Update<T>(int userId, int id, T update, Func<User, IEnumerable<T>> getter) where T : Descriptor {
             var user = service.GetUser(userId);
+            var invalid = await auth.VerifyUserIsCurrent(user, HttpContext);
 
-            if (user == null) {
-                return NotFound();
-            }
-
-            if (!await auth.IsCurrentUser(user)) {
-                return Unauthorized();
+            if (invalid != null) {
+                return invalid;
             }
 
             var descriptor = getter(user)
@@ -153,13 +148,10 @@ namespace Games.Controllers {
 
         private async Task<IActionResult> Delete<T>(int userId, int id, Func<User, IEnumerable<T>> getter) where T : Descriptor {
             var user = service.GetUser(userId);
+            var invalid = await auth.VerifyUserIsCurrent(user, HttpContext);
 
-            if (user == null) {
-                return NotFound();
-            }
-
-            if (!await auth.IsCurrentUser(user)) {
-                return Unauthorized();
+            if (invalid != null) {
+                return invalid;
             }
 
             var descriptor = getter(user)
@@ -176,9 +168,10 @@ namespace Games.Controllers {
 
         private IActionResult All<T>(int userId, Expression<Func<User, IEnumerable<T>>> relation) where T : BaseModel {
             var user = service.GetUser(userId);
+            var invalid = auth.VerifyUserExists(user, HttpContext);
 
-            if (user == null) {
-                return NotFound();
+            if (invalid != null) {
+                return invalid;
             }
 
             var list = db.Entry(user)
@@ -191,9 +184,10 @@ namespace Games.Controllers {
 
         private IActionResult Single<T>(int userId, int id, Expression<Func<User, IEnumerable<T>>> relation) where T : BaseModel {
             var user = service.GetUser(userId);
+            var invalid = auth.VerifyUserExists(user, HttpContext);
 
-            if (user == null) {
-                return NotFound();
+            if (invalid != null) {
+                return invalid;
             }
 
             var descriptor = db.Entry(user)

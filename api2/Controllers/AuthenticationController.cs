@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Games.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers {
@@ -26,19 +27,19 @@ namespace Games.Controllers {
                 return Unauthorized();
             }
 
-            await service.Authenticate(user);
+            await service.Authenticate(user, HttpContext);
             return Ok(user);
         }
 
         [HttpPost("logout")]
         public async Task<IActionResult> LogOut() {
-            await service.Deauthenticate();
+            await service.Deauthenticate(HttpContext);
             return Ok();
         }
 
         [HttpGet("login")]
         public async Task<IActionResult> GetCurrentUser() {
-            var user = await service.GetCurrentUser();
+            var user = await service.GetCurrentUser(HttpContext);
 
             if (user != null) {
                 return Ok(user);

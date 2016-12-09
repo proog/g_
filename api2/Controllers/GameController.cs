@@ -1,13 +1,12 @@
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Games.Models;
+using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 
 namespace Games.Controllers {
     [Route("api/users/{userId}")]
@@ -15,21 +14,20 @@ namespace Games.Controllers {
         private GamesContext db;
         private GameService service;
         private AuthenticationService auth;
-        private IHostingEnvironment environment;
 
-        public GameController(GamesContext db, GameService service, AuthenticationService auth, IHostingEnvironment env) {
+        public GameController(GamesContext db, GameService service, AuthenticationService auth) {
             this.db = db;
             this.service = service;
             this.auth = auth;
-            this.environment = env;
         }
 
         [HttpGet("games")]
         public async Task<IActionResult> GetGames(int userId) {
             var user = service.GetUser(userId);
+            var invalid = auth.VerifyUserExists(user, HttpContext);
 
-            if (user == null) {
-                return NotFound();
+            if (invalid != null) {
+                return invalid;
             }
 
             var games = (await GetGameQuery(user)).ToList();
@@ -40,13 +38,13 @@ namespace Games.Controllers {
         [HttpGet("games/{id}")]
         public async Task<IActionResult> GetGame(int userId, int id) {
             var user = service.GetUser(userId);
+            var invalid = auth.VerifyUserExists(user, HttpContext);
 
-            if (user == null) {
-                return NotFound();
+            if (invalid != null) {
+                return invalid;
             }
 
-            var game = (await GetGameQuery(user))
-                .SingleOrDefault(g => g.Id == id);
+            var game = await GetGame(user, id);
 
             if (game == null) {
                 return NotFound();
@@ -59,9 +57,10 @@ namespace Games.Controllers {
         [HttpGet("suggestions")]
         public async Task<IActionResult> GetSuggestions(int userId) {
             var user = service.GetUser(userId);
+            var invalid = auth.VerifyUserExists(user, HttpContext);
 
-            if (user == null) {
-                return NotFound();
+            if (invalid != null) {
+                return invalid;
             }
 
             var query = await GetGameQuery(user);
@@ -128,13 +127,10 @@ namespace Games.Controllers {
         [HttpPost("games")]
         public async Task<IActionResult> AddGame(int userId, [FromBody] Game game) {
             var user = service.GetUser(userId);
+            var invalid = await auth.VerifyUserIsCurrent(user, HttpContext);
 
-            if (user == null) {
-                return NotFound();
-            }
-
-            if (!await auth.IsCurrentUser(user)) {
-                return Unauthorized();
+            if (invalid != null) {
+                return invalid;
             }
 
             game.User = user;
@@ -154,24 +150,17 @@ namespace Games.Controllers {
         [HttpPut("games/{id}")]
         public async Task<IActionResult> UpdateGame(int userId, int id, [FromBody] Game update) {
             var user = service.GetUser(userId);
+            var invalid = await auth.VerifyUserIsCurrent(user, HttpContext);
 
-            if (user == null) {
-                return NotFound();
+            if (invalid != null) {
+                return invalid;
             }
 
-            if (!await auth.IsCurrentUser(user)) {
-                return Unauthorized();
-            }
-
-            var game = user.Games.SingleOrDefault(g => g.Id == id);
+            var game = await GetGame(user, id);
 
             if (game == null) {
                 return NotFound();
             }
-
-            db.Entry(game).Collection(g => g.GameGenres).Load();
-            db.Entry(game).Collection(g => g.GamePlatforms).Load();
-            db.Entry(game).Collection(g => g.GameTags).Load();
 
             game.Title = update.Title;
             game.Developer = update.Developer;
@@ -201,16 +190,13 @@ namespace Games.Controllers {
         [HttpDelete("games/{id}")]
         public async Task<IActionResult> DeleteGame(int userId, int id) {
             var user = service.GetUser(userId);
+            var invalid = await auth.VerifyUserIsCurrent(user, HttpContext);
 
-            if (user == null) {
-                return NotFound();
+            if (invalid != null) {
+                return invalid;
             }
 
-            if (!await auth.IsCurrentUser(user)) {
-                return Unauthorized();
-            }
-
-            var game = user.Games.SingleOrDefault(g => g.Id == id);
+            var game = await GetGame(user, id);
 
             if (game == null) {
                 return NotFound();
@@ -222,101 +208,9 @@ namespace Games.Controllers {
             return NoContent();
         }
 
-        [Authorize]
-        [HttpPost("games/{id}/image")]
-        public async Task<IActionResult> UploadImage(int userId, int id) {
-            var user = service.GetUser(userId);
-
-            if (user == null) {
-                return NotFound();
-            }
-
-            if (!await auth.IsCurrentUser(user)) {
-                return Unauthorized();
-            }
-
-            var game = user.Games.SingleOrDefault(g => g.Id == id);
-
-            if (game == null) {
-                return NotFound();
-            }
-
-            Stream imageStream;
-
-            if (Request.HasFormContentType) {
-                var form = await Request.ReadFormAsync();
-                var file = form.Files["image"];
-
-                if (file == null) {
-                    return BadRequest("No image supplied");
-                }
-
-                imageStream = file.OpenReadStream();
-            }
-            else {
-                string url;
-                using (var reader = new StreamReader(Request.Body)) {
-                    var json = reader.ReadToEnd();
-                    url = (string) JObject.Parse(json)["image_url"];
-                }
-
-                if (!Uri.IsWellFormedUriString(url, UriKind.Absolute)) {
-                    return BadRequest("Not a valid url");
-                }
-
-                var client = service.GetHttpClient();
-                var response = await client.GetAsync(url);
-
-                if (!response.IsSuccessStatusCode) {
-                    return BadRequest("Giant Bomb returned non-success status code");
-                }
-
-                imageStream = await response.Content.ReadAsStreamAsync();
-            }
-
-            var path = $"images/{game.Id}/image.jpg";
-            var absPath = Path.Combine(environment.WebRootPath, path);
-
-            using (imageStream) {
-                Directory.CreateDirectory(Path.GetDirectoryName(absPath));
-
-                using (var stream = new FileStream(absPath, FileMode.Create)) {
-                    imageStream.CopyTo(stream);
-                }
-            }
-
-            game.Image = path;
-            db.SaveChanges();
-
-            return Ok(game);
-        }
-
-        [Authorize]
-        [HttpDelete("games/{id}/image")]
-        public async Task<IActionResult> DeleteImage(int userId, int id) {
-            var user = service.GetUser(userId);
-
-            if (user == null) {
-                return NotFound();
-            }
-
-            if (!await auth.IsCurrentUser(user)) {
-                return Unauthorized();
-            }
-
-            var game = user.Games.SingleOrDefault(g => g.Id == id);
-
-            if (game == null) {
-                return NotFound();
-            }
-
-            var path = Path.Combine(environment.WebRootPath, $"images/{game.Id}");
-            Directory.Delete(path, true);
-
-            game.Image = null;
-            db.SaveChanges();
-
-            return NoContent();
+        private async Task<Game> GetGame(User user, int id) {
+            return (await GetGameQuery(user))
+                .SingleOrDefault(g => g.Id == id);
         }
 
         private async Task<IQueryable<Game>> GetGameQuery(User user) {
@@ -327,7 +221,7 @@ namespace Games.Controllers {
                 .Include(g => g.GamePlatforms)
                 .Include(g => g.GameTags);
 
-            if (!await auth.IsCurrentUser(user)) {
+            if (!await auth.IsCurrentUser(user, HttpContext)) {
                 query = query.Where(g => !g.Hidden);
             }
 
