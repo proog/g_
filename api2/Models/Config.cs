@@ -18,8 +18,7 @@ namespace Games.Models {
         [ForeignKey("DefaultUserId")]
         public User DefaultUser { get; set; }
 
-        public bool IsAssistedCreationEnabled {
-            get { return !string.IsNullOrEmpty(GiantBombApiKey); }
-        }
+        public bool IsAssistedCreationEnabled =>
+            !string.IsNullOrEmpty(GiantBombApiKey);
     }
 }

@@ -153,14 +153,8 @@ namespace Games.Controllers {
             public string Error;
             public int StatusCode;
             public T Results;
-
-            public bool IsSuccess {
-                get { return StatusCode == 1; }
-            }
-
-            public string ErrorMessage {
-                get { return $"Error {StatusCode}: {Error}"; }
-            }
+            public bool IsSuccess => StatusCode == 1;
+            public string ErrorMessage => $"Error {StatusCode}: {Error}";
         }
 
         public class GBSearchResult {
@@ -195,15 +189,10 @@ namespace Games.Controllers {
             public string SuperUrl;
             public string ThumbUrl;
             public string TinyUrl;
-
-            public string AnyUrl {
-                get {
-                    return new List<string> {
-                        SuperUrl, MediumUrl, SmallUrl,
-                        TinyUrl, ThumbUrl, ScreenUrl, IconUrl
-                    }.FirstOrDefault(it => it != null);
-                }
-            }
+            public string AnyUrl => new List<string> {
+                SuperUrl, MediumUrl, SmallUrl,
+                TinyUrl, ThumbUrl, ScreenUrl, IconUrl
+            }.FirstOrDefault(it => it != null);
         }
 
         public class SearchResult {
