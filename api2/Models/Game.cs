@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
 
 namespace Games.Models {
-    [Table("g_games")]
     public class Game : BaseModel {
         public const int NOT_FINISHED = 0;
         public const int FINISHED = 1;
@@ -24,49 +22,31 @@ namespace Games.Models {
         [Range(0, 3)]
         public int Finished { get; set; }
         public string Comment { get; set; }
-
-        [Column("sort_as")]
         public string SortAs { get; set; }
 
         [JsonIgnore]
-        [Column("private_comment")]
         public string PrivateComment { get; set; }
         public TimeSpan? Playtime { get; set; }
         [Range(1, 5)]
         public int? Rating { get; set; }
-
-        [Column("currently_playing")]
         public bool CurrentlyPlaying { get; set; }
-
-        [Column("queue_position")]
         public int? QueuePosition { get; set; }
-
         public bool Hidden { get; set; }
-
-        [Column("wishlist_position")]
         public int? WishlistPosition { get; set; }
-
-        [Column("user_id")]
         public int UserId { get; set; }
 
         [JsonIgnore]
-        [ForeignKey("UserId")]
         public User User { get; set; }
 
         [JsonIgnore]
         public List<GameGenre> GameGenres { get; set; }
-
         [JsonIgnore]
         public List<GamePlatform> GamePlatforms { get; set; }
-
         [JsonIgnore]
         public List<GameTag> GameTags { get; set; }
 
-        [NotMapped]
         public List<int> GenreIds { get; set; } = new List<int>();
-        [NotMapped]
         public List<int> PlatformIds { get; set; } = new List<int>();
-        [NotMapped]
         public List<int> TagIds { get; set; } = new List<int>();
 
         public void SerializeDescriptors() {

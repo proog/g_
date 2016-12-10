@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
 namespace Games.Models {
@@ -7,18 +6,12 @@ namespace Games.Models {
         public int Id { get; set; }
 
         [JsonIgnore]
-        [Column("created_at")]
         public DateTime? CreatedAt { get; set; }
-
         [JsonIgnore]
-        [Column("updated_at")]
         public DateTime? UpdatedAt { get; set; }
 
-        [NotMapped]
         [JsonProperty("created_at")]
         public int CreatedAtUnix => ToUnixTimestamp(CreatedAt);
-
-        [NotMapped]
         [JsonProperty("updated_at")]
         public int UpdatedAtUnix => ToUnixTimestamp(UpdatedAt);
 

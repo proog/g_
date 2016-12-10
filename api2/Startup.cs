@@ -18,7 +18,7 @@ namespace Games {
         public Startup() {
             config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.json", false)
                 .Build();
         }
 
