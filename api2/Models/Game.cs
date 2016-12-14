@@ -6,11 +6,6 @@ using Newtonsoft.Json;
 
 namespace Games.Models {
     public class Game : BaseModel {
-        public const int NOT_FINISHED = 0;
-        public const int FINISHED = 1;
-        public const int FINISHED_NA = 2;
-        public const int SHELVED = 3;
-
         [Required]
         public string Title { get; set; }
         public string Developer { get; set; }
@@ -20,7 +15,7 @@ namespace Games.Models {
 
         [Required]
         [Range(0, 3)]
-        public int Finished { get; set; }
+        public Completion Finished { get; set; }
         public string Comment { get; set; }
         public string SortAs { get; set; }
 

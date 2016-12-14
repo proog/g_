@@ -65,7 +65,7 @@ namespace Games.Controllers {
 
             var query = await GetGameQuery(user);
             var applicableGames = query
-                .Where(g => g.Finished == Game.NOT_FINISHED)
+                .Where(g => g.Finished == Completion.NotFinished)
                 .Where(g => g.Rating == null)
                 .Where(g => g.Playtime == null)
                 .Where(g => g.QueuePosition == null)

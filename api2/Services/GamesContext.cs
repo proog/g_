@@ -31,35 +31,67 @@ namespace Games.Services {
 
         protected override void OnModelCreating(ModelBuilder builder) {
             var prefix = settings.Prefix;
+            var varchar = "varchar(255)";
+            var tinyint = "int(4)";
+            var text = "text";
 
             builder.Entity<Config>(it => {
                 it.ToTable($"{prefix}config");
+                it.Property(c => c.Id)
+                    .HasColumnName("id");
                 it.Property(c => c.DefaultUserId)
                     .HasColumnName("default_user");
                 it.Property(c => c.GiantBombApiKey)
-                    .HasColumnName("giant_bomb_api_key");
+                    .HasColumnName("giant_bomb_api_key")
+                    .HasColumnType(varchar);
                 it.HasOne(c => c.DefaultUser)
                     .WithMany()
                     .HasForeignKey(c => c.DefaultUserId);
             });
             builder.Entity<Game>(it => {
                 it.ToTable($"{prefix}games");
+                it.Property(g => g.Title)
+                    .HasColumnName("title")
+                    .HasColumnType(varchar);
+                it.Property(g => g.Developer)
+                    .HasColumnName("developer")
+                    .HasColumnType(varchar);
+                it.Property(g => g.Publisher)
+                    .HasColumnName("publisher")
+                    .HasColumnType(varchar);
+                it.Property(g => g.Year)
+                    .HasColumnName("year");
+                it.Property(g => g.Image)
+                    .HasColumnName("image")
+                    .HasColumnType(varchar);
+                it.Property(g => g.Finished)
+                    .HasColumnName("finished")
+                    .HasColumnType(tinyint);
+                it.Property(g => g.Comment)
+                    .HasColumnName("comment")
+                    .HasColumnType(text);
                 it.Property(g => g.SortAs)
-                    .HasColumnName("sort_as");
+                    .HasColumnName("sort_as")
+                    .HasColumnType(varchar);
                 it.Property(g => g.PrivateComment)
-                    .HasColumnName("private_comment");
+                    .HasColumnName("private_comment")
+                    .HasColumnType(text);
+                it.Property(g => g.Playtime)
+                    .HasColumnName("playtime")
+                    .HasColumnType(tinyint);
+                it.Property(g => g.Rating)
+                    .HasColumnName("rating")
+                    .HasColumnType(tinyint);
                 it.Property(g => g.CurrentlyPlaying)
                     .HasColumnName("currently_playing");
                 it.Property(g => g.QueuePosition)
                     .HasColumnName("queue_position");
+                it.Property(g => g.Hidden)
+                    .HasColumnName("hidden");
                 it.Property(g => g.WishlistPosition)
                     .HasColumnName("wishlist_position");
                 it.Property(g => g.UserId)
                     .HasColumnName("user_id");
-                it.Property(g => g.CreatedAt)
-                    .HasColumnName("created_at");
-                it.Property(g => g.UpdatedAt)
-                    .HasColumnName("updated_at");
                 it.Ignore(g => g.GenreIds)
                     .Ignore(g => g.PlatformIds)
                     .Ignore(g => g.TagIds);
@@ -75,10 +107,14 @@ namespace Games.Services {
             });
             builder.Entity<User>(it => {
                 it.ToTable($"{prefix}users");
-                it.Property(u => u.CreatedAt)
-                    .HasColumnName("created_at");
-                it.Property(u => u.UpdatedAt)
-                    .HasColumnName("updated_at");
+                it.Property(u => u.Username)
+                    .HasColumnName("username")
+                    .HasColumnType(varchar);
+                it.Property(u => u.Password)
+                    .HasColumnName("password")
+                    .HasColumnType(varchar);
+                it.Property(u => u.View)
+                    .HasColumnName("view");
                 it.HasMany(u => u.Games)
                     .WithOne(g => g.User)
                     .HasForeignKey(g => g.UserId);
@@ -94,58 +130,28 @@ namespace Games.Services {
             });
             builder.Entity<Genre>(it => {
                 it.ToTable($"{prefix}genres");
-                it.Property(g => g.CreatedAt)
-                    .HasColumnName("created_at");
-                it.Property(g => g.UpdatedAt)
-                    .HasColumnName("updated_at");
-                it.Property(g => g.ShortName)
-                    .HasColumnName("short_name");
-                it.Property(g => g.UserId)
-                    .HasColumnName("user_id");
             });
             builder.Entity<Platform>(it => {
                 it.ToTable($"{prefix}platforms");
-                it.Property(p => p.CreatedAt)
-                    .HasColumnName("created_at");
-                it.Property(p => p.UpdatedAt)
-                    .HasColumnName("updated_at");
-                it.Property(p => p.ShortName)
-                    .HasColumnName("short_name");
-                it.Property(p => p.UserId)
-                    .HasColumnName("user_id");
             });
             builder.Entity<Tag>(it => {
                 it.ToTable($"{prefix}tags");
-                it.Property(t => t.CreatedAt)
-                    .HasColumnName("created_at");
-                it.Property(t => t.UpdatedAt)
-                    .HasColumnName("updated_at");
-                it.Property(t => t.ShortName)
-                    .HasColumnName("short_name");
-                it.Property(t => t.UserId)
-                    .HasColumnName("user_id");
             });
             builder.Entity<GameGenre>(it => {
                 it.ToTable($"{prefix}game_genre");
                 it.HasKey(gg => new { gg.GameId, gg.GenreId });
-                it.Property(gg => gg.GameId)
-                    .HasColumnName("game_id");
                 it.Property(gg => gg.GenreId)
                     .HasColumnName("genre_id");
             });
             builder.Entity<GamePlatform>(it => {
                 it.ToTable($"{prefix}game_platform");
                 it.HasKey(gp => new { gp.GameId, gp.PlatformId });
-                it.Property(gp => gp.GameId)
-                    .HasColumnName("game_id");
                 it.Property(gp => gp.PlatformId)
                     .HasColumnName("platform_id");
             });
             builder.Entity<GameTag>(it => {
                 it.ToTable($"{prefix}game_tag");
                 it.HasKey(gt => new { gt.GameId, gt.TagId });
-                it.Property(gt => gt.GameId)
-                    .HasColumnName("game_id");
                 it.Property(gt => gt.TagId)
                     .HasColumnName("tag_id");
             });

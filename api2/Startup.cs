@@ -4,7 +4,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Games.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +17,7 @@ namespace Games {
         public Startup() {
             config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", false)
+                .AddJsonFile("appsettings.json", true, true)
                 .Build();
         }
 

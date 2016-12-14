@@ -13,7 +13,7 @@
     "Microsoft.EntityFrameworkCore": "1.1.0",
     "Microsoft.Extensions.Configuration.Json": "1.1.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.1.0",
-    "Pomelo.EntityFrameworkCore.MySql": "1.1.0-rtm-10000"
+    "Pomelo.EntityFrameworkCore.MySql": "1.1.0"
   },
   "frameworks": {
     "netcoreapp1.0": {
