@@ -1,6 +1,6 @@
 public/images
 config/db.json
-api2/appsettings.json
+api2/games.db
 api2/bin/
 api2/obj/
 

@@ -1,28 +1,16 @@
 using System;
-using System.IO;
 using System.Net;
 using System.Threading.Tasks;
-using Games.Models;
 using Games.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace Games {
     public class Startup {
-        private IConfiguration config;
-
-        public Startup() {
-            config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
-        }
-
-        public void Configure(IApplicationBuilder app) {
+        public void Configure(IApplicationBuilder app, CommonService service) {
             var authOptions = new CookieAuthenticationOptions {
                 AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme,
                 AutomaticAuthenticate = true,
@@ -36,15 +24,22 @@ namespace Games {
                 }
             };
 
-            CreateDatabase(app);
+            // redirect to setup until configured
+            app.MapWhen(
+                ctx => ctx.Request.Path == "/" && !service.IsConfigured(),
+                req => req.Run(
+                    ctx => Task.Run(() => ctx.Response.Redirect("/setup"))
+                )
+            );
             app.UseDefaultFiles()
                 .UseStaticFiles()
                 .UseCookieAuthentication(authOptions)
                 .UseMvc();
+            CreateDatabase(app);
         }
 
         public void ConfigureServices(IServiceCollection services) {
-            services.Configure<AppSettings>(config)
+            services
                 .AddDbContext<GamesContext>()
                 .AddTransient<CommonService>()
                 .AddTransient<AuthenticationService>()
