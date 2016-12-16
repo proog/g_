@@ -17,18 +17,18 @@ namespace Games {
         public Startup() {
             config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile("appsettings.json", false, true)
                 .Build();
         }
 
         public void Configure(IApplicationBuilder app) {
             app.UseDeveloperExceptionPage();
-            var authOptions = new CookieAuthenticationOptions() {
+            var authOptions = new CookieAuthenticationOptions {
                 AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme,
                 AutomaticAuthenticate = true,
                 AutomaticChallenge = true,
                 ExpireTimeSpan = TimeSpan.FromHours(5),
-                Events = new CookieAuthenticationEvents() {
+                Events = new CookieAuthenticationEvents {
                     OnRedirectToLogin = context => {
                         context.Response.StatusCode = (int) HttpStatusCode.Unauthorized;
                         return Task.CompletedTask;
