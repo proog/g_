@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using Games.Models;
 using Games.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -17,7 +18,7 @@ namespace Games {
         public Startup() {
             config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", false, true)
+                .AddJsonFile("appsettings.json")
                 .Build();
         }
 
@@ -35,8 +36,8 @@ namespace Games {
                 }
             };
 
-            app.UseDeveloperExceptionPage()
-                .UseDefaultFiles()
+            InitializeDatabase(app);
+            app.UseDefaultFiles()
                 .UseStaticFiles()
                 .UseCookieAuthentication(authOptions)
                 .UseMvc();
@@ -56,6 +57,26 @@ namespace Games {
                             NamingStrategy = new SnakeCaseNamingStrategy()
                         };
                 });
+        }
+
+        private void InitializeDatabase(IApplicationBuilder app) {
+            var scopeFactory = app.ApplicationServices
+                .GetRequiredService<IServiceScopeFactory>();
+
+            using (var scope = scopeFactory.CreateScope()) {
+                var db = scope.ServiceProvider.GetService<GamesContext>();
+                var auth = scope.ServiceProvider.GetService<AuthenticationService>();
+
+                if (db.Database.EnsureCreated()) {
+                    var user = new User {
+                        Username = "Default",
+                        Password = auth.HashPassword("default")
+                    };
+                    db.Users.Add(user);
+                    db.Configs.Add(new Config { DefaultUser = user });
+                    db.SaveChanges();
+                }
+            }
         }
     }
 }

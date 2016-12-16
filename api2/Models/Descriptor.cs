@@ -12,7 +12,6 @@ namespace Games.Models {
         [JsonIgnore]
         public User User { get; set; }
 
-        [JsonIgnore]
         [Column("user_id")]
         public int UserId { get; set; }
     }
