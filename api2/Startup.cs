@@ -22,7 +22,6 @@ namespace Games {
         }
 
         public void Configure(IApplicationBuilder app) {
-            app.UseDeveloperExceptionPage();
             var authOptions = new CookieAuthenticationOptions {
                 AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme,
                 AutomaticAuthenticate = true,
@@ -35,24 +34,28 @@ namespace Games {
                     }
                 }
             };
-            app.UseCookieAuthentication(authOptions);
-            app.UseMvc();
-            app.UseStaticFiles();
+
+            app.UseDeveloperExceptionPage()
+                .UseDefaultFiles()
+                .UseStaticFiles()
+                .UseCookieAuthentication(authOptions)
+                .UseMvc();
         }
 
         public void ConfigureServices(IServiceCollection services) {
-            services.Configure<AppSettings>(config);
-            services.AddMvc().AddJsonOptions(options => {
-                options.SerializerSettings.ReferenceLoopHandling =
-                    ReferenceLoopHandling.Ignore;
-                options.SerializerSettings.ContractResolver =
-                    new DefaultContractResolver {
-                        NamingStrategy = new SnakeCaseNamingStrategy()
-                    };
-            });
-            services.AddDbContext<GamesContext>();
-            services.AddTransient<GameService>();
-            services.AddTransient<AuthenticationService>();
+            services.Configure<AppSettings>(config)
+                .AddDbContext<GamesContext>()
+                .AddTransient<CommonService>()
+                .AddTransient<AuthenticationService>()
+                .AddMvc()
+                .AddJsonOptions(options => {
+                    options.SerializerSettings.ReferenceLoopHandling =
+                        ReferenceLoopHandling.Ignore;
+                    options.SerializerSettings.ContractResolver =
+                        new DefaultContractResolver {
+                            NamingStrategy = new SnakeCaseNamingStrategy()
+                        };
+                });
         }
     }
 }

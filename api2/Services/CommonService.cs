@@ -6,10 +6,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace Games.Services {
-    public class GameService {
+    public class CommonService {
         private GamesContext db;
 
-        public GameService(GamesContext db) {
+        public CommonService(GamesContext db) {
             this.db = db;
         }
 

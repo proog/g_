@@ -11,10 +11,10 @@ namespace Games.Controllers {
     [Route("api")]
     public class SettingsController : Controller {
         private GamesContext db;
-        private GameService service;
+        private CommonService service;
         private AuthenticationService auth;
 
-        public SettingsController(GamesContext db, GameService service, AuthenticationService auth) {
+        public SettingsController(GamesContext db, CommonService service, AuthenticationService auth) {
             this.db = db;
             this.service = service;
             this.auth = auth;

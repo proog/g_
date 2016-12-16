@@ -11,12 +11,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Services {
     public class AuthenticationService {
-        private GameService service;
+        private CommonService service;
         private const string claimType = "id";
         private const string claimValueType = ClaimValueTypes.Integer;
         private const string authenticationType = "Password";
 
-        public AuthenticationService(GameService service) {
+        public AuthenticationService(CommonService service) {
             this.service = service;
         }
 

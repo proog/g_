@@ -12,11 +12,11 @@ namespace Games.Controllers {
     [Route("api/users/{userId}/games/{id}/image")]
     public class ImageController : Controller {
         private GamesContext db;
-        private GameService service;
+        private CommonService service;
         private AuthenticationService auth;
         private IHostingEnvironment environment;
 
-        public ImageController(GamesContext db, GameService service, AuthenticationService auth, IHostingEnvironment env) {
+        public ImageController(GamesContext db, CommonService service, AuthenticationService auth, IHostingEnvironment env) {
             this.db = db;
             this.service = service;
             this.auth = auth;

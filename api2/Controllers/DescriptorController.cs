@@ -13,10 +13,10 @@ namespace Games.Controllers {
     [Route("api/users/{userId}")]
     public class DescriptorController : Controller {
         private GamesContext db;
-        private GameService service;
+        private CommonService service;
         private AuthenticationService auth;
 
-        public DescriptorController(GamesContext db, GameService service, AuthenticationService auth) {
+        public DescriptorController(GamesContext db, CommonService service, AuthenticationService auth) {
             this.db = db;
             this.service = service;
             this.auth = auth;

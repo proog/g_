@@ -12,12 +12,12 @@ namespace Games.Controllers {
     [Route("api/assisted")]
     public class GiantBombController : Controller {
         private Config config;
-        private GameService service;
+        private CommonService service;
         private AuthenticationService auth;
         private JsonSerializerSettings jsonSettings;
         private const string NotFoundMessage = "No Giant Bomb API key specified. Please request an API key and update the giant_bomb_api_key attribute in the config table.";
 
-        public GiantBombController(GamesContext db, GameService service, AuthenticationService auth) {
+        public GiantBombController(GamesContext db, CommonService service, AuthenticationService auth) {
             this.service = service;
             this.auth = auth;
             config = db.Configs.SingleOrDefault();

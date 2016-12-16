@@ -12,10 +12,10 @@ namespace Games.Controllers {
     [Route("api/users/{userId}")]
     public class GameController : Controller {
         private GamesContext db;
-        private GameService service;
+        private CommonService service;
         private AuthenticationService auth;
 
-        public GameController(GamesContext db, GameService service, AuthenticationService auth) {
+        public GameController(GamesContext db, CommonService service, AuthenticationService auth) {
             this.db = db;
             this.service = service;
             this.auth = auth;
