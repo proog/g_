@@ -3,7 +3,7 @@ using Games.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Games {
+namespace Games.Infrastructure {
     public class ValidateModelAttribute : Attribute, IActionFilter {
         public void OnActionExecuted(ActionExecutedContext context) { }
 

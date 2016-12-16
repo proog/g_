@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Games {
+namespace Games.Infrastructure {
     public class Startup {
         public void Configure(IApplicationBuilder app, CommonService service) {
             var authOptions = new CookieAuthenticationOptions {
