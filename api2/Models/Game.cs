@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
 
@@ -43,8 +44,11 @@ namespace Games.Models {
         [JsonIgnore]
         public List<GameTag> GameTags { get; set; }
 
+        [NotMapped]
         public List<int> GenreIds { get; set; } = new List<int>();
+        [NotMapped]
         public List<int> PlatformIds { get; set; } = new List<int>();
+        [NotMapped]
         public List<int> TagIds { get; set; } = new List<int>();
 
         public void SerializeDescriptors() {

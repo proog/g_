@@ -15,7 +15,7 @@ namespace Games.Controllers {
         private CommonService service;
         private AuthenticationService auth;
         private JsonSerializerSettings jsonSettings;
-        private const string NotFoundMessage = "No Giant Bomb API key specified. Please request an API key and update the giant_bomb_api_key attribute in the config table.";
+        private const string NotFoundMessage = "No Giant Bomb API key specified. Please request an API key and update the GiantBombApiKey attribute in the Configs table.";
 
         public GiantBombController(GamesContext db, CommonService service, AuthenticationService auth) {
             this.service = service;
