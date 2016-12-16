@@ -2,12 +2,15 @@
   "version": "1.0.0-*",
   "buildOptions": {
     "debugType": "portable",
-    "emitEntryPoint": true
+    "emitEntryPoint": true,
+    "preserveCompilationContext": true
   },
   "dependencies": {
     "Microsoft.AspNetCore.Authentication.Cookies": "1.1.0",
     "Microsoft.AspNetCore.Diagnostics": "1.1.0",
     "Microsoft.AspNetCore.Mvc": "1.1.0",
+    "Microsoft.AspNetCore.Mvc.Razor": "1.1.0",
+    "Microsoft.AspNetCore.Mvc.TagHelpers": "1.1.0",
     "Microsoft.AspNetCore.Server.Kestrel": "1.1.0",
     "Microsoft.AspNetCore.StaticFiles": "1.1.0",
     "Microsoft.EntityFrameworkCore": "1.1.0",
