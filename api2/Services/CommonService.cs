@@ -37,5 +37,9 @@ namespace Games.Services {
                 }
             };
         }
+
+        public bool IsConfigured() {
+            return db.Configs.Count() > 0;
+        }
     }
 }

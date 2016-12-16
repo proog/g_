@@ -36,7 +36,7 @@ namespace Games {
                 }
             };
 
-            InitializeDatabase(app);
+            CreateDatabase(app);
             app.UseDefaultFiles()
                 .UseStaticFiles()
                 .UseCookieAuthentication(authOptions)
@@ -59,23 +59,13 @@ namespace Games {
                 });
         }
 
-        private void InitializeDatabase(IApplicationBuilder app) {
+        private void CreateDatabase(IApplicationBuilder app) {
             var scopeFactory = app.ApplicationServices
                 .GetRequiredService<IServiceScopeFactory>();
 
             using (var scope = scopeFactory.CreateScope()) {
                 var db = scope.ServiceProvider.GetService<GamesContext>();
-                var auth = scope.ServiceProvider.GetService<AuthenticationService>();
-
-                if (db.Database.EnsureCreated()) {
-                    var user = new User {
-                        Username = "Default",
-                        Password = auth.HashPassword("default")
-                    };
-                    db.Users.Add(user);
-                    db.Configs.Add(new Config { DefaultUser = user });
-                    db.SaveChanges();
-                }
+                db.Database.EnsureCreated();
             }
         }
     }

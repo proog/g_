@@ -6,9 +6,6 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="favicon.ico">
     <title>g_</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -28,50 +25,6 @@
             This page will help you set up your own installation of g_.
         </p>
         <form method="post">
-            <h2>Set up database</h2>
-            <p>
-                g_ needs to create database tables to store its data. Please enter your database configuration here.
-                You can always change these options by modifying <code>config/db.json</code> after setup has finished successfully.
-            </p>
-            @if (@Model.DbError != null) {
-                <div class="alert alert-danger">
-                    @Model.DbError
-                </div>
-            }
-            <div class="form-group">
-                <label>Database host</label>
-                <input asp-for="DbHost" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>Database port</label>
-                <input asp-for="DbPort" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>Database name</label>
-                <input asp-for="DbName" class="form-control" required>
-                <p class="help-block">
-                    The database in which to create tables.
-                </p>
-            </div>
-            <div class="form-group">
-                <label>Database username</label>
-                <input asp-for="DbUser" class="form-control" required>
-                <p class="help-block">
-                    g_ needs a user with sufficient permissions for creating tables and inserting, updating and deleting records.
-                </p>
-            </div>
-            <div class="form-group">
-                <label>Database password</label>
-                <input asp-for="DbPass" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>Table prefix</label>
-                <input asp-for="DbPrefix" class="form-control" required>
-                <p class="help-block">
-                    By default, g_ will create tables named g_games, g_genres, g_users, etc.
-                    If you don't want to use the g_ prefix, you can change it here.
-                </p>
-            </div>
             <h2>Create default user</h2>
             <p>
                 g_ needs at least one user to function. Create your login details here.
@@ -103,7 +56,7 @@
                 <input asp-for="ApiKey" class="form-control" placeholder="Your API key">
                 <p class="help-block">
                     g_ relies on the Giant Bomb game wiki for assisted game creation, making it possible to automatically retrieve most information when adding games to your collection.<br>
-                    If you want to use this feature, you need to create a free Giant Bomb account and <a href="http://www.giantbomb.com/api/" target="_blank">request an API key</a>.
+                    If you want to use this feature, you need to create a free Giant Bomb account and <a href="http://www.giantbomb.com/api/" target="_blank" rel="noopener noreferrer">request an API key</a>.
                     Without an API key, assisted game creation will be unavailable.
                 </p>
             </div>
