@@ -21,7 +21,10 @@ namespace Games.Models {
 
         [JsonIgnore]
         public string PrivateComment { get; set; }
-        public TimeSpan? Playtime { get; set; }
+
+        [RegularExpression(@"^\d{2,}:\d{2}:\d{2}$")]
+        public string Playtime { get; set; }
+
         [Range(1, 5)]
         public int? Rating { get; set; }
         public bool CurrentlyPlaying { get; set; }
