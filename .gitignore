@@ -1,5 +1,5 @@
 public/images
-data/games.db
+data
 bin
 obj
 .vscode
