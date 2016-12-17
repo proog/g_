@@ -5,6 +5,10 @@
     "emitEntryPoint": true,
     "preserveCompilationContext": true
   },
+  "publishOptions": {
+    "include": ["Views/", "public/"],
+    "exclude": ["public/images/"]
+  },
   "dependencies": {
     "Microsoft.AspNetCore.Authentication.Cookies": "1.1.0",
     "Microsoft.AspNetCore.Diagnostics": "1.1.0",
