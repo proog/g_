@@ -105,9 +105,7 @@ namespace Games.Controllers {
                 return NotFound();
             }
 
-            var path = Path.Combine(environment.WebRootPath, $"images/{game.Id}");
-            Directory.Delete(path, true);
-
+            service.DeleteImageDirectory(game);
             game.Image = null;
             db.SaveChanges();
 

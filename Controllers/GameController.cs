@@ -202,6 +202,7 @@ namespace Games.Controllers {
                 return NotFound();
             }
 
+            service.DeleteImageDirectory(game);
             db.Remove(game);
             db.SaveChanges();
 

@@ -1,6 +1,8 @@
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using Games.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -8,9 +10,11 @@ using Newtonsoft.Json.Serialization;
 namespace Games.Services {
     public class CommonService {
         private GamesContext db;
+        private IHostingEnvironment environment;
 
-        public CommonService(GamesContext db) {
+        public CommonService(GamesContext db, IHostingEnvironment environment) {
             this.db = db;
+            this.environment = environment;
         }
 
         public User GetUser(int id) {
@@ -40,6 +44,11 @@ namespace Games.Services {
 
         public bool IsConfigured() {
             return db.Configs.Count() > 0;
+        }
+
+        public void DeleteImageDirectory(Game game) {
+            var path = Path.Combine(environment.WebRootPath, $"images/{game.Id}");
+            Directory.Delete(path, true);
         }
     }
 }
