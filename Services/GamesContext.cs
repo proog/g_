@@ -18,7 +18,8 @@ namespace Games.Services {
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder builder) {
-            var path = Path.Combine(environment.ContentRootPath, "games.db");
+            var path = Path.Combine(environment.ContentRootPath, "data/games.db");
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
             builder.UseSqlite($"Data Source={path}");
         }
 
