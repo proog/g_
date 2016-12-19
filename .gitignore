@@ -1,14 +1,10 @@
 public/images
-public/components
+public/vendor
 public/js/g.min.js
 public/js/g.min.js.map
 data
 bin
 obj
 .vscode
-.idea
 project.lock.json
 node_modules
-.bower-cache
-.bower-registry
-.bower-tmp
