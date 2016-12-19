@@ -14,7 +14,7 @@
   "devDependencies": {},
   "scripts": {
     "vendor:clean": "rm -rf public/vendor",
-    "vendor:copy": "mkdir public/vendor && cp node_modules/{angular-bootstrap/ui-bootstrap-tpls.min.js,angular-loading-bar/build/loading-bar.min.js,angular-loading-bar/build/loading-bar.min.css,angular-upload/angular-upload.min.js,chart.js/Chart.min.js,moment/min/moment.min.js} public/vendor",
+    "vendor:copy": "mkdir public/vendor && cp node_modules/angular-bootstrap/ui-bootstrap-tpls.min.js node_modules/angular-loading-bar/build/loading-bar.min.js node_modules/angular-loading-bar/build/loading-bar.min.css node_modules/angular-upload/angular-upload.min.js node_modules/chart.js/Chart.min.js node_modules/moment/min/moment.min.js public/vendor",
     "js:uglify": "cd public/js && uglifyjs app.js */*.js -o g.min.js --source-map g.min.js.map",
     "build": "npm run vendor:clean && npm run vendor:copy && npm run js:uglify",
     "postinstall": "npm run build"
