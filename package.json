@@ -9,7 +9,9 @@
   },
   "devDependencies": {},
   "scripts": {
-    "build": "cd public/js && uglifyjs app.js */*.js -o g.min.js --source-map g.min.js.map"
+    "uglify": "cd public/js && uglifyjs app.js */*.js -o g.min.js --source-map g.min.js.map",
+    "bower": "bower install",
+    "build": "npm run bower && npm run uglify"
   },
   "author": "Per Mortensen",
   "license": "ISC"
