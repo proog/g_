@@ -1,4 +1,7 @@
 public/images
+public/components
+public/js/g.min.js
+public/js/g.min.js.map
 data
 bin
 obj
@@ -6,7 +9,6 @@ obj
 .idea
 project.lock.json
 node_modules
-public/components
 .bower-cache
 .bower-registry
 .bower-tmp
