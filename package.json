@@ -5,6 +5,7 @@
   "main": "",
   "dependencies": {
     "uglify-js": "latest",
+    "watch": "latest",
     "angular-loading-bar": "~0.7.0",
     "chart.js": "~1.0.1",
     "moment": "~2.9.0",
@@ -15,8 +16,9 @@
   "scripts": {
     "vendor:clean": "rm -rf public/vendor",
     "vendor:copy": "mkdir public/vendor && cp node_modules/angular-bootstrap/ui-bootstrap-tpls.min.js node_modules/angular-loading-bar/build/loading-bar.min.js node_modules/angular-loading-bar/build/loading-bar.min.css node_modules/angular-upload/angular-upload.min.js node_modules/chart.js/Chart.min.js node_modules/moment/min/moment.min.js public/vendor",
-    "js:uglify": "cd public/js && uglifyjs app.js */*.js -o g.min.js --source-map g.min.js.map",
+    "js:uglify": "cd public && uglifyjs js/app.js js/*/*.js -o g.min.js --source-map g.min.js.map",
     "build": "npm run vendor:clean && npm run vendor:copy && npm run js:uglify",
+    "watch": "npm run build && watch 'npm run js:uglify' public/js",
     "postinstall": "npm run build"
   },
   "author": "Per Mortensen",

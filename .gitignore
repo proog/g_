@@ -1,7 +1,7 @@
 public/images
 public/vendor
-public/js/g.min.js
-public/js/g.min.js.map
+public/g.min.js
+public/g.min.js.map
 data
 bin
 obj
