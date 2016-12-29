@@ -1,4 +1,4 @@
-angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$route', '$q', '$location', 'upload', '$modal', '$filter', 'Games', 'Genres', 'Platforms', 'Tags', 'Users', 'gameService', '$cookies', 'searchFilter', '$timeout', function($scope, $routeParams, $route, $q, $location, upload, $modal, $filter, Games, Genres, Platforms, Tags, Users, gameService, $cookies, searchFilter, $timeout) {
+angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$route', '$q', '$location', 'upload', '$uibModal', '$filter', 'Games', 'Genres', 'Platforms', 'Tags', 'Users', 'gameService', '$cookies', 'searchFilter', '$timeout', function($scope, $routeParams, $route, $q, $location, upload, $modal, $filter, Games, Genres, Platforms, Tags, Users, gameService, $cookies, searchFilter, $timeout) {
     "use strict";
     var self = this;
 
@@ -131,7 +131,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             return;
 
         self.view = view;
-        $cookies.view = view;
+        $cookies.put('view', view);
 
         $timeout(function() {
             self.updateChart();
@@ -268,7 +268,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
     self.collapseSection = function(sectionKey) {
         var collapsed = !self.sections[sectionKey];
         self.sections[sectionKey] = collapsed;
-        $cookies[sectionKey] = (collapsed ? 1 : 0);
+        $cookies.put(sectionKey, collapsed ? 1 : 0);
 
         // fix for when loading the page with statistics collapsed, the chart wouldn't display
         if(sectionKey == 'statistics' && !collapsed) {
@@ -312,7 +312,13 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             ]
         };
 
-        var ctx = document.getElementById('stats-chart').getContext('2d');
+        var element = document.getElementById('stats-chart');
+
+        if (!element) {
+            return;
+        }
+
+        var ctx = element.getContext('2d');
         var options = {
             animation: false,
             responsive: true,
@@ -546,11 +552,11 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
             }, 'sort_as'] }
         ];
         self.sections = {
-            currently_playing: $cookies.currently_playing == 1,
-            queue: $cookies.queue == 1,
-            all_games: $cookies.all_games == 1,
-            statistics: $cookies.statistics == 1,
-            suggestions: $cookies.suggestions == 1
+            currently_playing: $cookies.get('currently_playing') == 1,
+            queue: $cookies.get('queue') == 1,
+            all_games: $cookies.get('all_games') == 1,
+            statistics: $cookies.get('statistics') == 1,
+            suggestions: $cookies.get('suggestions') == 1
         };
 
         self.offset = 0;
@@ -560,7 +566,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         self.selectedGame = null;
         self.GRID_VIEW = 1;
         self.LIST_VIEW = 2;
-        self.view = $cookies.view ? $cookies.view : self.LIST_VIEW;
+        self.view = $cookies.get('view') || self.LIST_VIEW;
         self.gameService = gameService;
         self.initFilter();
         self.resetFilter();

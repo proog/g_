@@ -1,4 +1,4 @@
-angular.module('games').controller('queueFormCtrl', ['$scope', '$modalInstance', '$filter', 'games', 'property', 'gameService', '$q', function($scope, $modalInstance, $filter, games, property, gameService, $q) {
+angular.module('games').controller('queueFormCtrl', ['$scope', '$uibModalInstance', '$filter', 'games', 'property', 'gameService', '$q', function($scope, $modalInstance, $filter, games, property, gameService, $q) {
     $scope.initialize = function() {
         $scope.games = angular.copy(games);
         $scope.property = property;

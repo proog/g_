@@ -82,7 +82,7 @@ angular.module('games').factory('Games', ['$resource', 'upload', '$http', functi
 
     Games.prototype.deleteImage = function() {
         var self = this;
-        return $http.delete('api/users/' + self.user_id + '/games/' + self.id + '/image').success(function() {
+        return $http.delete('api/users/' + self.user_id + '/games/' + self.id + '/image').then(function() {
             self.image = null;
             self.decachedImage = null;
         });

@@ -1,4 +1,4 @@
-angular.module('games', ['ngRoute', 'ngResource', 'ngCookies', 'lr.upload', 'ui.bootstrap', 'angular-loading-bar'])
+angular.module('games', ['ngAnimate', 'ngRoute', 'ngResource', 'ngCookies', 'lr.upload', 'ui.bootstrap', 'angular-loading-bar'])
 .config(['$routeProvider', 'cfpLoadingBarProvider', function($routeProvider, loadingBarProvider) {
     $routeProvider
         .when('/:userId?/:gameId?', {
@@ -12,7 +12,7 @@ angular.module('games', ['ngRoute', 'ngResource', 'ngCookies', 'lr.upload', 'ui.
     loadingBarProvider.latencyThreshold = 500;
     loadingBarProvider.includeSpinner = false;
 }])
-.run(['$rootScope', '$modalStack', function($rootScope, $modalStack) {
+.run(['$rootScope', '$uibModalStack', function($rootScope, $modalStack) {
     $rootScope.$on('$routeChangeSuccess', function() {
         $modalStack.dismissAll();
     });

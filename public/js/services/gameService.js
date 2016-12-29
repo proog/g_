@@ -27,8 +27,8 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
         });
     };
     self.refreshSuggestions = function(userId) {
-        return $http.get('api/users/'+userId+'/suggestions').success(function(data) {
-            self.suggestions = data;
+        return $http.get('api/users/'+userId+'/suggestions').then(function(response) {
+            self.suggestions = response.data;
         });
     };
     self.refreshConfig = function() {

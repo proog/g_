@@ -1,4 +1,4 @@
-angular.module('games').controller('loginFormCtrl', ['$scope', '$modalInstance', 'gameService', function($scope, $modalInstance, gameService) {
+angular.module('games').controller('loginFormCtrl', ['$scope', '$uibModalInstance', 'gameService', function($scope, $modalInstance, gameService) {
     $scope.loginClick = function() {
         $scope.loginError = false;
         gameService.logIn($scope.loginForm.username, $scope.loginForm.password)

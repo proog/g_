@@ -1,4 +1,4 @@
-angular.module('games').controller('manageFormCtrl', ['$scope', '$modalInstance', '$filter', 'Entities', 'items', 'gameService', '$q', function($scope, $modalInstance, $filter, Entities, items, gameService, $q) {
+angular.module('games').controller('manageFormCtrl', ['$scope', '$uibModalInstance', '$filter', 'Entities', 'items', 'gameService', '$q', function($scope, $modalInstance, $filter, Entities, items, gameService, $q) {
     $scope.initialize = function() {
         $scope.form = { };
         $scope.originalItems = items;

@@ -1,4 +1,4 @@
-angular.module('games').controller('settingsFormCtrl', ['$scope', '$modalInstance', 'gameService', 'Settings', function($scope, $modalInstance, gameService, Settings) {
+angular.module('games').controller('settingsFormCtrl', ['$scope', '$uibModalInstance', 'gameService', 'Settings', function($scope, $modalInstance, gameService, Settings) {
     $scope.initialize = function() {
         $scope.gameService = gameService;
         $scope.model = Settings.get();
