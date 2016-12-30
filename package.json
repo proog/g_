@@ -22,7 +22,7 @@
   "devDependencies": {},
   "scripts": {
     "vendor:clean": "rm -rf public/vendor",
-    "vendor:copy": "mkdir public/vendor && mkdir public/vendor/{js,css,fonts} && npm run vendor:js && npm run vendor:css && npm run vendor:fonts",
+    "vendor:copy": "mkdir public/vendor && mkdir public/vendor/js && mkdir public/vendor/css && mkdir public/vendor/fonts && npm run vendor:js && npm run vendor:css && npm run vendor:fonts",
     "vendor:js": "cp node_modules/angular/angular.min.js node_modules/angular-animate/angular-animate.min.js node_modules/angular-cookies/angular-cookies.min.js node_modules/angular-resource/angular-resource.min.js node_modules/angular-route/angular-route.min.js node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js node_modules/angular-loading-bar/build/loading-bar.min.js node_modules/angular-upload/angular-upload.min.js node_modules/chart.js/Chart.min.js node_modules/moment/min/moment.min.js node_modules/jquery/dist/jquery.min.js node_modules/bootstrap/dist/js/bootstrap.min.js public/vendor/js",
     "vendor:css": "cp node_modules/bootstrap/dist/css/bootstrap.min.css node_modules/angular-loading-bar/build/loading-bar.min.css public/vendor/css",
     "vendor:fonts": "cp node_modules/bootstrap/dist/fonts/* public/vendor/fonts",
