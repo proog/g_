@@ -65,7 +65,7 @@
                     <div class="form-group">
                         <div class="input-group">
                             <div class="form-control" ng-disabled="state == STATE_ON_WISHLIST">
-                                <rating ng-model="model.rating" max="5" readonly="state == STATE_ON_WISHLIST"></rating>
+                                <span uib-rating ng-model="model.rating" max="5" readonly="state == STATE_ON_WISHLIST"></span>
                             </div>
                             <div class="input-group-btn">
                                 <button type="button" class="btn btn-default pull-right" ng-click="model.rating = null" ng-disabled="state == STATE_ON_WISHLIST">

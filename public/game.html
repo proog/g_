@@ -47,7 +47,7 @@
                 <span ng-if="game.finished != gameService.FINISHED_NA">in</span>
                 <strong>{{game.getPlaytimeDisplay()}}</strong>
             </span><br>
-            <rating ng-model="game.rating" max="5" readonly="true" ng-if="game.hasRating()"></rating>
+            <span uib-rating ng-model="game.rating" max="5" readonly="true" ng-if="game.hasRating()"></span>
             <br>
             <strong ng-if="game.tag_ids.length > 0" ng-repeat="t in getTags() | orderBy:'short_name'" title="{{t.name != t.short_name ? t.name : ''}}">
                 {{t.short_name}}<span ng-if="!$last">, </span>
