@@ -82,19 +82,20 @@
     </div>
     <div class="row" uib-collapse="ctrl.sections.all_games">
         <div class="col-lg-12 text-center">
-            <pagination total-items="ctrl.filtered.length"
-                        items-per-page="ctrl.itemsPerPage"
-                        num-pages="ctrl.pageCount"
-                        boundary-links="false"
-                        max-size="30"
-                        rotate="false"
-                        previous-text="&lt;"
-                        next-text="&gt;"
-                        first-text="{{1}}"
-                        last-text="{{ctrl.pageCount}}"
-                        ng-model="ctrl.currentPage"
-                        class="game-pagination">
-            </pagination>
+            <ul uib-pagination
+                total-items="ctrl.filtered.length"
+                items-per-page="ctrl.itemsPerPage"
+                num-pages="ctrl.pageCount"
+                boundary-links="false"
+                max-size="30"
+                rotate="false"
+                previous-text="&lt;"
+                next-text="&gt;"
+                first-text="{{1}}"
+                last-text="{{ctrl.pageCount}}"
+                ng-model="ctrl.currentPage"
+                class="game-pagination">
+            </ul>
         </div>
         <div class="col-lg-4" ng-repeat="game in ctrl.filtered = (ctrl.gameService.getOwnedGames() | search:ctrl.query | orderBy:ctrl.sorting) | offset:ctrl.offset | limitTo:ctrl.itemsPerPage" id="game{{game.id}}">
             <game game="game"
@@ -103,19 +104,20 @@
             </game>
         </div>
         <div class="col-lg-12 text-center">
-            <pagination total-items="ctrl.filtered.length"
-                        items-per-page="ctrl.itemsPerPage"
-                        num-pages="ctrl.pageCount"
-                        boundary-links="false"
-                        max-size="30"
-                        rotate="false"
-                        previous-text="&lt;"
-                        next-text="&gt;"
-                        first-text="{{1}}"
-                        last-text="{{ctrl.pageCount}}"
-                        ng-model="ctrl.currentPage"
-                        class="game-pagination">
-            </pagination>
+            <ul uib-pagination
+                total-items="ctrl.filtered.length"
+                items-per-page="ctrl.itemsPerPage"
+                num-pages="ctrl.pageCount"
+                boundary-links="false"
+                max-size="30"
+                rotate="false"
+                previous-text="&lt;"
+                next-text="&gt;"
+                first-text="{{1}}"
+                last-text="{{ctrl.pageCount}}"
+                ng-model="ctrl.currentPage"
+                class="game-pagination">
+            </ul>
         </div>
     </div>
 </div>

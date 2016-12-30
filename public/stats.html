@@ -18,18 +18,19 @@
             </dd>
         </dl>
         <div style="text-align: center;">
-            <pagination total-items="filtered.length"
-                        items-per-page="itemsPerPage"
-                        num-pages="pageCount"
-                        boundary-links="false"
-                        max-size="5"
-                        rotate="true"
-                        previous-text="&lt;"
-                        next-text="&gt;"
-                        ng-model="currentPage"
-                        ng-change="pageChanged()"
-                        class="pagination-sm">
-            </pagination>
+            <ul uib-pagination
+                total-items="filtered.length"
+                items-per-page="itemsPerPage"
+                num-pages="pageCount"
+                boundary-links="false"
+                max-size="5"
+                rotate="true"
+                previous-text="&lt;"
+                next-text="&gt;"
+                ng-model="currentPage"
+                ng-change="pageChanged()"
+                class="pagination-sm">
+            </ul>
         </div>
     </div>
 </div>
