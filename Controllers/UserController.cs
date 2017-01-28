@@ -8,11 +8,11 @@ namespace Games.Controllers {
     [Route("api")]
     public class UserController : Controller {
         private GamesContext db;
-        private CommonService service;
+        private CommonService common;
 
-        public UserController(GamesContext db, CommonService service) {
+        public UserController(GamesContext db, CommonService common) {
             this.db = db;
-            this.service = service;
+            this.common = common;
         }
 
         [HttpGet("users")]
@@ -22,7 +22,7 @@ namespace Games.Controllers {
 
         [HttpGet("users/{id}")]
         public User GetUser(int id) {
-            return service.GetUser(id);
+            return common.GetUser(id);
         }
     }
 }

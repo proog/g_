@@ -9,19 +9,19 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace Games.Controllers {
-    [Route("api/assisted")]
+    [Route("api/assisted"), Authorize]
     public class GiantBombController : Controller {
-        private Config config;
-        private CommonService service;
+        private string apiKey;
+        private CommonService common;
         private AuthenticationService auth;
         private JsonSerializerSettings jsonSettings;
-        private const string NotFoundMessage = "No Giant Bomb API key specified. Please request an API key and update the GiantBombApiKey attribute in the Configs table.";
+        private const string NotFoundMessage = "No Giant Bomb API key specified. Please request an API key and add it in the settings dialog or database.";
 
-        public GiantBombController(GamesContext db, CommonService service, AuthenticationService auth) {
-            this.service = service;
+        public GiantBombController(GamesContext db, CommonService common, AuthenticationService auth) {
+            this.common = common;
             this.auth = auth;
-            config = db.Configs.SingleOrDefault();
-            jsonSettings = service.GetJsonSettings();
+            apiKey = db.Configs.SingleOrDefault()?.GiantBombApiKey;
+            jsonSettings = common.GetJsonSettings();
             // sometimes GB returns results as an object instead of an
             // array on error conditions. We just squelch errors about
             // those since the response will be unusable anyway
@@ -32,24 +32,21 @@ namespace Games.Controllers {
             };
         }
 
-        [Authorize]
         [HttpGet("search/{title}")]
         public async Task<IActionResult> Search(string title) {
-            if (config == null) {
-                return NotFound(NotFoundMessage);
-            }
+            common.VerifyExists(apiKey, NotFoundMessage);
 
             var uri = GetUri("games", new Dictionary<string, string> {
                 { "filter", "name:" + Uri.EscapeDataString(title) },
                 { "field_list", "name,original_release_date,id" },
                 { "limit", "20" }
             });
-            var json = await service.GetHttpClient().GetStringAsync(uri);
+            var json = await common.GetHttpClient().GetStringAsync(uri);
             var response = JsonConvert
                 .DeserializeObject<GBResponse<List<GBSearchResult>>>(json, jsonSettings);
 
             if (!response.IsSuccess) {
-                return this.BadRequest(response.ErrorMessage);
+                throw new Exception(response.ErrorMessage);
             }
 
             var results = response.Results
@@ -60,23 +57,20 @@ namespace Games.Controllers {
             return Ok(results);
         }
 
-        [Authorize]
         [HttpGet("game/{id}")]
         public async Task<IActionResult> Get(int id) {
-            if (config == null) {
-                return NotFound(NotFoundMessage);
-            }
+            common.VerifyExists(apiKey, NotFoundMessage);
 
             var user = await auth.GetCurrentUser(HttpContext);
             var uri = GetUri($"game/{id}", new Dictionary<string, string> {
                 { "field_list", "name,original_release_date,genres,platforms,image,developers,publishers" }
             });
-            var json = await service.GetHttpClient().GetStringAsync(uri);
+            var json = await common.GetHttpClient().GetStringAsync(uri);
             var response = JsonConvert
                 .DeserializeObject<GBResponse<GBGameResult>>(json, jsonSettings);
 
             if (!response.IsSuccess) {
-                return this.BadRequest(response.ErrorMessage);
+                throw new Exception(response.ErrorMessage);
             }
 
             var gb = response.Results;
@@ -142,7 +136,7 @@ namespace Games.Controllers {
                 Query = string.Join("&",
                     queries.Concat(new [] {
                         new KeyValuePair<string, string>("format", "json"),
-                        new KeyValuePair<string, string>("api_key", config.GiantBombApiKey)
+                        new KeyValuePair<string, string>("api_key", apiKey)
                     })
                     .Select(it => $"{it.Key}={it.Value}")
                 )

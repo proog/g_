@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Games.Infrastructure;
 using Games.Models;
 using Games.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -14,12 +13,12 @@ namespace Games.Controllers {
     [Route("api/users/{userId}")]
     public class DescriptorController : Controller {
         private GamesContext db;
-        private CommonService service;
+        private CommonService common;
         private AuthenticationService auth;
 
-        public DescriptorController(GamesContext db, CommonService service, AuthenticationService auth) {
+        public DescriptorController(GamesContext db, CommonService common, AuthenticationService auth) {
             this.db = db;
-            this.service = service;
+            this.common = common;
             this.auth = auth;
         }
 
@@ -49,70 +48,48 @@ namespace Games.Controllers {
             return Single(userId, id, u => u.Tags);
         }
 
-        [Authorize]
-        [ValidateModel]
-        [HttpPost("genres")]
+        [HttpPost("genres"), Authorize]
         public Task<IActionResult> AddGenre(int userId, [FromBody] Genre rendition) {
             return Add(userId, rendition, () => db.Genres);
         }
-        [Authorize]
-        [ValidateModel]
-        [HttpPost("platforms")]
+        [HttpPost("platforms"), Authorize]
         public Task<IActionResult> AddPlatform(int userId, [FromBody] Platform rendition) {
             return Add(userId, rendition, () => db.Platforms);
         }
-        [Authorize]
-        [ValidateModel]
-        [HttpPost("tags")]
+        [HttpPost("tags"), Authorize]
         public Task<IActionResult> AddTag(int userId, [FromBody] Tag rendition) {
             return Add(userId, rendition, () => db.Tags);
         }
 
-        [Authorize]
-        [ValidateModel]
-        [HttpPut("genres/{id}")]
+        [HttpPut("genres/{id}"), Authorize]
         public Task<IActionResult> UpdateGenre(int userId, int id, [FromBody] Genre rendition) {
             return Update(userId, id, rendition, u => u.Genres);
         }
-        [Authorize]
-        [ValidateModel]
-        [HttpPut("platforms/{id}")]
+        [HttpPut("platforms/{id}"), Authorize]
         public Task<IActionResult> UpdatePlatform(int userId, int id, [FromBody] Platform rendition) {
             return Update(userId, id, rendition, u => u.Platforms);
         }
-        [Authorize]
-        [ValidateModel]
-        [HttpPut("tags/{id}")]
+        [HttpPut("tags/{id}"), Authorize]
         public Task<IActionResult> UpdateTags(int userId, int id, [FromBody] Tag rendition) {
             return Update(userId, id, rendition, u => u.Tags);
         }
 
-        [Authorize]
-        [ValidateModel]
-        [HttpDelete("genres/{id}")]
+        [HttpDelete("genres/{id}"), Authorize]
         public Task<IActionResult> DeleteGenre(int userId, int id) {
             return Delete(userId, id, u => u.Genres);
         }
-        [Authorize]
-        [ValidateModel]
-        [HttpDelete("platforms/{id}")]
+        [HttpDelete("platforms/{id}"), Authorize]
         public Task<IActionResult> DeletePlatform(int userId, int id) {
             return Delete(userId, id, u => u.Platforms);
         }
-        [Authorize]
-        [ValidateModel]
-        [HttpDelete("tags/{id}")]
+        [HttpDelete("tags/{id}"), Authorize]
         public Task<IActionResult> DeleteTag(int userId, int id) {
             return Delete(userId, id, u => u.Tags);
         }
 
         private async Task<IActionResult> Add<T>(int userId, T descriptor, Func<DbSet<T>> getter) where T : Descriptor {
-            var user = service.GetUser(userId);
-            var invalid = await auth.VerifyUserIsCurrent(user, HttpContext);
-
-            if (invalid != null) {
-                return invalid;
-            }
+            var user = common.GetUser(userId);
+            await auth.VerifyCurrentUser(user, HttpContext);
 
             descriptor.Id = 0;
             descriptor.User = user;
@@ -125,19 +102,12 @@ namespace Games.Controllers {
         }
 
         private async Task<IActionResult> Update<T>(int userId, int id, T update, Func<User, IEnumerable<T>> getter) where T : Descriptor {
-            var user = service.GetUser(userId);
-            var invalid = await auth.VerifyUserIsCurrent(user, HttpContext);
-
-            if (invalid != null) {
-                return invalid;
-            }
+            var user = common.GetUser(userId);
+            await auth.VerifyCurrentUser(user, HttpContext);
 
             var descriptor = getter(user)
                 .SingleOrDefault(it => it.Id == id);
-
-            if (descriptor == null) {
-                return NotFound();
-            }
+            common.VerifyExists(descriptor);
 
             descriptor.Name = update.Name;
             descriptor.ShortName = update.ShortName;
@@ -148,19 +118,12 @@ namespace Games.Controllers {
         }
 
         private async Task<IActionResult> Delete<T>(int userId, int id, Func<User, IEnumerable<T>> getter) where T : Descriptor {
-            var user = service.GetUser(userId);
-            var invalid = await auth.VerifyUserIsCurrent(user, HttpContext);
-
-            if (invalid != null) {
-                return invalid;
-            }
+            var user = common.GetUser(userId);
+            await auth.VerifyCurrentUser(user, HttpContext);
 
             var descriptor = getter(user)
                 .SingleOrDefault(it => it.Id == id);
-
-            if (descriptor == null) {
-                return NotFound();
-            }
+            common.VerifyExists(descriptor);
 
             db.Remove(descriptor);
             db.SaveChanges();
@@ -168,12 +131,8 @@ namespace Games.Controllers {
         }
 
         private IActionResult All<T>(int userId, Expression<Func<User, IEnumerable<T>>> relation) where T : BaseModel {
-            var user = service.GetUser(userId);
-            var invalid = auth.VerifyUserExists(user, HttpContext);
-
-            if (invalid != null) {
-                return invalid;
-            }
+            var user = common.GetUser(userId);
+            common.VerifyExists(user);
 
             var list = db.Entry(user)
                 .Collection(relation)
@@ -184,21 +143,14 @@ namespace Games.Controllers {
         }
 
         private IActionResult Single<T>(int userId, int id, Expression<Func<User, IEnumerable<T>>> relation) where T : BaseModel {
-            var user = service.GetUser(userId);
-            var invalid = auth.VerifyUserExists(user, HttpContext);
-
-            if (invalid != null) {
-                return invalid;
-            }
+            var user = common.GetUser(userId);
+            common.VerifyExists(user);
 
             var descriptor = db.Entry(user)
                 .Collection(relation)
                 .Query()
                 .SingleOrDefault(it => it.Id == id);
-
-            if (descriptor == null) {
-                return NotFound();
-            }
+            common.VerifyExists(descriptor);
 
             return Ok(descriptor);
         }

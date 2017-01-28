@@ -1,6 +1,7 @@
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using Games.Infrastructure;
 using Games.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +50,12 @@ namespace Games.Services {
         public void DeleteImageDirectory(Game game) {
             var path = Path.Combine(environment.WebRootPath, $"images/{game.Id}");
             Directory.Delete(path, true);
+        }
+
+        public void VerifyExists<T>(T value, string message = "Not found.") {
+            if (value == null) {
+                throw new NotFoundException(message);
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ namespace Games.Models {
 
         [JsonIgnore]
         public string GiantBombApiKey { get; set; }
+
         public User DefaultUser { get; set; }
 
         public bool IsAssistedCreationEnabled =>

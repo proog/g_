@@ -1,9 +1,9 @@
 using System;
-using System.Net;
 using System.Threading.Tasks;
 using Games.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -18,7 +18,7 @@ namespace Games.Infrastructure {
                 ExpireTimeSpan = TimeSpan.FromHours(5),
                 Events = new CookieAuthenticationEvents {
                     OnRedirectToLogin = context => {
-                        context.Response.StatusCode = (int) HttpStatusCode.Unauthorized;
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                         return Task.CompletedTask;
                     }
                 }
@@ -43,7 +43,10 @@ namespace Games.Infrastructure {
                 .AddDbContext<GamesContext>()
                 .AddTransient<CommonService>()
                 .AddTransient<AuthenticationService>()
-                .AddMvc()
+                .AddMvc(options => {
+                    options.Filters.Add(new ValidateModelFilter());
+                    options.Filters.Add(new HandleExceptionFilter());
+                })
                 .AddJsonOptions(options => {
                     options.SerializerSettings.ReferenceLoopHandling =
                         ReferenceLoopHandling.Ignore;

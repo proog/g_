@@ -13,15 +13,13 @@ namespace Games.Models {
         [JsonIgnore]
         public DateTime? UpdatedAt { get; set; }
 
-        [JsonProperty("created_at")]
-        [NotMapped]
+        [JsonProperty("created_at"), NotMapped]
         public int CreatedAtUnix => ToUnixTimestamp(CreatedAt);
 
-        [JsonProperty("updated_at")]
-        [NotMapped]
+        [JsonProperty("updated_at"), NotMapped]
         public int UpdatedAtUnix => ToUnixTimestamp(UpdatedAt);
 
-        private int ToUnixTimestamp(DateTime? dt) {
+        private static int ToUnixTimestamp(DateTime? dt) {
             if (dt.HasValue && dt.Value != DateTime.MinValue) {
                 return dt.Value.ToUnixTimestamp();
             }

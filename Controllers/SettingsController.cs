@@ -11,12 +11,12 @@ namespace Games.Controllers {
     [Route("api")]
     public class SettingsController : Controller {
         private GamesContext db;
-        private CommonService service;
+        private CommonService common;
         private AuthenticationService auth;
 
-        public SettingsController(GamesContext db, CommonService service, AuthenticationService auth) {
+        public SettingsController(GamesContext db, CommonService common, AuthenticationService auth) {
             this.db = db;
-            this.service = service;
+            this.common = common;
             this.auth = auth;
         }
 
@@ -25,16 +25,11 @@ namespace Games.Controllers {
             var config = db.Configs
                 .Include(c => c.DefaultUser)
                 .SingleOrDefault();
-
-            if (config == null) {
-                return NotFound();
-            }
-
+            common.VerifyExists(config);
             return Ok(config);
         }
 
-        [Authorize]
-        [HttpGet("settings")]
+        [HttpGet("settings"), Authorize]
         public IActionResult GetSettings() {
             var config = db.Configs.SingleOrDefault();
             var settings = new AuthorizedSettings {
@@ -44,21 +39,19 @@ namespace Games.Controllers {
             return Ok(settings);
         }
 
-        [Authorize]
-        [ValidateModel]
-        [HttpPut("settings")]
+        [HttpPut("settings"), Authorize]
         public async Task<IActionResult> UpdateSettings([FromBody] AuthorizedSettingsInput settings) {
             var user = await auth.GetCurrentUser(HttpContext);
             var hash = auth.HashPassword(settings.OldPassword);
 
             if (hash != user.Password) {
-                return Unauthorized();
+                throw new UnauthorizedException();
             }
 
-            var defaultUser = service.GetUser(settings.DefaultUserId);
+            var defaultUser = common.GetUser(settings.DefaultUserId);
 
             if (defaultUser == null) {
-                return BadRequest();
+                throw new BadRequestException();
             }
 
             var config = db.Configs.Single();

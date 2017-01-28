@@ -9,44 +9,41 @@ namespace Games.Controllers {
     [Route("api")]
     public class AuthenticationController : Controller {
         private GamesContext db;
-        private AuthenticationService service;
+        private CommonService common;
+        private AuthenticationService auth;
 
-        public AuthenticationController(GamesContext db, AuthenticationService service) {
+        public AuthenticationController(GamesContext db, CommonService common, AuthenticationService auth) {
             this.db = db;
-            this.service = service;
+            this.common = common;
+            this.auth = auth;
         }
 
-        [ValidateModel]
         [HttpPost("login")]
         public async Task<IActionResult> LogIn([FromBody] Credentials cred) {
-            var hash = service.HashPassword(cred.Password);
+            var hash = auth.HashPassword(cred.Password);
             var user = db.Users.SingleOrDefault(u =>
                 u.Username == cred.Username && u.Password == hash
             );
 
             if (user == null) {
-                return Unauthorized();
+                throw new UnauthorizedException("Invalid credentials");
             }
 
-            await service.Authenticate(user, HttpContext);
+            await auth.Authenticate(user, HttpContext);
             return Ok(user);
         }
 
         [HttpPost("logout")]
         public async Task<IActionResult> LogOut() {
-            await service.Deauthenticate(HttpContext);
+            await auth.Deauthenticate(HttpContext);
             return Ok();
         }
 
         [HttpGet("login")]
         public async Task<IActionResult> GetCurrentUser() {
-            var user = await service.GetCurrentUser(HttpContext);
-
-            if (user != null) {
-                return Ok(user);
-            }
-
-            return NotFound();
+            var user = await auth.GetCurrentUser(HttpContext);
+            common.VerifyExists(user);
+            return Ok(user);
         }
     }
 

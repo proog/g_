@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Games.Infrastructure;
 using Games.Models;
 using Games.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -12,23 +11,19 @@ namespace Games.Controllers {
     [Route("api/users/{userId}")]
     public class GameController : Controller {
         private GamesContext db;
-        private CommonService service;
+        private CommonService common;
         private AuthenticationService auth;
 
-        public GameController(GamesContext db, CommonService service, AuthenticationService auth) {
+        public GameController(GamesContext db, CommonService common, AuthenticationService auth) {
             this.db = db;
-            this.service = service;
+            this.common = common;
             this.auth = auth;
         }
 
         [HttpGet("games")]
         public async Task<IActionResult> GetGames(int userId) {
-            var user = service.GetUser(userId);
-            var invalid = auth.VerifyUserExists(user, HttpContext);
-
-            if (invalid != null) {
-                return invalid;
-            }
+            var user = common.GetUser(userId);
+            common.VerifyExists(user);
 
             var games = (await GetGameQuery(user)).ToList();
             games.ForEach(g => g.SerializeDescriptors());
@@ -37,31 +32,19 @@ namespace Games.Controllers {
 
         [HttpGet("games/{id}")]
         public async Task<IActionResult> GetGame(int userId, int id) {
-            var user = service.GetUser(userId);
-            var invalid = auth.VerifyUserExists(user, HttpContext);
-
-            if (invalid != null) {
-                return invalid;
-            }
+            var user = common.GetUser(userId);
+            common.VerifyExists(user);
 
             var game = await GetGame(user, id);
-
-            if (game == null) {
-                return NotFound();
-            }
-
+            common.VerifyExists(game);
             game.SerializeDescriptors();
             return Ok(game);
         }
 
         [HttpGet("suggestions")]
         public async Task<IActionResult> GetSuggestions(int userId) {
-            var user = service.GetUser(userId);
-            var invalid = auth.VerifyUserExists(user, HttpContext);
-
-            if (invalid != null) {
-                return invalid;
-            }
+            var user = common.GetUser(userId);
+            common.VerifyExists(user);
 
             var query = await GetGameQuery(user);
             var applicableGames = query
@@ -122,16 +105,10 @@ namespace Games.Controllers {
             return Ok(suggestions);
         }
 
-        [Authorize]
-        [ValidateModel]
-        [HttpPost("games")]
+        [HttpPost("games"), Authorize]
         public async Task<IActionResult> AddGame(int userId, [FromBody] Game game) {
-            var user = service.GetUser(userId);
-            var invalid = await auth.VerifyUserIsCurrent(user, HttpContext);
-
-            if (invalid != null) {
-                return invalid;
-            }
+            var user = common.GetUser(userId);
+            await auth.VerifyCurrentUser(user, HttpContext);
 
             game.User = user;
             game.DeserializeDescriptors(user.Genres, user.Platforms, user.Tags);
@@ -145,22 +122,13 @@ namespace Games.Controllers {
             return Ok(game);
         }
 
-        [Authorize]
-        [ValidateModel]
-        [HttpPut("games/{id}")]
+        [HttpPut("games/{id}"), Authorize]
         public async Task<IActionResult> UpdateGame(int userId, int id, [FromBody] Game update) {
-            var user = service.GetUser(userId);
-            var invalid = await auth.VerifyUserIsCurrent(user, HttpContext);
-
-            if (invalid != null) {
-                return invalid;
-            }
+            var user = common.GetUser(userId);
+            await auth.VerifyCurrentUser(user, HttpContext);
 
             var game = await GetGame(user, id);
-
-            if (game == null) {
-                return NotFound();
-            }
+            common.VerifyExists(game);
 
             game.Title = update.Title;
             game.Developer = update.Developer;
@@ -186,23 +154,15 @@ namespace Games.Controllers {
             return Ok(game);
         }
 
-        [Authorize]
-        [HttpDelete("games/{id}")]
+        [HttpDelete("games/{id}"), Authorize]
         public async Task<IActionResult> DeleteGame(int userId, int id) {
-            var user = service.GetUser(userId);
-            var invalid = await auth.VerifyUserIsCurrent(user, HttpContext);
-
-            if (invalid != null) {
-                return invalid;
-            }
+            var user = common.GetUser(userId);
+            await auth.VerifyCurrentUser(user, HttpContext);
 
             var game = await GetGame(user, id);
+            common.VerifyExists(game);
 
-            if (game == null) {
-                return NotFound();
-            }
-
-            service.DeleteImageDirectory(game);
+            common.DeleteImageDirectory(game);
             db.Remove(game);
             db.SaveChanges();
 

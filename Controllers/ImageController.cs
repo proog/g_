@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Games.Infrastructure;
 using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -9,36 +10,27 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
 namespace Games.Controllers {
-    [Route("api/users/{userId}/games/{id}/image")]
+    [Route("api/users/{userId}/games/{id}/image"), Authorize]
     public class ImageController : Controller {
         private GamesContext db;
-        private CommonService service;
+        private CommonService common;
         private AuthenticationService auth;
         private IHostingEnvironment environment;
 
-        public ImageController(GamesContext db, CommonService service, AuthenticationService auth, IHostingEnvironment env) {
+        public ImageController(GamesContext db, CommonService common, AuthenticationService auth, IHostingEnvironment env) {
             this.db = db;
-            this.service = service;
+            this.common = common;
             this.auth = auth;
             this.environment = env;
         }
 
-        [Authorize]
         [HttpPost]
         public async Task<IActionResult> UploadImage(int userId, int id) {
-            var user = service.GetUser(userId);
-            var invalid = await auth.VerifyUserIsCurrent(user, HttpContext);
-
-            if (invalid != null) {
-                return invalid;
-            }
+            var user = common.GetUser(userId);
+            await auth.VerifyCurrentUser(user, HttpContext);
 
             var game = user.Games.SingleOrDefault(g => g.Id == id);
-
-            if (game == null) {
-                return NotFound();
-            }
-
+            common.VerifyExists(game);
             Stream imageStream;
 
             if (Request.HasFormContentType) {
@@ -46,7 +38,7 @@ namespace Games.Controllers {
                 var file = form.Files["image"];
 
                 if (file == null) {
-                    return BadRequest("No image supplied");
+                    throw new BadRequestException("No image supplied");
                 }
 
                 imageStream = file.OpenReadStream();
@@ -59,14 +51,14 @@ namespace Games.Controllers {
                 }
 
                 if (!Uri.IsWellFormedUriString(url, UriKind.Absolute)) {
-                    return BadRequest("Not a valid url");
+                    throw new BadRequestException("Not a valid url");
                 }
 
-                var client = service.GetHttpClient();
+                var client = common.GetHttpClient();
                 var response = await client.GetAsync(url);
 
                 if (!response.IsSuccessStatusCode) {
-                    return BadRequest("Giant Bomb returned non-success status code");
+                    throw new Exception("Giant Bomb returned non-success status code");
                 }
 
                 imageStream = await response.Content.ReadAsStreamAsync();
@@ -85,30 +77,20 @@ namespace Games.Controllers {
 
             game.Image = path;
             db.SaveChanges();
-
             return Ok(game);
         }
 
-        [Authorize]
         [HttpDelete]
         public async Task<IActionResult> DeleteImage(int userId, int id) {
-            var user = service.GetUser(userId);
-            var invalid = await auth.VerifyUserIsCurrent(user, HttpContext);
-
-            if (invalid != null) {
-                return invalid;
-            }
+            var user = common.GetUser(userId);
+            await auth.VerifyCurrentUser(user, HttpContext);
 
             var game = user.Games.SingleOrDefault(g => g.Id == id);
+            common.VerifyExists(game);
 
-            if (game == null) {
-                return NotFound();
-            }
-
-            service.DeleteImageDirectory(game);
+            common.DeleteImageDirectory(game);
             game.Image = null;
             db.SaveChanges();
-
             return NoContent();
         }
     }

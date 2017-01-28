@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -14,8 +13,7 @@ namespace Games.Models {
         public int? Year { get; set; }
         public string Image { get; set; }
 
-        [Required]
-        [Range(0, 3)]
+        [Required, Range(0, 3)]
         public Completion Finished { get; set; }
         public string Comment { get; set; }
         public string SortAs { get; set; }

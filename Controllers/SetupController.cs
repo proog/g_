@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Games.Infrastructure;
 using Games.Models;
 using Games.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -9,26 +8,25 @@ namespace Games.Controllers {
     [Route("setup")]
     public class SetupController : Controller {
         private GamesContext db;
-        private CommonService service;
+        private CommonService common;
         private AuthenticationService auth;
 
-        public SetupController(GamesContext db, CommonService service, AuthenticationService auth) {
+        public SetupController(GamesContext db, CommonService common, AuthenticationService auth) {
             this.db = db;
-            this.service = service;
+            this.common = common;
             this.auth = auth;
         }
 
         [HttpGet]
         public IActionResult Show() {
             return Render(new ViewModel {
-                Success = service.IsConfigured()
+                Success = common.IsConfigured()
             });
         }
 
         [HttpPost]
-        [ValidateModel]
         public IActionResult Do([FromForm] ViewModel vm) {
-            if (service.IsConfigured()) {
+            if (common.IsConfigured()) {
                 vm.Success = true;
                 return Render(vm);
             }

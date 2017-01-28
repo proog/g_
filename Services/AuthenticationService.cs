@@ -4,20 +4,20 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Games.Infrastructure;
 using Games.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Services {
     public class AuthenticationService {
-        private CommonService service;
+        private CommonService common;
         private const string claimType = "id";
         private const string claimValueType = ClaimValueTypes.Integer;
         private const string authenticationType = "Password";
 
-        public AuthenticationService(CommonService service) {
-            this.service = service;
+        public AuthenticationService(CommonService common) {
+            this.common = common;
         }
 
         public async Task<User> GetCurrentUser(HttpContext ctx) {
@@ -30,7 +30,7 @@ namespace Games.Services {
                     c.Type == claimType && c.ValueType == claimValueType
                 );
                 var id = int.Parse(claim.Value);
-                return service.GetUser(id);
+                return common.GetUser(id);
             }
 
             return null;
@@ -67,27 +67,14 @@ namespace Games.Services {
             return currentUser != null && user.Id == currentUser.Id;
         }
 
-        public IActionResult VerifyUserExists(User user, HttpContext ctx) {
-            if (user == null) {
-                return new NotFoundResult();
-            }
-
-            // if the user is okay, don't return a response
-            return null;
-        }
-
-        public async Task<IActionResult> VerifyUserIsCurrent(User user, HttpContext ctx) {
-            var invalid = VerifyUserExists(user, ctx);
-
-            if (invalid != null) {
-                return invalid;
-            }
+        public async Task VerifyCurrentUser(User user, HttpContext ctx) {
+            common.VerifyExists(user, "The user does not exist.");
 
             if (!await IsCurrentUser(user, ctx)) {
-                return new UnauthorizedResult();
+                throw new UnauthorizedException(
+                    "The specified user is not the current user."
+                );
             }
-
-            return null;
         }
     }
 }
