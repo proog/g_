@@ -5,9 +5,9 @@
 </div>
 <form name="form">
     <div class="modal-body">
-        <alert type="danger" close="closeAlert()" ng-if="error">
+        <div uib-alert class="alert-danger" close="closeAlert()" ng-if="error">
             Something went wrong. Did you enter your password correctly?
-        </alert>
+        </div>
         <h4>Change password</h4>
         <div class="form-group">
             <input type="password" class="form-control" placeholder="New password" ng-model="model.new_password">
