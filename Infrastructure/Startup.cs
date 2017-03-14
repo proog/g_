@@ -13,10 +13,10 @@ using Newtonsoft.Json.Serialization;
 
 namespace Games.Infrastructure {
     public class Startup {
-        private IHostingEnvironment environment;
+        private string dataDirectory;
 
         public Startup(IHostingEnvironment env) {
-            environment = env;
+            dataDirectory = Path.Combine(env.ContentRootPath, "data");
         }
 
         public void Configure(IApplicationBuilder app, CommonService service) {
@@ -34,8 +34,9 @@ namespace Games.Infrastructure {
             };
             var fileOptions = new FileServerOptions {
                 RequestPath = "/images",
+                EnableDefaultFiles = false,
                 FileProvider = new PhysicalFileProvider(
-                    Path.Combine(environment.ContentRootPath, "data/images")
+                    Path.Combine(dataDirectory, "images")
                 )
             };
 
@@ -59,6 +60,7 @@ namespace Games.Infrastructure {
                 .AddDbContext<GamesContext>()
                 .AddTransient<CommonService>()
                 .AddTransient<AuthenticationService>()
+                .AddSingleton<IFileProvider>(new PhysicalFileProvider(dataDirectory))
                 .AddMvc(options => {
                     options.Filters.Add(new ValidateModelFilter());
                     options.Filters.Add(new HandleExceptionFilter());

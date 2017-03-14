@@ -3,19 +3,19 @@ using System.Linq;
 using System.Net.Http;
 using Games.Infrastructure;
 using Games.Models;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace Games.Services {
     public class CommonService {
         private GamesContext db;
-        private IHostingEnvironment environment;
+        private IFileProvider data;
 
-        public CommonService(GamesContext db, IHostingEnvironment environment) {
+        public CommonService(GamesContext db, IFileProvider fileProvider) {
             this.db = db;
-            this.environment = environment;
+            this.data = fileProvider;
         }
 
         public User GetUser(int id) {
@@ -48,8 +48,8 @@ namespace Games.Services {
         }
 
         public void DeleteImageDirectory(Game game) {
-            var path = Path.Combine(environment.ContentRootPath, $"data/images/{game.Id}");
-            Directory.Delete(path, true);
+            var file = data.GetFileInfo($"images/{game.Id}");
+            Directory.Delete(file.PhysicalPath, true);
         }
 
         public void VerifyExists<T>(T value, string message = "Not found.") {

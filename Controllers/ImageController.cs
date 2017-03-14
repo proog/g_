@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json.Linq;
 
 namespace Games.Controllers {
@@ -15,13 +15,13 @@ namespace Games.Controllers {
         private GamesContext db;
         private CommonService common;
         private AuthenticationService auth;
-        private IHostingEnvironment environment;
+        private IFileProvider data;
 
-        public ImageController(GamesContext db, CommonService common, AuthenticationService auth, IHostingEnvironment env) {
+        public ImageController(GamesContext db, CommonService common, AuthenticationService auth, IFileProvider fileProvider) {
             this.db = db;
             this.common = common;
             this.auth = auth;
-            this.environment = env;
+            this.data = fileProvider;
         }
 
         [HttpPost]
@@ -65,12 +65,12 @@ namespace Games.Controllers {
             }
 
             var path = $"images/{game.Id}/image.jpg";
-            var absPath = Path.Combine(environment.ContentRootPath, "data/", path);
+            var fileInfo = data.GetFileInfo(path);
 
             using (imageStream) {
-                Directory.CreateDirectory(Path.GetDirectoryName(absPath));
+                Directory.CreateDirectory(Path.GetDirectoryName(fileInfo.PhysicalPath));
 
-                using (var stream = new FileStream(absPath, FileMode.Create)) {
+                using (var stream = new FileStream(fileInfo.PhysicalPath, FileMode.Create)) {
                     imageStream.CopyTo(stream);
                 }
             }

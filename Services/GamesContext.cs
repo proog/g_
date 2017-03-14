@@ -1,7 +1,7 @@
 using System.IO;
 using Games.Models;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 namespace Games.Services {
     public class GamesContext : DbContext {
@@ -11,14 +11,14 @@ namespace Games.Services {
         public DbSet<Tag> Tags { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Config> Configs { get; set; }
-        private IHostingEnvironment environment;
+        private IFileProvider data;
 
-        public GamesContext(IHostingEnvironment environment) {
-            this.environment = environment;
+        public GamesContext(IFileProvider fileProvider) {
+            data = fileProvider;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder builder) {
-            var path = Path.Combine(environment.ContentRootPath, "data/games.db");
+            var path = data.GetFileInfo("games.db").PhysicalPath;
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             builder.UseSqlite($"Data Source={path}");
         }
