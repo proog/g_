@@ -48,7 +48,7 @@ namespace Games.Services {
         }
 
         public void DeleteImageDirectory(Game game) {
-            var path = Path.Combine(environment.WebRootPath, $"images/{game.Id}");
+            var path = Path.Combine(environment.ContentRootPath, $"data/images/{game.Id}");
             Directory.Delete(path, true);
         }
 

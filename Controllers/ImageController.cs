@@ -65,7 +65,7 @@ namespace Games.Controllers {
             }
 
             var path = $"images/{game.Id}/image.jpg";
-            var absPath = Path.Combine(environment.WebRootPath, path);
+            var absPath = Path.Combine(environment.ContentRootPath, "data/", path);
 
             using (imageStream) {
                 Directory.CreateDirectory(Path.GetDirectoryName(absPath));

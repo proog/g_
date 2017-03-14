@@ -1,4 +1,3 @@
-public/images
 public/vendor
 public/g.min.js
 public/g.min.js.map
@@ -6,5 +5,4 @@ data
 bin
 obj
 .vscode
-project.lock.json
 node_modules

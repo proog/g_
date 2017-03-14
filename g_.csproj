@@ -15,9 +15,6 @@
     <None Update="Views\**\*;public\**\*">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
-    <None Update="public\images\**\*">
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>

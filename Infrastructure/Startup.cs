@@ -1,15 +1,24 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Games.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace Games.Infrastructure {
     public class Startup {
+        private IHostingEnvironment environment;
+
+        public Startup(IHostingEnvironment env) {
+            environment = env;
+        }
+
         public void Configure(IApplicationBuilder app, CommonService service) {
             var authOptions = new CookieAuthenticationOptions {
                 AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme,
@@ -23,6 +32,12 @@ namespace Games.Infrastructure {
                     }
                 }
             };
+            var fileOptions = new FileServerOptions {
+                RequestPath = "/images",
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(environment.ContentRootPath, "data/images")
+                )
+            };
 
             // redirect to setup until configured
             app.MapWhen(
@@ -31,8 +46,9 @@ namespace Games.Infrastructure {
                     ctx => Task.Run(() => ctx.Response.Redirect("/setup"))
                 )
             );
-            app.UseDefaultFiles()
-                .UseStaticFiles()
+            app.UseDefaultFiles() // serve index.html for /
+                .UseStaticFiles() // serve public
+                .UseFileServer(fileOptions) // serve data/images
                 .UseCookieAuthentication(authOptions)
                 .UseMvc();
             CreateDatabase(app);
