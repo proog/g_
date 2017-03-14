@@ -17,6 +17,7 @@ namespace Games.Infrastructure {
 
         public Startup(IHostingEnvironment env) {
             dataDirectory = Path.Combine(env.ContentRootPath, "data");
+            CreateDirectories();
         }
 
         public void Configure(IApplicationBuilder app, CommonService service) {
@@ -73,6 +74,11 @@ namespace Games.Infrastructure {
                             NamingStrategy = new SnakeCaseNamingStrategy()
                         };
                 });
+        }
+
+        private void CreateDirectories() {
+            Directory.CreateDirectory(dataDirectory);
+            Directory.CreateDirectory(Path.Combine(dataDirectory, "images"));
         }
 
         private void CreateDatabase(IApplicationBuilder app) {
