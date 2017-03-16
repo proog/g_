@@ -10,13 +10,13 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 
 namespace Games.Services {
-    public class AuthenticationService {
-        private CommonService common;
+    class AuthenticationService : IAuthenticationService {
+        private ICommonService common;
         private const string claimType = "id";
         private const string claimValueType = ClaimValueTypes.Integer;
         private const string authenticationType = "Password";
 
-        public AuthenticationService(CommonService common) {
+        public AuthenticationService(ICommonService common) {
             this.common = common;
         }
 

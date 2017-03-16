@@ -13,11 +13,11 @@ namespace Games.Controllers {
     [Route("api/users/{userId}/games/{id}/image"), Authorize]
     public class ImageController : Controller {
         private GamesContext db;
-        private CommonService common;
-        private AuthenticationService auth;
+        private ICommonService common;
+        private IAuthenticationService auth;
         private IFileProvider data;
 
-        public ImageController(GamesContext db, CommonService common, AuthenticationService auth, IFileProvider fileProvider) {
+        public ImageController(GamesContext db, ICommonService common, IAuthenticationService auth, IFileProvider fileProvider) {
             this.db = db;
             this.common = common;
             this.auth = auth;

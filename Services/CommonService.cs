@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace Games.Services {
-    public class CommonService {
+    class CommonService : ICommonService {
         private GamesContext db;
         private IFileProvider data;
 
@@ -52,7 +52,7 @@ namespace Games.Services {
             Directory.Delete(file.PhysicalPath, true);
         }
 
-        public void VerifyExists<T>(T value, string message = "Not found.") {
+        public void VerifyExists<T>(T value, string message) {
             if (value == null) {
                 throw new NotFoundException(message);
             }

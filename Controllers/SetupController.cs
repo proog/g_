@@ -8,10 +8,10 @@ namespace Games.Controllers {
     [Route("setup")]
     public class SetupController : Controller {
         private GamesContext db;
-        private CommonService common;
-        private AuthenticationService auth;
+        private ICommonService common;
+        private IAuthenticationService auth;
 
-        public SetupController(GamesContext db, CommonService common, AuthenticationService auth) {
+        public SetupController(GamesContext db, ICommonService common, IAuthenticationService auth) {
             this.db = db;
             this.common = common;
             this.auth = auth;

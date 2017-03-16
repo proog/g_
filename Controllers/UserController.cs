@@ -8,9 +8,9 @@ namespace Games.Controllers {
     [Route("api")]
     public class UserController : Controller {
         private GamesContext db;
-        private CommonService common;
+        private ICommonService common;
 
-        public UserController(GamesContext db, CommonService common) {
+        public UserController(GamesContext db, ICommonService common) {
             this.db = db;
             this.common = common;
         }
