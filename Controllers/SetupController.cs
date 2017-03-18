@@ -20,13 +20,13 @@ namespace Games.Controllers {
         [HttpGet]
         public IActionResult Show() {
             return Render(new ViewModel {
-                Success = common.IsConfigured()
+                Success = common.IsConfigured
             });
         }
 
         [HttpPost]
         public IActionResult Do([FromForm] ViewModel vm) {
-            if (common.IsConfigured()) {
+            if (common.IsConfigured) {
                 vm.Success = true;
                 return Render(vm);
             }

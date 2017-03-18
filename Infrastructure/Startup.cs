@@ -43,7 +43,7 @@ namespace Games.Infrastructure {
 
             // redirect to setup until configured
             app.MapWhen(
-                ctx => ctx.Request.Path == "/" && !common.IsConfigured(),
+                ctx => ctx.Request.Path == "/" && !common.IsConfigured,
                 req => req.Run(
                     ctx => Task.Run(() => ctx.Response.Redirect("/setup"))
                 )

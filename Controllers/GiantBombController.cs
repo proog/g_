@@ -21,7 +21,7 @@ namespace Games.Controllers {
             this.common = common;
             this.auth = auth;
             apiKey = db.Configs.SingleOrDefault()?.GiantBombApiKey;
-            jsonSettings = common.GetJsonSettings();
+            jsonSettings = common.JsonSettings;
             // sometimes GB returns results as an object instead of an
             // array on error conditions. We just squelch errors about
             // those since the response will be unusable anyway
@@ -41,7 +41,7 @@ namespace Games.Controllers {
                 { "field_list", "name,original_release_date,id" },
                 { "limit", "20" }
             });
-            var json = await common.GetHttpClient().GetStringAsync(uri);
+            var json = await common.HttpClient.GetStringAsync(uri);
             var response = JsonConvert
                 .DeserializeObject<GBResponse<List<GBSearchResult>>>(json, jsonSettings);
 
@@ -65,7 +65,7 @@ namespace Games.Controllers {
             var uri = GetUri($"game/{id}", new Dictionary<string, string> {
                 { "field_list", "name,original_release_date,genres,platforms,image,developers,publishers" }
             });
-            var json = await common.GetHttpClient().GetStringAsync(uri);
+            var json = await common.HttpClient.GetStringAsync(uri);
             var response = JsonConvert
                 .DeserializeObject<GBResponse<GBGameResult>>(json, jsonSettings);
 

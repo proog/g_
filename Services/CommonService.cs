@@ -12,10 +12,21 @@ namespace Games.Services {
     class CommonService : ICommonService {
         private GamesContext db;
         private IFileProvider data;
+        public HttpClient HttpClient { get; }
+        public bool IsConfigured => db.Configs.Count() > 0;
+        public JsonSerializerSettings JsonSettings => new JsonSerializerSettings {
+            ContractResolver = new DefaultContractResolver {
+                NamingStrategy = new SnakeCaseNamingStrategy()
+            }
+        };
 
         public CommonService(GamesContext db, IFileProvider fileProvider) {
             this.db = db;
             this.data = fileProvider;
+            this.HttpClient = new HttpClient();
+            this.HttpClient.DefaultRequestHeaders.Add(
+                "User-Agent", new[] { "permortensen.com g_sharp 0.1" }
+            );
         }
 
         public User GetUser(int id) {
@@ -25,26 +36,6 @@ namespace Games.Services {
                 .Include(u => u.Platforms)
                 .Include(u => u.Tags)
                 .SingleOrDefault(u => u.Id == id);
-        }
-
-        public HttpClient GetHttpClient() {
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Add(
-                "User-Agent", new[] { "permortensen.com g_sharp 0.1" }
-            );
-            return client;
-        }
-
-        public JsonSerializerSettings GetJsonSettings() {
-            return new JsonSerializerSettings {
-                ContractResolver = new DefaultContractResolver {
-                    NamingStrategy = new SnakeCaseNamingStrategy()
-                }
-            };
-        }
-
-        public bool IsConfigured() {
-            return db.Configs.Count() > 0;
         }
 
         public void DeleteImageDirectory(Game game) {

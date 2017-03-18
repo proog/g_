@@ -54,8 +54,7 @@ namespace Games.Controllers {
                     throw new BadRequestException("Not a valid url");
                 }
 
-                var client = common.GetHttpClient();
-                var response = await client.GetAsync(url);
+                var response = await common.HttpClient.GetAsync(url);
 
                 if (!response.IsSuccessStatusCode) {
                     throw new Exception("Giant Bomb returned non-success status code");

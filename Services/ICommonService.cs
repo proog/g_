@@ -4,10 +4,10 @@ using Newtonsoft.Json;
 
 namespace Games.Services {
     public interface ICommonService {
+        HttpClient HttpClient { get; }
+        JsonSerializerSettings JsonSettings { get; }
+        bool IsConfigured { get; }
         User GetUser(int id);
-        HttpClient GetHttpClient();
-        JsonSerializerSettings GetJsonSettings();
-        bool IsConfigured();
         void DeleteImageDirectory(Game game);
         void VerifyExists<T>(T value, string message = "Not found.");
     }
