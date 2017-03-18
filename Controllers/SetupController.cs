@@ -51,7 +51,7 @@ namespace Games.Controllers {
                 GiantBombApiKey = vm.ApiKey?.Trim(),
                 DefaultUser = new User {
                     Username = vm.Username.Trim(),
-                    Password = auth.HashPassword(vm.Password.Trim())
+                    Password = auth.HashPassword(vm.Password)
                 }
             });
 
