@@ -12,7 +12,9 @@ namespace Games.Services {
     class CommonService : ICommonService {
         private GamesContext db;
         private IFileProvider data;
-        public HttpClient HttpClient { get; }
+        private static HttpClient httpClient;
+
+        public HttpClient HttpClient => httpClient;
         public bool IsConfigured => db.Configs.Count() > 0;
         public JsonSerializerSettings JsonSettings => new JsonSerializerSettings {
             ContractResolver = new DefaultContractResolver {
@@ -20,13 +22,16 @@ namespace Games.Services {
             }
         };
 
+        static CommonService() {
+            httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Add(
+                "User-Agent", new[] { "permortensen.com g_sharp 0.1" }
+            );
+        }
+
         public CommonService(GamesContext db, IFileProvider fileProvider) {
             this.db = db;
             this.data = fileProvider;
-            this.HttpClient = new HttpClient();
-            this.HttpClient.DefaultRequestHeaders.Add(
-                "User-Agent", new[] { "permortensen.com g_sharp 0.1" }
-            );
         }
 
         public User GetUser(int id) {
