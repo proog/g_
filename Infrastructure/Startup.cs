@@ -61,6 +61,7 @@ namespace Games.Infrastructure {
                 .AddDbContext<GamesContext>()
                 .AddTransient<ICommonService, CommonService>()
                 .AddTransient<IAuthenticationService, AuthenticationService>()
+                .AddSingleton<IHttpService, HttpService>()
                 .AddSingleton<IFileProvider>(new PhysicalFileProvider(dataDirectory))
                 .AddMvc(options => {
                     options.Filters.Add(new ValidateModelFilter());

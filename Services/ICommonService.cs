@@ -1,10 +1,8 @@
-using System.Net.Http;
 using Games.Models;
 using Newtonsoft.Json;
 
 namespace Games.Services {
     public interface ICommonService {
-        HttpClient HttpClient { get; }
         JsonSerializerSettings JsonSettings { get; }
         bool IsConfigured { get; }
         User GetUser(int id);

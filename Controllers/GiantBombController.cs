@@ -13,12 +13,14 @@ namespace Games.Controllers {
     public class GiantBombController : Controller {
         private string apiKey;
         private ICommonService common;
+        private IHttpService http;
         private IAuthenticationService auth;
         private JsonSerializerSettings jsonSettings;
         private const string NotFoundMessage = "No Giant Bomb API key specified. Please request an API key and add it in the settings dialog or database.";
 
-        public GiantBombController(GamesContext db, ICommonService common, IAuthenticationService auth) {
+        public GiantBombController(GamesContext db, ICommonService common, IHttpService http, IAuthenticationService auth) {
             this.common = common;
+            this.http = http;
             this.auth = auth;
             apiKey = db.Configs.SingleOrDefault()?.GiantBombApiKey;
             jsonSettings = common.JsonSettings;
@@ -41,7 +43,7 @@ namespace Games.Controllers {
                 { "field_list", "name,original_release_date,id" },
                 { "limit", "20" }
             });
-            var json = await common.HttpClient.GetStringAsync(uri);
+            var json = await http.Client.GetStringAsync(uri);
             var response = JsonConvert
                 .DeserializeObject<GBResponse<List<GBSearchResult>>>(json, jsonSettings);
 
@@ -65,7 +67,7 @@ namespace Games.Controllers {
             var uri = GetUri($"game/{id}", new Dictionary<string, string> {
                 { "field_list", "name,original_release_date,genres,platforms,image,developers,publishers" }
             });
-            var json = await common.HttpClient.GetStringAsync(uri);
+            var json = await http.Client.GetStringAsync(uri);
             var response = JsonConvert
                 .DeserializeObject<GBResponse<GBGameResult>>(json, jsonSettings);
 

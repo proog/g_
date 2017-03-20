@@ -14,12 +14,14 @@ namespace Games.Controllers {
     public class ImageController : Controller {
         private GamesContext db;
         private ICommonService common;
+        private IHttpService http;
         private IAuthenticationService auth;
         private IFileProvider data;
 
-        public ImageController(GamesContext db, ICommonService common, IAuthenticationService auth, IFileProvider fileProvider) {
+        public ImageController(GamesContext db, ICommonService common, IHttpService http, IAuthenticationService auth, IFileProvider fileProvider) {
             this.db = db;
             this.common = common;
+            this.http = http;
             this.auth = auth;
             this.data = fileProvider;
         }
@@ -54,7 +56,7 @@ namespace Games.Controllers {
                     throw new BadRequestException("Not a valid url");
                 }
 
-                var response = await common.HttpClient.GetAsync(url);
+                var response = await http.Client.GetAsync(url);
 
                 if (!response.IsSuccessStatusCode) {
                     throw new Exception("Giant Bomb returned non-success status code");
