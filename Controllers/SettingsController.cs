@@ -25,7 +25,7 @@ namespace Games.Controllers {
             var config = db.Configs
                 .Include(c => c.DefaultUser)
                 .SingleOrDefault();
-            common.VerifyExists(config);
+            config.VerifyExists();
             return Ok(config);
         }
 

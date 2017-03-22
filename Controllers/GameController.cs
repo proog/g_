@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Games.Infrastructure;
 using Games.Models;
 using Games.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -23,7 +24,7 @@ namespace Games.Controllers {
         [HttpGet("games")]
         public async Task<IActionResult> GetGames(int userId) {
             var user = common.GetUser(userId);
-            common.VerifyExists(user);
+            user.VerifyExists();
 
             var games = (await GetGameQuery(user)).ToList();
             games.ForEach(g => g.SerializeDescriptors());
@@ -33,10 +34,10 @@ namespace Games.Controllers {
         [HttpGet("games/{id}")]
         public async Task<IActionResult> GetGame(int userId, int id) {
             var user = common.GetUser(userId);
-            common.VerifyExists(user);
+            user.VerifyExists();
 
             var game = await GetGame(user, id);
-            common.VerifyExists(game);
+            game.VerifyExists();
             game.SerializeDescriptors();
             return Ok(game);
         }
@@ -44,7 +45,7 @@ namespace Games.Controllers {
         [HttpGet("suggestions")]
         public async Task<IActionResult> GetSuggestions(int userId) {
             var user = common.GetUser(userId);
-            common.VerifyExists(user);
+            user.VerifyExists();
 
             var query = await GetGameQuery(user);
             var applicableGames = query
@@ -128,7 +129,7 @@ namespace Games.Controllers {
             await auth.VerifyCurrentUser(user, HttpContext);
 
             var game = await GetGame(user, id);
-            common.VerifyExists(game);
+            game.VerifyExists();
 
             game.Title = update.Title;
             game.Developer = update.Developer;
@@ -160,7 +161,7 @@ namespace Games.Controllers {
             await auth.VerifyCurrentUser(user, HttpContext);
 
             var game = await GetGame(user, id);
-            common.VerifyExists(game);
+            game.VerifyExists();
 
             common.DeleteImageDirectory(game);
             db.Remove(game);

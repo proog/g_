@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Games.Infrastructure;
 using Games.Models;
 using Games.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -12,14 +13,12 @@ namespace Games.Controllers {
     [Route("api/assisted"), Authorize]
     public class GiantBombController : Controller {
         private string apiKey;
-        private ICommonService common;
         private IHttpService http;
         private IAuthenticationService auth;
         private JsonSerializerSettings jsonSettings;
         private const string NotFoundMessage = "No Giant Bomb API key specified. Please request an API key and add it in the settings dialog or database.";
 
         public GiantBombController(GamesContext db, ICommonService common, IHttpService http, IAuthenticationService auth) {
-            this.common = common;
             this.http = http;
             this.auth = auth;
             apiKey = db.Configs.SingleOrDefault()?.GiantBombApiKey;
@@ -36,7 +35,7 @@ namespace Games.Controllers {
 
         [HttpGet("search/{title}")]
         public async Task<IActionResult> Search(string title) {
-            common.VerifyExists(apiKey, NotFoundMessage);
+            apiKey.VerifyExists(NotFoundMessage);
 
             var uri = GetUri("games", new Dictionary<string, string> {
                 { "filter", "name:" + Uri.EscapeDataString(title) },
@@ -61,7 +60,7 @@ namespace Games.Controllers {
 
         [HttpGet("game/{id}")]
         public async Task<IActionResult> Get(int id) {
-            common.VerifyExists(apiKey, NotFoundMessage);
+            apiKey.VerifyExists(NotFoundMessage);
 
             var user = await auth.GetCurrentUser(HttpContext);
             var uri = GetUri($"game/{id}", new Dictionary<string, string> {

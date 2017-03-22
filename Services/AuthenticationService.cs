@@ -68,7 +68,7 @@ namespace Games.Services {
         }
 
         public async Task VerifyCurrentUser(User user, HttpContext ctx) {
-            common.VerifyExists(user, "The user does not exist.");
+            user.VerifyExists("The user does not exist.");
 
             if (!await IsCurrentUser(user, ctx)) {
                 throw new UnauthorizedException(

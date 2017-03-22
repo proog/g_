@@ -7,6 +7,5 @@ namespace Games.Services {
         bool IsConfigured { get; }
         User GetUser(int id);
         void DeleteImageDirectory(Game game);
-        void VerifyExists<T>(T value, string message = "Not found.");
     }
 }

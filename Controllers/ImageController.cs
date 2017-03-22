@@ -32,7 +32,7 @@ namespace Games.Controllers {
             await auth.VerifyCurrentUser(user, HttpContext);
 
             var game = user.Games.SingleOrDefault(g => g.Id == id);
-            common.VerifyExists(game);
+            game.VerifyExists();
             Stream imageStream;
 
             if (Request.HasFormContentType) {
@@ -87,7 +87,7 @@ namespace Games.Controllers {
             await auth.VerifyCurrentUser(user, HttpContext);
 
             var game = user.Games.SingleOrDefault(g => g.Id == id);
-            common.VerifyExists(game);
+            game.VerifyExists();
 
             common.DeleteImageDirectory(game);
             game.Image = null;

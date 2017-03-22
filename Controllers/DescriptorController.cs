@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Games.Infrastructure;
 using Games.Models;
 using Games.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -107,7 +108,7 @@ namespace Games.Controllers {
 
             var descriptor = getter(user)
                 .SingleOrDefault(it => it.Id == id);
-            common.VerifyExists(descriptor);
+            descriptor.VerifyExists();
 
             descriptor.Name = update.Name;
             descriptor.ShortName = update.ShortName;
@@ -123,7 +124,7 @@ namespace Games.Controllers {
 
             var descriptor = getter(user)
                 .SingleOrDefault(it => it.Id == id);
-            common.VerifyExists(descriptor);
+            descriptor.VerifyExists();
 
             db.Remove(descriptor);
             db.SaveChanges();
@@ -132,7 +133,7 @@ namespace Games.Controllers {
 
         private IActionResult All<T>(int userId, Expression<Func<User, IEnumerable<T>>> relation) where T : BaseModel {
             var user = common.GetUser(userId);
-            common.VerifyExists(user);
+            user.VerifyExists();
 
             var list = db.Entry(user)
                 .Collection(relation)
@@ -144,13 +145,13 @@ namespace Games.Controllers {
 
         private IActionResult Single<T>(int userId, int id, Expression<Func<User, IEnumerable<T>>> relation) where T : BaseModel {
             var user = common.GetUser(userId);
-            common.VerifyExists(user);
+            user.VerifyExists();
 
             var descriptor = db.Entry(user)
                 .Collection(relation)
                 .Query()
                 .SingleOrDefault(it => it.Id == id);
-            common.VerifyExists(descriptor);
+            descriptor.VerifyExists();
 
             return Ok(descriptor);
         }

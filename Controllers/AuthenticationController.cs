@@ -42,7 +42,7 @@ namespace Games.Controllers {
         [HttpGet("login")]
         public async Task<IActionResult> GetCurrentUser() {
             var user = await auth.GetCurrentUser(HttpContext);
-            common.VerifyExists(user);
+            user.VerifyExists();
             return Ok(user);
         }
     }

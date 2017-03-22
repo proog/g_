@@ -1,6 +1,5 @@
 using System.IO;
 using System.Linq;
-using Games.Infrastructure;
 using Games.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -36,12 +35,6 @@ namespace Games.Services {
         public void DeleteImageDirectory(Game game) {
             var file = data.GetFileInfo($"images/{game.Id}");
             Directory.Delete(file.PhysicalPath, true);
-        }
-
-        public void VerifyExists<T>(T value, string message) {
-            if (value == null) {
-                throw new NotFoundException(message);
-            }
         }
     }
 }
