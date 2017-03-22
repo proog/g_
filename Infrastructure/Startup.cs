@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
@@ -58,11 +59,11 @@ namespace Games.Infrastructure {
 
         public void ConfigureServices(IServiceCollection services) {
             services
-                .AddDbContext<GamesContext>()
                 .AddTransient<ICommonService, CommonService>()
                 .AddTransient<IAuthenticationService, AuthenticationService>()
                 .AddSingleton<IHttpService, HttpService>()
                 .AddSingleton<IFileProvider>(new PhysicalFileProvider(dataDirectory))
+                .AddDbContext<GamesContext>(ConfigureDatabase)
                 .AddMvc(options => {
                     options.Filters.Add(new ValidateModelFilter());
                     options.Filters.Add(new HandleExceptionFilter());
@@ -80,6 +81,11 @@ namespace Games.Infrastructure {
         private void CreateDirectories() {
             Directory.CreateDirectory(dataDirectory);
             Directory.CreateDirectory(Path.Combine(dataDirectory, "images"));
+        }
+
+        private void ConfigureDatabase(DbContextOptionsBuilder builder) {
+            var path = Path.Combine(dataDirectory, "games.db");
+            builder.UseSqlite($"Data Source={path}");
         }
 
         private void CreateDatabase(IApplicationBuilder app) {

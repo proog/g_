@@ -1,4 +1,3 @@
-using System.IO;
 using Games.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -13,14 +12,8 @@ namespace Games.Services {
         public DbSet<Config> Configs { get; set; }
         private IFileProvider data;
 
-        public GamesContext(IFileProvider fileProvider) {
+        public GamesContext(IFileProvider fileProvider, DbContextOptions<GamesContext> options) : base(options) {
             data = fileProvider;
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder builder) {
-            var path = data.GetFileInfo("games.db").PhysicalPath;
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
-            builder.UseSqlite($"Data Source={path}");
         }
 
         protected override void OnModelCreating(ModelBuilder builder) {
