@@ -1,14 +1,13 @@
-using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Games.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -26,19 +25,17 @@ namespace Games.Infrastructure
 
         public void Configure(IApplicationBuilder app, GamesContext db)
         {
-            var authOptions = new CookieAuthenticationOptions
+            var authOptions = new JwtBearerOptions
             {
-                AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme,
+                AuthenticationScheme = "Bearer",
                 AutomaticAuthenticate = true,
                 AutomaticChallenge = true,
-                ExpireTimeSpan = TimeSpan.FromHours(5),
-                Events = new CookieAuthenticationEvents
+                TokenValidationParameters = new TokenValidationParameters
                 {
-                    OnRedirectToLogin = context =>
-                    {
-                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                        return Task.CompletedTask;
-                    }
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("hejsasdifosdfnsdiofnsdifosdnfiosdfndsio"))
                 }
             };
             var fileOptions = new FileServerOptions
@@ -60,7 +57,7 @@ namespace Games.Infrastructure
             app.UseDefaultFiles() // serve index.html for /
                 .UseStaticFiles() // serve public
                 .UseFileServer(fileOptions) // serve data/images
-                .UseCookieAuthentication(authOptions)
+                .UseJwtBearerAuthentication(authOptions)
                 .UseMvc();
             CreateDatabase(app);
         }

@@ -1,9 +1,11 @@
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Models;
 using Games.Services;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Games.Controllers
 {
@@ -19,30 +21,6 @@ namespace Games.Controllers
             this.auth = auth;
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> LogIn([FromBody] Credentials cred)
-        {
-            var hash = auth.HashPassword(cred.Password);
-            var user = db.Users.SingleOrDefault(u =>
-                u.Username == cred.Username && u.Password == hash
-            );
-
-            if (user == null)
-            {
-                throw new UnauthorizedException("Invalid credentials");
-            }
-
-            await auth.Authenticate(user, HttpContext);
-            return Ok(user);
-        }
-
-        [HttpPost("logout")]
-        public async Task<IActionResult> LogOut()
-        {
-            await auth.Deauthenticate(HttpContext);
-            return Ok();
-        }
-
         [HttpGet("login")]
         public async Task<IActionResult> GetCurrentUser()
         {
@@ -50,5 +28,48 @@ namespace Games.Controllers
             user.VerifyExists();
             return Ok(user);
         }
+
+        [HttpPost("token")]
+        public async Task<IActionResult> Token([FromForm] OAuthCredentials cred)
+        {
+            var hash = auth.HashPassword(cred.Password);
+            var user = db.Users.SingleOrDefault(
+                u => u.Username == cred.Username && u.Password == hash
+            );
+
+            if (user == null)
+                throw new UnauthorizedException("Invalid credentials");
+
+            var jwt = await auth.Authenticate(user);
+
+            return Ok(new OAuthResponse
+            {
+                AccessToken = jwt,
+                TokenType = "Bearer"
+            });
+        }
+    }
+
+    public class OAuthCredentials
+    {
+        [FromForm(Name = "grant_type"), Required, RegularExpression("password")]
+        public string GrantType { get; set; }
+
+        [FromForm(Name = "username"), Required]
+        public string Username { get; set; }
+
+        [FromForm(Name = "password"), Required]
+        public string Password { get; set; }
+    }
+
+    public class OAuthResponse
+    {
+        public string AccessToken { get; set; }
+        public string TokenType { get; set; }
+    }
+
+    public class OAuthError
+    {
+        public string Error { get; set; }
     }
 }

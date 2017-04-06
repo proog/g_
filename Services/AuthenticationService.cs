@@ -1,4 +1,5 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -6,8 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Models;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Games.Services
 {
@@ -25,40 +26,28 @@ namespace Games.Services
 
         public async Task<User> GetCurrentUser(HttpContext ctx)
         {
-            var auth = await ctx.Authentication.AuthenticateAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme
+            var idClaim = ctx.User.Claims.FirstOrDefault(
+                c => c.Type == claimType && c.ValueType == claimValueType
             );
-
-            if (auth != null && auth.Identity.IsAuthenticated)
-            {
-                var claim = auth.Claims.Single(c =>
-                    c.Type == claimType && c.ValueType == claimValueType
-                );
-                var id = int.Parse(claim.Value);
-                return db.GetUser(id);
-            }
-
-            return null;
+            return idClaim != null
+                ? db.GetUser(int.Parse(idClaim.Value))
+                : null;
         }
 
-        public async Task Authenticate(User user, HttpContext ctx)
+        public async Task<string> Authenticate(User user)
         {
-            var identity = new ClaimsIdentity(
-                new[] { new Claim(claimType, user.Id.ToString(), claimValueType) },
-                authenticationType
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.CreateJwtSecurityToken(
+                subject: new ClaimsIdentity(
+                    new[] { new Claim(claimType, user.Id.ToString(), claimValueType) },
+                    authenticationType
+                ),
+                signingCredentials: new SigningCredentials(
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes("hejsasdifosdfnsdiofnsdifosdnfiosdfndsio")),
+                    SecurityAlgorithms.HmacSha256Signature
+                )
             );
-            var principal = new ClaimsPrincipal(identity);
-            await ctx.Authentication.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                principal
-            );
-        }
-
-        public async Task Deauthenticate(HttpContext ctx)
-        {
-            await ctx.Authentication.SignOutAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme
-            );
+            return handler.WriteToken(token);
         }
 
         public string HashPassword(string plain)

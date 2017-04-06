@@ -8,9 +8,7 @@ namespace Games.Services
     {
         Task<User> GetCurrentUser(HttpContext ctx);
 
-        Task Authenticate(User user, HttpContext ctx);
-
-        Task Deauthenticate(HttpContext ctx);
+        Task<string> Authenticate(User user);
 
         string HashPassword(string plain);
 
