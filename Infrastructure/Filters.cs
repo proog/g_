@@ -30,23 +30,23 @@ namespace Games.Infrastructure {
             else
                 context.Result = new InternalServerErrorObjectResult(error);
         }
-    }
 
-    public class InternalServerErrorObjectResult : ObjectResult {
-        public InternalServerErrorObjectResult(object error) : base(error) {
-            StatusCode = StatusCodes.Status500InternalServerError;
+        private class InternalServerErrorObjectResult : ObjectResult {
+            public InternalServerErrorObjectResult(object error) : base(error) {
+                StatusCode = StatusCodes.Status500InternalServerError;
+            }
         }
-    }
 
-    public class NotFoundObjectResult : ObjectResult {
-        public NotFoundObjectResult(object error) : base(error) {
-            StatusCode = StatusCodes.Status404NotFound;
+        private class NotFoundObjectResult : ObjectResult {
+            public NotFoundObjectResult(object error) : base(error) {
+                StatusCode = StatusCodes.Status404NotFound;
+            }
         }
-    }
 
-    public class UnauthorizedObjectResult : ObjectResult {
-        public UnauthorizedObjectResult(object error) : base(error) {
-            StatusCode = StatusCodes.Status401Unauthorized;
+        private class UnauthorizedObjectResult : ObjectResult {
+            public UnauthorizedObjectResult(object error) : base(error) {
+                StatusCode = StatusCodes.Status401Unauthorized;
+            }
         }
     }
 }
