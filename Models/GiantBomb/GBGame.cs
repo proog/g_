@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Games.Models.GiantBomb
 {
-    public class GBGameResult
+    public class GBGame
     {
         public string Name { get; set; }
 

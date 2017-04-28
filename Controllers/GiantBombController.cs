@@ -76,7 +76,7 @@ namespace Games.Controllers
             });
             var json = await http.Client.GetStringAsync(uri);
             var response = JsonConvert
-                .DeserializeObject<GBResponse<GBGameResult>>(json, jsonSettings);
+                .DeserializeObject<GBResponse<GBGame>>(json, jsonSettings);
 
             if (!response.IsSuccess)
                 throw new Exception(response.ErrorMessage);
