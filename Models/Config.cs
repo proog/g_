@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
-namespace Games.Models {
-    public class Config {
+namespace Games.Models
+{
+    public class Config
+    {
         public int Id { get; set; }
 
         [Required]

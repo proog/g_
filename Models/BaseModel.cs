@@ -3,8 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Games.Infrastructure;
 using Newtonsoft.Json;
 
-namespace Games.Models {
-    public abstract class BaseModel {
+namespace Games.Models
+{
+    public abstract class DbModel
+    {
         public int Id { get; set; }
 
         [JsonIgnore]
@@ -19,11 +21,9 @@ namespace Games.Models {
         [JsonProperty("updated_at"), NotMapped]
         public int UpdatedAtUnix => ToUnixTimestamp(UpdatedAt);
 
-        private static int ToUnixTimestamp(DateTime? dt) {
-            if (dt.HasValue && dt.Value != DateTime.MinValue) {
-                return dt.Value.ToUnixTimestamp();
-            }
-            return 0;
-        }
+        private static int ToUnixTimestamp(DateTime? dt) =>
+            dt.HasValue && dt.Value != DateTime.MinValue
+                ? dt.Value.ToUnixTimestamp()
+                : 0;
     }
 }

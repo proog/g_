@@ -2,26 +2,31 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Games.Infrastructure;
+using Games.Models;
 using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Games.Controllers {
+namespace Games.Controllers
+{
     [Route("api")]
-    public class SettingsController : Controller {
+    public class SettingsController : Controller
+    {
         private GamesContext db;
         private ICommonService common;
         private IAuthenticationService auth;
 
-        public SettingsController(GamesContext db, ICommonService common, IAuthenticationService auth) {
+        public SettingsController(GamesContext db, ICommonService common, IAuthenticationService auth)
+        {
             this.db = db;
             this.common = common;
             this.auth = auth;
         }
 
         [HttpGet("config")]
-        public IActionResult GetConfig() {
+        public IActionResult GetConfig()
+        {
             var config = db.Configs
                 .Include(c => c.DefaultUser)
                 .SingleOrDefault();
@@ -30,9 +35,11 @@ namespace Games.Controllers {
         }
 
         [HttpGet("settings"), Authorize]
-        public IActionResult GetSettings() {
+        public IActionResult GetSettings()
+        {
             var config = db.Configs.SingleOrDefault();
-            var settings = new AuthorizedSettings {
+            var settings = new AuthorizedSettings
+            {
                 DefaultUserId = config.DefaultUserId,
                 GiantBombApiKey = config.GiantBombApiKey
             };
@@ -40,42 +47,28 @@ namespace Games.Controllers {
         }
 
         [HttpPut("settings"), Authorize]
-        public async Task<IActionResult> UpdateSettings([FromBody] AuthorizedSettingsInput settings) {
+        public async Task<IActionResult> UpdateSettings([FromBody] AuthorizedSettingsInput settings)
+        {
             var user = await auth.GetCurrentUser(HttpContext);
             var hash = auth.HashPassword(settings.OldPassword);
 
-            if (hash != user.Password) {
+            if (hash != user.Password)
                 throw new UnauthorizedException();
-            }
 
             var defaultUser = common.GetUser(settings.DefaultUserId);
 
-            if (defaultUser == null) {
+            if (defaultUser == null)
                 throw new BadRequestException();
-            }
 
             var config = db.Configs.Single();
             config.DefaultUser = defaultUser;
             config.GiantBombApiKey = settings.GiantBombApiKey;
 
-            if (!string.IsNullOrEmpty(settings.NewPassword)) {
+            if (!string.IsNullOrEmpty(settings.NewPassword))
                 user.Password = auth.HashPassword(settings.NewPassword);
-            }
 
             db.SaveChanges();
             return GetSettings();
-        }
-
-        public class AuthorizedSettings {
-            [Required]
-            public int DefaultUserId { get; set; }
-            public string GiantBombApiKey { get; set; }
-        }
-
-        public class AuthorizedSettingsInput : AuthorizedSettings {
-            [Required]
-            public string OldPassword { get; set; }
-            public string NewPassword { get; set; }
         }
     }
 }

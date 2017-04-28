@@ -9,16 +9,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json.Linq;
 
-namespace Games.Controllers {
+namespace Games.Controllers
+{
     [Route("api/users/{userId}/games/{id}/image"), Authorize]
-    public class ImageController : Controller {
+    public class ImageController : Controller
+    {
         private GamesContext db;
         private ICommonService common;
         private IHttpService http;
         private IAuthenticationService auth;
         private IFileProvider data;
 
-        public ImageController(GamesContext db, ICommonService common, IHttpService http, IAuthenticationService auth, IFileProvider fileProvider) {
+        public ImageController(GamesContext db, ICommonService common, IHttpService http, IAuthenticationService auth, IFileProvider fileProvider)
+        {
             this.db = db;
             this.common = common;
             this.http = http;
@@ -27,7 +30,8 @@ namespace Games.Controllers {
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadImage(int userId, int id) {
+        public async Task<IActionResult> UploadImage(int userId, int id)
+        {
             var user = common.GetUser(userId);
             await auth.VerifyCurrentUser(user, HttpContext);
 
@@ -35,32 +39,32 @@ namespace Games.Controllers {
             game.VerifyExists();
             Stream imageStream;
 
-            if (Request.HasFormContentType) {
+            if (Request.HasFormContentType)
+            {
                 var form = await Request.ReadFormAsync();
                 var file = form.Files["image"];
 
-                if (file == null) {
+                if (file == null)
                     throw new BadRequestException("No image supplied");
-                }
 
                 imageStream = file.OpenReadStream();
             }
-            else {
+            else
+            {
                 string url;
-                using (var reader = new StreamReader(Request.Body)) {
+                using (var reader = new StreamReader(Request.Body))
+                {
                     var json = reader.ReadToEnd();
-                    url = (string) JObject.Parse(json)["image_url"];
+                    url = (string)JObject.Parse(json)["image_url"];
                 }
 
-                if (!Uri.IsWellFormedUriString(url, UriKind.Absolute)) {
+                if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
                     throw new BadRequestException("Not a valid url");
-                }
 
                 var response = await http.Client.GetAsync(url);
 
-                if (!response.IsSuccessStatusCode) {
+                if (!response.IsSuccessStatusCode)
                     throw new Exception("Giant Bomb returned non-success status code");
-                }
 
                 imageStream = await response.Content.ReadAsStreamAsync();
             }
@@ -68,10 +72,12 @@ namespace Games.Controllers {
             var path = $"images/{game.Id}/image.jpg";
             var fileInfo = data.GetFileInfo(path);
 
-            using (imageStream) {
+            using (imageStream)
+            {
                 Directory.CreateDirectory(Path.GetDirectoryName(fileInfo.PhysicalPath));
 
-                using (var stream = new FileStream(fileInfo.PhysicalPath, FileMode.Create)) {
+                using (var stream = new FileStream(fileInfo.PhysicalPath, FileMode.Create))
+                {
                     imageStream.CopyTo(stream);
                 }
             }
@@ -82,7 +88,8 @@ namespace Games.Controllers {
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteImage(int userId, int id) {
+        public async Task<IActionResult> DeleteImage(int userId, int id)
+        {
             var user = common.GetUser(userId);
             await auth.VerifyCurrentUser(user, HttpContext);
 

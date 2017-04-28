@@ -9,23 +9,28 @@ using Games.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 
-namespace Games.Services {
-    class AuthenticationService : IAuthenticationService {
+namespace Games.Services
+{
+    class AuthenticationService : IAuthenticationService
+    {
         private ICommonService common;
         private const string claimType = "id";
         private const string claimValueType = ClaimValueTypes.Integer;
         private const string authenticationType = "Password";
 
-        public AuthenticationService(ICommonService common) {
+        public AuthenticationService(ICommonService common)
+        {
             this.common = common;
         }
 
-        public async Task<User> GetCurrentUser(HttpContext ctx) {
+        public async Task<User> GetCurrentUser(HttpContext ctx)
+        {
             var auth = await ctx.Authentication.AuthenticateAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme
             );
 
-            if (auth != null && auth.Identity.IsAuthenticated) {
+            if (auth != null && auth.Identity.IsAuthenticated)
+            {
                 var claim = auth.Claims.Single(c =>
                     c.Type == claimType && c.ValueType == claimValueType
                 );
@@ -36,9 +41,10 @@ namespace Games.Services {
             return null;
         }
 
-        public async Task Authenticate(User user, HttpContext ctx) {
+        public async Task Authenticate(User user, HttpContext ctx)
+        {
             var identity = new ClaimsIdentity(
-                new [] { new Claim(claimType, user.Id.ToString(), claimValueType) },
+                new[] { new Claim(claimType, user.Id.ToString(), claimValueType) },
                 authenticationType
             );
             var principal = new ClaimsPrincipal(identity);
@@ -48,13 +54,15 @@ namespace Games.Services {
             );
         }
 
-        public async Task Deauthenticate(HttpContext ctx) {
+        public async Task Deauthenticate(HttpContext ctx)
+        {
             await ctx.Authentication.SignOutAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme
             );
         }
 
-        public string HashPassword(string plain) {
+        public string HashPassword(string plain)
+        {
             var bytes = Encoding.UTF8.GetBytes(plain);
             var hashBytes = SHA256.Create().ComputeHash(bytes);
             return BitConverter.ToString(hashBytes)
@@ -62,15 +70,18 @@ namespace Games.Services {
                 .ToLower();
         }
 
-        public async Task<bool> IsCurrentUser(User user, HttpContext ctx) {
+        public async Task<bool> IsCurrentUser(User user, HttpContext ctx)
+        {
             var currentUser = await GetCurrentUser(ctx);
             return currentUser != null && user.Id == currentUser.Id;
         }
 
-        public async Task VerifyCurrentUser(User user, HttpContext ctx) {
+        public async Task VerifyCurrentUser(User user, HttpContext ctx)
+        {
             user.VerifyExists("The user does not exist.");
 
-            if (!await IsCurrentUser(user, ctx)) {
+            if (!await IsCurrentUser(user, ctx))
+            {
                 throw new UnauthorizedException(
                     "The specified user is not the current user."
                 );

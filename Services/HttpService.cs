@@ -1,6 +1,7 @@
 using System.Net.Http;
 
-namespace Games.Services {
+namespace Games.Services
+{
     class HttpService : IHttpService
     {
         public HttpClient Client { get; }

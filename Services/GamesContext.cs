@@ -2,22 +2,33 @@ using Games.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
-namespace Games.Services {
-    public class GamesContext : DbContext {
-        public DbSet<Game> Games { get; set; }
-        public DbSet<Genre> Genres { get; set; }
-        public DbSet<Platform> Platforms { get; set; }
-        public DbSet<Tag> Tags { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Config> Configs { get; set; }
+namespace Games.Services
+{
+    public class GamesContext : DbContext
+    {
         private IFileProvider data;
 
-        public GamesContext(IFileProvider fileProvider, DbContextOptions<GamesContext> options) : base(options) {
+        public DbSet<Game> Games { get; set; }
+
+        public DbSet<Genre> Genres { get; set; }
+
+        public DbSet<Platform> Platforms { get; set; }
+
+        public DbSet<Tag> Tags { get; set; }
+
+        public DbSet<User> Users { get; set; }
+
+        public DbSet<Config> Configs { get; set; }
+
+        public GamesContext(IFileProvider fileProvider, DbContextOptions<GamesContext> options) : base(options)
+        {
             data = fileProvider;
         }
 
-        protected override void OnModelCreating(ModelBuilder builder) {
-            builder.Entity<Game>(it => {
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<Game>(it =>
+            {
                 it.HasMany(g => g.GameGenres)
                     .WithOne(gg => gg.Game)
                     .HasForeignKey(gg => gg.GameId);
@@ -28,7 +39,8 @@ namespace Games.Services {
                     .WithOne(gt => gt.Game)
                     .HasForeignKey(gt => gt.GameId);
             });
-            builder.Entity<User>(it => {
+            builder.Entity<User>(it =>
+            {
                 it.HasMany(u => u.Games)
                     .WithOne(g => g.User)
                     .HasForeignKey(g => g.UserId);

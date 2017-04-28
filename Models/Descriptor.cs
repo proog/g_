@@ -1,7 +1,9 @@
 using Newtonsoft.Json;
 
-namespace Games.Models {
-    public abstract class Descriptor : BaseModel {
+namespace Games.Models
+{
+    public abstract class Descriptor : DbModel
+    {
         public string Name { get; set; }
 
         public string ShortName { get; set; }
@@ -10,10 +12,5 @@ namespace Games.Models {
 
         [JsonIgnore]
         public User User { get; set; }
-    }
-
-    public abstract class GameDescriptor {
-        public int GameId { get; set; }
-        public Game Game { get; set; }
     }
 }

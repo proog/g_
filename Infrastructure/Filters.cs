@@ -3,12 +3,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Games.Infrastructure {
-    public class ValidateModelFilter : IActionFilter {
+namespace Games.Infrastructure
+{
+    public class ValidateModelFilter : IActionFilter
+    {
         public void OnActionExecuted(ActionExecutedContext context) { }
 
-        public void OnActionExecuting(ActionExecutingContext context) {
-            if (!context.ModelState.IsValid) {
+        public void OnActionExecuting(ActionExecutingContext context)
+        {
+            if (!context.ModelState.IsValid)
+            {
                 context.Result = new BadRequestObjectResult(
                     new ApiError { Message = "The input was invalid." }
                 );
@@ -16,8 +20,10 @@ namespace Games.Infrastructure {
         }
     }
 
-    public class HandleExceptionFilter : IExceptionFilter {
-        public void OnException(ExceptionContext context) {
+    public class HandleExceptionFilter : IExceptionFilter
+    {
+        public void OnException(ExceptionContext context)
+        {
             var e = context.Exception;
             var error = new ApiError { Message = e.Message };
 
@@ -31,20 +37,26 @@ namespace Games.Infrastructure {
                 context.Result = new InternalServerErrorObjectResult(error);
         }
 
-        private class InternalServerErrorObjectResult : ObjectResult {
-            public InternalServerErrorObjectResult(object error) : base(error) {
+        private class InternalServerErrorObjectResult : ObjectResult
+        {
+            public InternalServerErrorObjectResult(object error) : base(error)
+            {
                 StatusCode = StatusCodes.Status500InternalServerError;
             }
         }
 
-        private class NotFoundObjectResult : ObjectResult {
-            public NotFoundObjectResult(object error) : base(error) {
+        private class NotFoundObjectResult : ObjectResult
+        {
+            public NotFoundObjectResult(object error) : base(error)
+            {
                 StatusCode = StatusCodes.Status404NotFound;
             }
         }
 
-        private class UnauthorizedObjectResult : ObjectResult {
-            public UnauthorizedObjectResult(object error) : base(error) {
+        private class UnauthorizedObjectResult : ObjectResult
+        {
+            public UnauthorizedObjectResult(object error) : base(error)
+            {
                 StatusCode = StatusCodes.Status401Unauthorized;
             }
         }

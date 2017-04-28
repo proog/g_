@@ -8,21 +8,25 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Games.Controllers {
+namespace Games.Controllers
+{
     [Route("api/users/{userId}")]
-    public class GameController : Controller {
+    public class GameController : Controller
+    {
         private GamesContext db;
         private ICommonService common;
         private IAuthenticationService auth;
 
-        public GameController(GamesContext db, ICommonService common, IAuthenticationService auth) {
+        public GameController(GamesContext db, ICommonService common, IAuthenticationService auth)
+        {
             this.db = db;
             this.common = common;
             this.auth = auth;
         }
 
         [HttpGet("games")]
-        public async Task<IActionResult> GetGames(int userId) {
+        public async Task<IActionResult> GetGames(int userId)
+        {
             var user = common.GetUser(userId);
             user.VerifyExists();
 
@@ -32,7 +36,8 @@ namespace Games.Controllers {
         }
 
         [HttpGet("games/{id}")]
-        public async Task<IActionResult> GetGame(int userId, int id) {
+        public async Task<IActionResult> GetGame(int userId, int id)
+        {
             var user = common.GetUser(userId);
             user.VerifyExists();
 
@@ -43,7 +48,8 @@ namespace Games.Controllers {
         }
 
         [HttpGet("suggestions")]
-        public async Task<IActionResult> GetSuggestions(int userId) {
+        public async Task<IActionResult> GetSuggestions(int userId)
+        {
             var user = common.GetUser(userId);
             user.VerifyExists();
 
@@ -70,44 +76,54 @@ namespace Games.Controllers {
                 .ToDictionary(it => it.Key, it => it.Count());
 
             var random = new Random();
-            var suggestions = applicableGames.Select(game => {
-                var score = 0;
+            var suggestions = applicableGames
+                .Select(game =>
+                {
+                    var score = 0;
 
-                // how similar are the genres to top 10's genres?
-                foreach (var genre in game.GameGenres) {
-                    var id = genre.GenreId;
+                    // how similar are the genres to top 10's genres?
+                    foreach (var genre in game.GameGenres)
+                    {
+                        var id = genre.GenreId;
 
-                    if (topGenres.ContainsKey(id)) {
-                        score += topGenres[id];
+                        if (topGenres.ContainsKey(id))
+                        {
+                            score += topGenres[id];
+                        }
                     }
-                }
 
-                // how similar is the title on average to top 10
-                var titleSimilarity = 0;
-                foreach (var topGame in topGames) {
-                    // TODO similar_text
-                    titleSimilarity += 0;
-                }
-                score += topGames.Count > 0
-                    ? titleSimilarity / topGames.Count
-                    : 0;
+                    // how similar is the title on average to top 10
+                    var titleSimilarity = 0;
+                    foreach (var topGame in topGames)
+                    {
+                        // TODO similar_text
+                        titleSimilarity += 0;
+                    }
+                    score += topGames.Count > 0
+                        ? titleSimilarity / topGames.Count
+                        : 0;
 
-                // 30% chance of getting score boosted by 33%
-                if (random.Next(10) > 7) {
-                    score += score / 3;
-                }
+                    // 30% chance of getting score boosted by 33%
+                    if (random.Next(10) > 7)
+                    {
+                        score += score / 3;
+                    }
 
-                return new Suggestion {
-                    GameId = game.Id,
-                    Score = score
-                };
-            }).OrderByDescending(it => it.Score).Take(5);
+                    return new Suggestion
+                    {
+                        GameId = game.Id,
+                        Score = score
+                    };
+                })
+                .OrderByDescending(it => it.Score)
+                .Take(5);
 
             return Ok(suggestions);
         }
 
         [HttpPost("games"), Authorize]
-        public async Task<IActionResult> AddGame(int userId, [FromBody] Game game) {
+        public async Task<IActionResult> AddGame(int userId, [FromBody] Game game)
+        {
             var user = common.GetUser(userId);
             await auth.VerifyCurrentUser(user, HttpContext);
 
@@ -124,7 +140,8 @@ namespace Games.Controllers {
         }
 
         [HttpPut("games/{id}"), Authorize]
-        public async Task<IActionResult> UpdateGame(int userId, int id, [FromBody] Game update) {
+        public async Task<IActionResult> UpdateGame(int userId, int id, [FromBody] Game update)
+        {
             var user = common.GetUser(userId);
             await auth.VerifyCurrentUser(user, HttpContext);
 
@@ -156,7 +173,8 @@ namespace Games.Controllers {
         }
 
         [HttpDelete("games/{id}"), Authorize]
-        public async Task<IActionResult> DeleteGame(int userId, int id) {
+        public async Task<IActionResult> DeleteGame(int userId, int id)
+        {
             var user = common.GetUser(userId);
             await auth.VerifyCurrentUser(user, HttpContext);
 
@@ -170,12 +188,14 @@ namespace Games.Controllers {
             return NoContent();
         }
 
-        private async Task<Game> GetGame(User user, int id) {
+        private async Task<Game> GetGame(User user, int id)
+        {
             return (await GetGameQuery(user))
                 .SingleOrDefault(g => g.Id == id);
         }
 
-        private async Task<IQueryable<Game>> GetGameQuery(User user) {
+        private async Task<IQueryable<Game>> GetGameQuery(User user)
+        {
             IQueryable<Game> query = db.Entry(user)
                 .Collection(u => u.Games)
                 .Query()
@@ -183,16 +203,12 @@ namespace Games.Controllers {
                 .Include(g => g.GamePlatforms)
                 .Include(g => g.GameTags);
 
-            if (!await auth.IsCurrentUser(user, HttpContext)) {
+            if (!await auth.IsCurrentUser(user, HttpContext))
+            {
                 query = query.Where(g => !g.Hidden);
             }
 
             return query;
-        }
-
-        public class Suggestion {
-            public int GameId;
-            public int Score;
         }
     }
 }

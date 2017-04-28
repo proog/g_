@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Games.Models {
-    public class User : BaseModel {
+namespace Games.Models
+{
+    public class User : DbModel
+    {
         public string Username { get; set; }
+
         public int? View { get; set; }
 
         [JsonIgnore]
