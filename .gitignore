@@ -6,3 +6,4 @@ bin
 obj
 .vscode
 node_modules
+*.userprefs
