@@ -80,13 +80,13 @@ namespace Games.Infrastructure
                 })
                 .AddJsonOptions(options =>
                 {
-                    options.SerializerSettings.ReferenceLoopHandling =
-                        ReferenceLoopHandling.Ignore;
-                    options.SerializerSettings.ContractResolver =
-                        new DefaultContractResolver
-                        {
-                            NamingStrategy = new SnakeCaseNamingStrategy()
-                        };
+                    var settings = options.SerializerSettings;
+                    settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    settings.Converters.Add(new UnixDateTimeConverter());
+                    settings.ContractResolver = new DefaultContractResolver
+                    {
+                        NamingStrategy = new SnakeCaseNamingStrategy()
+                    };
                 });
         }
 
