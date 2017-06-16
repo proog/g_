@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Games.Infrastructure;
@@ -7,27 +8,28 @@ using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 namespace Games.Controllers
 {
     [Route("api/users/{userId}")]
     public class GameController : Controller
     {
-        private GamesContext db;
-        private ICommonService common;
-        private IAuthenticationService auth;
+        private readonly GamesContext db;
+        private readonly IFileProvider data;
+        private readonly IAuthenticationService auth;
 
-        public GameController(GamesContext db, ICommonService common, IAuthenticationService auth)
+        public GameController(GamesContext db, IFileProvider data, IAuthenticationService auth)
         {
             this.db = db;
-            this.common = common;
+            this.data = data;
             this.auth = auth;
         }
 
         [HttpGet("games")]
         public async Task<IActionResult> GetGames(int userId)
         {
-            var user = common.GetUser(userId);
+            var user = db.GetUser(userId);
             user.VerifyExists();
 
             var games = (await GetGameQuery(user)).ToList();
@@ -38,7 +40,7 @@ namespace Games.Controllers
         [HttpGet("games/{id}")]
         public async Task<IActionResult> GetGame(int userId, int id)
         {
-            var user = common.GetUser(userId);
+            var user = db.GetUser(userId);
             user.VerifyExists();
 
             var game = await GetGame(user, id);
@@ -50,7 +52,7 @@ namespace Games.Controllers
         [HttpGet("suggestions")]
         public async Task<IActionResult> GetSuggestions(int userId)
         {
-            var user = common.GetUser(userId);
+            var user = db.GetUser(userId);
             user.VerifyExists();
 
             var query = await GetGameQuery(user);
@@ -124,7 +126,7 @@ namespace Games.Controllers
         [HttpPost("games"), Authorize]
         public async Task<IActionResult> AddGame(int userId, [FromBody] Game game)
         {
-            var user = common.GetUser(userId);
+            var user = db.GetUser(userId);
             await auth.VerifyCurrentUser(user, HttpContext);
 
             game.User = user;
@@ -142,7 +144,7 @@ namespace Games.Controllers
         [HttpPut("games/{id}"), Authorize]
         public async Task<IActionResult> UpdateGame(int userId, int id, [FromBody] Game update)
         {
-            var user = common.GetUser(userId);
+            var user = db.GetUser(userId);
             await auth.VerifyCurrentUser(user, HttpContext);
 
             var game = await GetGame(user, id);
@@ -175,15 +177,17 @@ namespace Games.Controllers
         [HttpDelete("games/{id}"), Authorize]
         public async Task<IActionResult> DeleteGame(int userId, int id)
         {
-            var user = common.GetUser(userId);
+            var user = db.GetUser(userId);
             await auth.VerifyCurrentUser(user, HttpContext);
 
             var game = await GetGame(user, id);
             game.VerifyExists();
 
-            common.DeleteImageDirectory(game);
             db.Remove(game);
             db.SaveChanges();
+
+            var imageDir = data.GetFileInfo($"images/{game.Id}");
+            Directory.Delete(imageDir.PhysicalPath, true);
 
             return NoContent();
         }

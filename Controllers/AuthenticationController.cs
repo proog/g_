@@ -10,14 +10,12 @@ namespace Games.Controllers
     [Route("api")]
     public class AuthenticationController : Controller
     {
-        private GamesContext db;
-        private ICommonService common;
-        private IAuthenticationService auth;
+        private readonly GamesContext db;
+        private readonly IAuthenticationService auth;
 
-        public AuthenticationController(GamesContext db, ICommonService common, IAuthenticationService auth)
+        public AuthenticationController(GamesContext db, IAuthenticationService auth)
         {
             this.db = db;
-            this.common = common;
             this.auth = auth;
         }
 

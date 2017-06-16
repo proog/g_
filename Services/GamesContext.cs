@@ -1,3 +1,4 @@
+using System.Linq;
 using Games.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -6,8 +7,6 @@ namespace Games.Services
 {
     public class GamesContext : DbContext
     {
-        private IFileProvider data;
-
         public DbSet<Game> Games { get; set; }
 
         public DbSet<Genre> Genres { get; set; }
@@ -20,14 +19,23 @@ namespace Games.Services
 
         public DbSet<Config> Configs { get; set; }
 
-        public GamesContext(IFileProvider fileProvider, DbContextOptions<GamesContext> options) : base(options)
+        public bool IsConfigured => Configs.Any();
+
+        public GamesContext(DbContextOptions<GamesContext> options) : base(options) { }
+
+        public User GetUser(int id)
         {
-            data = fileProvider;
+            return Users
+                .Include(u => u.Games)
+                .Include(u => u.Genres)
+                .Include(u => u.Platforms)
+                .Include(u => u.Tags)
+                .SingleOrDefault(u => u.Id == id);
         }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            builder.Entity<Game>(it =>
+            modelBuilder.Entity<Game>(it =>
             {
                 it.HasMany(g => g.GameGenres)
                     .WithOne(gg => gg.Game)
@@ -39,7 +47,7 @@ namespace Games.Services
                     .WithOne(gt => gt.Game)
                     .HasForeignKey(gt => gt.GameId);
             });
-            builder.Entity<User>(it =>
+            modelBuilder.Entity<User>(it =>
             {
                 it.HasMany(u => u.Games)
                     .WithOne(g => g.User)
@@ -54,15 +62,15 @@ namespace Games.Services
                     .WithOne(t => t.User)
                     .HasForeignKey(t => t.UserId);
             });
-            builder.Entity<Config>()
+            modelBuilder.Entity<Config>()
                 .HasOne(c => c.DefaultUser)
                 .WithMany()
                 .HasForeignKey(c => c.DefaultUserId);
-            builder.Entity<GameGenre>()
+            modelBuilder.Entity<GameGenre>()
                 .HasKey(gg => new { gg.GameId, gg.GenreId });
-            builder.Entity<GamePlatform>()
+            modelBuilder.Entity<GamePlatform>()
                 .HasKey(gp => new { gp.GameId, gp.PlatformId });
-            builder.Entity<GameTag>()
+            modelBuilder.Entity<GameTag>()
                 .HasKey(gt => new { gt.GameId, gt.TagId });
         }
     }

@@ -15,14 +15,12 @@ namespace Games.Controllers
     [Route("api/users/{userId}")]
     public class DescriptorController : Controller
     {
-        private GamesContext db;
-        private ICommonService common;
-        private IAuthenticationService auth;
+        private readonly GamesContext db;
+        private readonly IAuthenticationService auth;
 
-        public DescriptorController(GamesContext db, ICommonService common, IAuthenticationService auth)
+        public DescriptorController(GamesContext db, IAuthenticationService auth)
         {
             this.db = db;
-            this.common = common;
             this.auth = auth;
         }
 
@@ -108,7 +106,7 @@ namespace Games.Controllers
 
         private async Task<IActionResult> Add<T>(int userId, T descriptor, Func<DbSet<T>> getter) where T : Descriptor
         {
-            var user = common.GetUser(userId);
+            var user = db.GetUser(userId);
             await auth.VerifyCurrentUser(user, HttpContext);
 
             descriptor.Id = 0;
@@ -123,7 +121,7 @@ namespace Games.Controllers
 
         private async Task<IActionResult> Update<T>(int userId, int id, T update, Func<User, IEnumerable<T>> getter) where T : Descriptor
         {
-            var user = common.GetUser(userId);
+            var user = db.GetUser(userId);
             await auth.VerifyCurrentUser(user, HttpContext);
 
             var descriptor = getter(user)
@@ -140,7 +138,7 @@ namespace Games.Controllers
 
         private async Task<IActionResult> Delete<T>(int userId, int id, Func<User, IEnumerable<T>> getter) where T : Descriptor
         {
-            var user = common.GetUser(userId);
+            var user = db.GetUser(userId);
             await auth.VerifyCurrentUser(user, HttpContext);
 
             var descriptor = getter(user)
@@ -154,7 +152,7 @@ namespace Games.Controllers
 
         private IActionResult All<T>(int userId, Expression<Func<User, IEnumerable<T>>> relation) where T : DbModel
         {
-            var user = common.GetUser(userId);
+            var user = db.GetUser(userId);
             user.VerifyExists();
 
             var list = db.Entry(user)
@@ -167,7 +165,7 @@ namespace Games.Controllers
 
         private IActionResult Single<T>(int userId, int id, Expression<Func<User, IEnumerable<T>>> relation) where T : DbModel
         {
-            var user = common.GetUser(userId);
+            var user = db.GetUser(userId);
             user.VerifyExists();
 
             var descriptor = db.Entry(user)

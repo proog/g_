@@ -8,14 +8,12 @@ namespace Games.Controllers
     [Route("setup")]
     public partial class SetupController : Controller
     {
-        private GamesContext db;
-        private ICommonService common;
-        private IAuthenticationService auth;
+        private readonly GamesContext db;
+        private readonly IAuthenticationService auth;
 
-        public SetupController(GamesContext db, ICommonService common, IAuthenticationService auth)
+        public SetupController(GamesContext db, IAuthenticationService auth)
         {
             this.db = db;
-            this.common = common;
             this.auth = auth;
         }
 
@@ -24,14 +22,14 @@ namespace Games.Controllers
         {
             return Render(new SetupViewModel
             {
-                Success = common.IsConfigured
+                Success = db.IsConfigured
             });
         }
 
         [HttpPost]
         public IActionResult Do([FromForm] SetupViewModel vm)
         {
-            if (common.IsConfigured)
+            if (db.IsConfigured)
             {
                 vm.Success = true;
                 return Render(vm);

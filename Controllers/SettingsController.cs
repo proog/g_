@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Games.Infrastructure;
@@ -13,14 +12,12 @@ namespace Games.Controllers
     [Route("api")]
     public class SettingsController : Controller
     {
-        private GamesContext db;
-        private ICommonService common;
-        private IAuthenticationService auth;
+        private readonly GamesContext db;
+        private readonly IAuthenticationService auth;
 
-        public SettingsController(GamesContext db, ICommonService common, IAuthenticationService auth)
+        public SettingsController(GamesContext db, IAuthenticationService auth)
         {
             this.db = db;
-            this.common = common;
             this.auth = auth;
         }
 
@@ -55,7 +52,7 @@ namespace Games.Controllers
             if (hash != user.Password)
                 throw new UnauthorizedException();
 
-            var defaultUser = common.GetUser(settings.DefaultUserId);
+            var defaultUser = db.GetUser(settings.DefaultUserId);
 
             if (defaultUser == null)
                 throw new BadRequestException();

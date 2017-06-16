@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Games.Infrastructure;
 using Games.Models;
 using Games.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -9,13 +10,11 @@ namespace Games.Controllers
     [Route("api")]
     public class UserController : Controller
     {
-        private GamesContext db;
-        private ICommonService common;
+        private readonly GamesContext db;
 
-        public UserController(GamesContext db, ICommonService common)
+        public UserController(GamesContext db)
         {
             this.db = db;
-            this.common = common;
         }
 
         [HttpGet("users")]
@@ -27,7 +26,9 @@ namespace Games.Controllers
         [HttpGet("users/{id}")]
         public User GetUser(int id)
         {
-            return common.GetUser(id);
+            var user = db.GetUser(id);
+            user.VerifyExists();
+            return user;
         }
     }
 }

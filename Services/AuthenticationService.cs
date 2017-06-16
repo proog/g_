@@ -13,14 +13,14 @@ namespace Games.Services
 {
     class AuthenticationService : IAuthenticationService
     {
-        private ICommonService common;
+        private readonly GamesContext db;
         private const string claimType = "id";
         private const string claimValueType = ClaimValueTypes.Integer;
         private const string authenticationType = "Password";
 
-        public AuthenticationService(ICommonService common)
+        public AuthenticationService(GamesContext db)
         {
-            this.common = common;
+            this.db = db;
         }
 
         public async Task<User> GetCurrentUser(HttpContext ctx)
@@ -35,7 +35,7 @@ namespace Games.Services
                     c.Type == claimType && c.ValueType == claimValueType
                 );
                 var id = int.Parse(claim.Value);
-                return common.GetUser(id);
+                return db.GetUser(id);
             }
 
             return null;

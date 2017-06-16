@@ -14,25 +14,23 @@ namespace Games.Controllers
     [Route("api/users/{userId}/games/{id}/image"), Authorize]
     public class ImageController : Controller
     {
-        private GamesContext db;
-        private ICommonService common;
-        private IHttpService http;
-        private IAuthenticationService auth;
-        private IFileProvider data;
+        private readonly GamesContext db;
+        private readonly IHttpService http;
+        private readonly IAuthenticationService auth;
+        private readonly IFileProvider data;
 
-        public ImageController(GamesContext db, ICommonService common, IHttpService http, IAuthenticationService auth, IFileProvider fileProvider)
+        public ImageController(GamesContext db, IHttpService http, IAuthenticationService auth, IFileProvider data)
         {
             this.db = db;
-            this.common = common;
             this.http = http;
             this.auth = auth;
-            this.data = fileProvider;
+            this.data = data;
         }
 
         [HttpPost]
         public async Task<IActionResult> UploadImage(int userId, int id)
         {
-            var user = common.GetUser(userId);
+            var user = db.GetUser(userId);
             await auth.VerifyCurrentUser(user, HttpContext);
 
             var game = user.Games.SingleOrDefault(g => g.Id == id);
@@ -90,15 +88,18 @@ namespace Games.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteImage(int userId, int id)
         {
-            var user = common.GetUser(userId);
+            var user = db.GetUser(userId);
             await auth.VerifyCurrentUser(user, HttpContext);
 
             var game = user.Games.SingleOrDefault(g => g.Id == id);
             game.VerifyExists();
 
-            common.DeleteImageDirectory(game);
             game.Image = null;
             db.SaveChanges();
+
+            var imageDir = data.GetFileInfo($"images/{game.Id}");
+            Directory.Delete(imageDir.PhysicalPath, true);
+
             return NoContent();
         }
     }

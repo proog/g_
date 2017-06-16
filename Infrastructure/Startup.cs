@@ -24,7 +24,7 @@ namespace Games.Infrastructure
             CreateDirectories();
         }
 
-        public void Configure(IApplicationBuilder app, ICommonService common)
+        public void Configure(IApplicationBuilder app, GamesContext db)
         {
             var authOptions = new CookieAuthenticationOptions
             {
@@ -52,7 +52,7 @@ namespace Games.Infrastructure
 
             // redirect to setup until configured
             app.MapWhen(
-                ctx => ctx.Request.Path == "/" && !common.IsConfigured,
+                ctx => ctx.Request.Path == "/" && !db.IsConfigured,
                 req => req.Run(
                     ctx => Task.Run(() => ctx.Response.Redirect("/setup"))
                 )
@@ -68,7 +68,6 @@ namespace Games.Infrastructure
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddTransient<ICommonService, CommonService>()
                 .AddTransient<IAuthenticationService, AuthenticationService>()
                 .AddSingleton<IHttpService, HttpService>()
                 .AddSingleton<IFileProvider>(new PhysicalFileProvider(dataDirectory))
