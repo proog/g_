@@ -2,7 +2,6 @@ public/vendor
 public/g.min.js
 public/g.min.js.map
 data
-appsettings.json
 appsettings.*.json
 bin
 obj

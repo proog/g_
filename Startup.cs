@@ -19,21 +19,26 @@ namespace Games
 {
     public class Startup
     {
-        private string dataDirectory;
-        private IConfigurationRoot configuration;
+        private readonly IConfigurationRoot configuration;
+        private readonly string dataDirectory;
+        private readonly string imageDirectory;
+        private readonly string connectionString;
 
         public Startup(IHostingEnvironment env)
         {
-            dataDirectory = Path.Combine(env.ContentRootPath, "data");
             configuration = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: false)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .Build();
-            CreateDirectories();
+
+            dataDirectory = Path.Combine(env.ContentRootPath, configuration["dataDirectory"]);
+            imageDirectory = Path.Combine(dataDirectory, "images");
+            connectionString = $"Data Source={Path.Combine(dataDirectory, "games.db")}";
+            Directory.CreateDirectory(imageDirectory);
         }
 
-        public void Configure(IApplicationBuilder app, GamesContext db, IOptions<AppSettings> appSettings)
+        public void Configure(IApplicationBuilder app, GamesContext db)
         {
             var authOptions = new JwtBearerOptions
             {
@@ -46,16 +51,14 @@ namespace Games
                     ValidateIssuer = false,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.Value.SigningKey))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["signingKey"]))
                 }
             };
             var fileOptions = new FileServerOptions
             {
                 RequestPath = "/images",
                 EnableDefaultFiles = false,
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(dataDirectory, "images")
-                )
+                FileProvider = new PhysicalFileProvider(imageDirectory)
             };
 
             // redirect to setup until configured
@@ -67,7 +70,7 @@ namespace Games
             );
             app.UseDefaultFiles() // serve index.html for /
                 .UseStaticFiles() // serve public
-                .UseFileServer(fileOptions) // serve data/images
+                .UseFileServer(fileOptions) // serve uploaded images
                 .UseJwtBearerAuthentication(authOptions)
                 .UseMvc();
             CreateDatabase(app);
@@ -81,7 +84,7 @@ namespace Games
                 .AddTransient<IAuthenticationService, AuthenticationService>()
                 .AddSingleton<HttpClient>(CreateHttpClient())
                 .AddSingleton<IFileProvider>(new PhysicalFileProvider(dataDirectory))
-                .AddDbContext<GamesContext>(ConfigureDatabase)
+                .AddDbContext<GamesContext>(options => options.UseSqlite(connectionString))
                 .AddMvc(options =>
                 {
                     options.Filters.Add(new ValidateModelFilter());
@@ -97,18 +100,6 @@ namespace Games
                         NamingStrategy = new SnakeCaseNamingStrategy()
                     };
                 });
-        }
-
-        private void CreateDirectories()
-        {
-            Directory.CreateDirectory(dataDirectory);
-            Directory.CreateDirectory(Path.Combine(dataDirectory, "images"));
-        }
-
-        private void ConfigureDatabase(DbContextOptionsBuilder builder)
-        {
-            var path = Path.Combine(dataDirectory, "games.db");
-            builder.UseSqlite($"Data Source={path}");
         }
 
         private void CreateDatabase(IApplicationBuilder app)
