@@ -1,4 +1,4 @@
-angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 'Tags', 'Users', '$q', '$routeParams', '$http', '$filter', 'Config', function(Games, Genres, Platforms, Tags, Users, $q, $routeParams, $http, $filter, Config) {
+angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 'Tags', 'Users', '$q', '$routeParams', '$http', '$filter', 'Config', '$httpParamSerializerJQLike', function(Games, Genres, Platforms, Tags, Users, $q, $routeParams, $http, $filter, Config, $httpParamSerializerJQLike) {
     var self = this;
 
     self.refreshGames = function(userId) {
@@ -64,24 +64,31 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
 
     // if username is not specified, use a get to see if we have an active session
     self.logIn = function(username, password) {
-        var url = 'api/login';
-
         if(!username && !password) {
-            return $http.get(url).then(function(response) {
-                var data = response.data;
-                self.authenticated = true;
-                self.authenticatedUser = data;
-                return data;
-            });
+            return self.checkLogin();
         }
 
-        return $http.post(url, { username: username, password: password })
-            .then(function(response) {
-                var data = response.data;
-                self.authenticated = true;
-                self.authenticatedUser = data;
-                return data;
-            });
+        return $http({
+            url: 'api/token',
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            data: $httpParamSerializerJQLike({
+                grant_type: 'password',
+                username: username,
+                password: password
+            })
+        }).then(function(response) {
+            window.sessionStorage.setItem('token', response.data.access_token);
+        }).then(self.checkLogin);
+    };
+
+    self.checkLogin = function() {
+        return $http.get('api/login').then(function(response) {
+            var data = response.data;
+            self.authenticated = true;
+            self.authenticatedUser = data;
+            return data;
+        });
     };
 
     self.logOut = function() {
