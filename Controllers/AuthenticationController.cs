@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Models;
 using Games.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers
@@ -19,7 +20,7 @@ namespace Games.Controllers
             this.auth = auth;
         }
 
-        [HttpGet("login")]
+        [HttpGet("login"), Authorize]
         public IActionResult GetCurrentUser()
         {
             var user = auth.GetCurrentUser(HttpContext);

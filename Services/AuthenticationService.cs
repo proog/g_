@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Games.Services
@@ -15,13 +16,15 @@ namespace Games.Services
     class AuthenticationService : IAuthenticationService
     {
         private readonly GamesContext db;
+        private readonly string signingKey;
         private const string claimType = "id";
         private const string claimValueType = ClaimValueTypes.Integer;
         private const string authenticationType = "Password";
 
-        public AuthenticationService(GamesContext db)
+        public AuthenticationService(GamesContext db, IOptions<AppSettings> appSettings)
         {
             this.db = db;
+            this.signingKey = appSettings.Value.SigningKey;
         }
 
         public User GetCurrentUser(HttpContext ctx)
@@ -43,7 +46,7 @@ namespace Games.Services
                     authenticationType
                 ),
                 signingCredentials: new SigningCredentials(
-                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes("hejsasdifosdfnsdiofnsdifosdnfiosdfndsio")),
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
                     SecurityAlgorithms.HmacSha256Signature
                 )
             );

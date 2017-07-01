@@ -5,8 +5,10 @@ using Games.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -16,14 +18,20 @@ namespace Games.Infrastructure
     public class Startup
     {
         private string dataDirectory;
+        private IConfigurationRoot configuration;
 
         public Startup(IHostingEnvironment env)
         {
             dataDirectory = Path.Combine(env.ContentRootPath, "data");
+            configuration = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: false)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .Build();
             CreateDirectories();
         }
 
-        public void Configure(IApplicationBuilder app, GamesContext db)
+        public void Configure(IApplicationBuilder app, GamesContext db, IAuthenticationService auth, IOptions<AppSettings> appSettings)
         {
             var authOptions = new JwtBearerOptions
             {
@@ -35,7 +43,7 @@ namespace Games.Infrastructure
                     ValidateAudience = false,
                     ValidateIssuer = false,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("hejsasdifosdfnsdiofnsdifosdnfiosdfndsio"))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.Value.SigningKey))
                 }
             };
             var fileOptions = new FileServerOptions
@@ -65,6 +73,8 @@ namespace Games.Infrastructure
         public void ConfigureServices(IServiceCollection services)
         {
             services
+                .Configure<AppSettings>(configuration)
+                .AddOptions()
                 .AddTransient<IAuthenticationService, AuthenticationService>()
                 .AddSingleton<IHttpService, HttpService>()
                 .AddSingleton<IFileProvider>(new PhysicalFileProvider(dataDirectory))
