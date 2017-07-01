@@ -1,3 +1,4 @@
+using System.Linq;
 using Games.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +14,15 @@ namespace Games.Infrastructure
         {
             if (!context.ModelState.IsValid)
             {
-                context.Result = new BadRequestObjectResult(
-                    new ApiError { Message = "The input was invalid." }
-                );
+                var error = new ApiError
+                {
+                    Message = "The input was invalid.",
+                    Errors = context.ModelState.Values
+                        .SelectMany(x => x.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .ToList()
+                };
+                context.Result = new BadRequestObjectResult(error);
             }
         }
     }
