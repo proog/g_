@@ -91,11 +91,11 @@ angular.module('games').service('gameService', ['Games', 'Genres', 'Platforms', 
         });
     };
 
-    self.logOut = function() {
-        return $http.post('api/logout').then(function() {
-            self.authenticated = false;
-            self.authenticatedUser = null;
-        });
+    self.logOut = function () {
+        window.sessionStorage.removeItem('token');
+        self.authenticated = false;
+        self.authenticatedUser = null;
+        return $q.when();
     };
 
     self.assistedCreationSearch = function(search) {
