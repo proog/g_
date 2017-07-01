@@ -33,7 +33,7 @@ namespace Games
             CreateDirectories();
         }
 
-        public void Configure(IApplicationBuilder app, GamesContext db, IAuthenticationService auth, IOptions<AppSettings> appSettings)
+        public void Configure(IApplicationBuilder app, GamesContext db, IOptions<AppSettings> appSettings)
         {
             var authOptions = new JwtBearerOptions
             {
