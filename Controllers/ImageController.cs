@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Services;
@@ -15,16 +16,16 @@ namespace Games.Controllers
     public class ImageController : Controller
     {
         private readonly GamesContext db;
-        private readonly IHttpService http;
+        private readonly HttpClient httpClient;
         private readonly IAuthenticationService auth;
         private readonly IFileProvider data;
 
-        public ImageController(GamesContext db, IHttpService http, IAuthenticationService auth, IFileProvider data)
+        public ImageController(GamesContext db, IAuthenticationService auth, IFileProvider data, HttpClient httpClient)
         {
             this.db = db;
-            this.http = http;
             this.auth = auth;
             this.data = data;
+            this.httpClient = httpClient;
         }
 
         [HttpPost]
@@ -59,7 +60,7 @@ namespace Games.Controllers
                 if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
                     throw new BadRequestException("Not a valid url");
 
-                var response = await http.Client.GetAsync(url);
+                var response = await httpClient.GetAsync(url);
 
                 if (!response.IsSuccessStatusCode)
                     throw new Exception("Giant Bomb returned non-success status code");

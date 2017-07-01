@@ -1,6 +1,8 @@
 using System.IO;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Games.Infrastructure;
 using Games.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -13,7 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Games.Infrastructure
+namespace Games
 {
     public class Startup
     {
@@ -76,7 +78,7 @@ namespace Games.Infrastructure
                 .Configure<AppSettings>(configuration)
                 .AddOptions()
                 .AddTransient<IAuthenticationService, AuthenticationService>()
-                .AddSingleton<IHttpService, HttpService>()
+                .AddSingleton<HttpClient>(CreateHttpClient())
                 .AddSingleton<IFileProvider>(new PhysicalFileProvider(dataDirectory))
                 .AddDbContext<GamesContext>(ConfigureDatabase)
                 .AddMvc(options =>
@@ -118,6 +120,15 @@ namespace Games.Infrastructure
                 var db = scope.ServiceProvider.GetService<GamesContext>();
                 db.Database.EnsureCreated();
             }
+        }
+
+        private HttpClient CreateHttpClient()
+        {
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Add(
+                "User-Agent", new[] { "permortensen.com g_sharp 0.1" }
+            );
+            return client;
         }
     }
 }
