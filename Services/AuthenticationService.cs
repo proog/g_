@@ -24,7 +24,7 @@ namespace Games.Services
             this.db = db;
         }
 
-        public async Task<User> GetCurrentUser(HttpContext ctx)
+        public User GetCurrentUser(HttpContext ctx)
         {
             var idClaim = ctx.User.Claims.FirstOrDefault(
                 c => c.Type == claimType && c.ValueType == claimValueType
@@ -34,7 +34,7 @@ namespace Games.Services
                 : null;
         }
 
-        public async Task<string> Authenticate(User user)
+        public string Authenticate(User user)
         {
             var handler = new JwtSecurityTokenHandler();
             var token = handler.CreateJwtSecurityToken(
@@ -59,17 +59,17 @@ namespace Games.Services
                 .ToLower();
         }
 
-        public async Task<bool> IsCurrentUser(User user, HttpContext ctx)
+        public bool IsCurrentUser(User user, HttpContext ctx)
         {
-            var currentUser = await GetCurrentUser(ctx);
+            var currentUser = GetCurrentUser(ctx);
             return currentUser != null && user.Id == currentUser.Id;
         }
 
-        public async Task VerifyCurrentUser(User user, HttpContext ctx)
+        public void VerifyCurrentUser(User user, HttpContext ctx)
         {
             user.VerifyExists("The user does not exist.");
 
-            if (!await IsCurrentUser(user, ctx))
+            if (!IsCurrentUser(user, ctx))
             {
                 throw new UnauthorizedException(
                     "The specified user is not the current user."

@@ -57,57 +57,57 @@ namespace Games.Controllers
         }
 
         [HttpPost("genres"), Authorize]
-        public Task<IActionResult> AddGenre(int userId, [FromBody] Genre rendition)
+        public IActionResult AddGenre(int userId, [FromBody] Genre rendition)
         {
             return Add(userId, rendition, () => db.Genres);
         }
         [HttpPost("platforms"), Authorize]
-        public Task<IActionResult> AddPlatform(int userId, [FromBody] Platform rendition)
+        public IActionResult AddPlatform(int userId, [FromBody] Platform rendition)
         {
             return Add(userId, rendition, () => db.Platforms);
         }
         [HttpPost("tags"), Authorize]
-        public Task<IActionResult> AddTag(int userId, [FromBody] Tag rendition)
+        public IActionResult AddTag(int userId, [FromBody] Tag rendition)
         {
             return Add(userId, rendition, () => db.Tags);
         }
 
         [HttpPut("genres/{id}"), Authorize]
-        public Task<IActionResult> UpdateGenre(int userId, int id, [FromBody] Genre rendition)
+        public IActionResult UpdateGenre(int userId, int id, [FromBody] Genre rendition)
         {
             return Update(userId, id, rendition, u => u.Genres);
         }
         [HttpPut("platforms/{id}"), Authorize]
-        public Task<IActionResult> UpdatePlatform(int userId, int id, [FromBody] Platform rendition)
+        public IActionResult UpdatePlatform(int userId, int id, [FromBody] Platform rendition)
         {
             return Update(userId, id, rendition, u => u.Platforms);
         }
         [HttpPut("tags/{id}"), Authorize]
-        public Task<IActionResult> UpdateTags(int userId, int id, [FromBody] Tag rendition)
+        public IActionResult UpdateTags(int userId, int id, [FromBody] Tag rendition)
         {
             return Update(userId, id, rendition, u => u.Tags);
         }
 
         [HttpDelete("genres/{id}"), Authorize]
-        public Task<IActionResult> DeleteGenre(int userId, int id)
+        public IActionResult DeleteGenre(int userId, int id)
         {
             return Delete(userId, id, u => u.Genres);
         }
         [HttpDelete("platforms/{id}"), Authorize]
-        public Task<IActionResult> DeletePlatform(int userId, int id)
+        public IActionResult DeletePlatform(int userId, int id)
         {
             return Delete(userId, id, u => u.Platforms);
         }
         [HttpDelete("tags/{id}"), Authorize]
-        public Task<IActionResult> DeleteTag(int userId, int id)
+        public IActionResult DeleteTag(int userId, int id)
         {
             return Delete(userId, id, u => u.Tags);
         }
 
-        private async Task<IActionResult> Add<T>(int userId, T descriptor, Func<DbSet<T>> getter) where T : Descriptor
+        private IActionResult Add<T>(int userId, T descriptor, Func<DbSet<T>> getter) where T : Descriptor
         {
             var user = db.GetUser(userId);
-            await auth.VerifyCurrentUser(user, HttpContext);
+            auth.VerifyCurrentUser(user, HttpContext);
 
             descriptor.Id = 0;
             descriptor.User = user;
@@ -119,10 +119,10 @@ namespace Games.Controllers
             return Ok(descriptor);
         }
 
-        private async Task<IActionResult> Update<T>(int userId, int id, T update, Func<User, IEnumerable<T>> getter) where T : Descriptor
+        private IActionResult Update<T>(int userId, int id, T update, Func<User, IEnumerable<T>> getter) where T : Descriptor
         {
             var user = db.GetUser(userId);
-            await auth.VerifyCurrentUser(user, HttpContext);
+            auth.VerifyCurrentUser(user, HttpContext);
 
             var descriptor = getter(user)
                 .SingleOrDefault(it => it.Id == id);
@@ -136,10 +136,10 @@ namespace Games.Controllers
             return Ok(descriptor);
         }
 
-        private async Task<IActionResult> Delete<T>(int userId, int id, Func<User, IEnumerable<T>> getter) where T : Descriptor
+        private IActionResult Delete<T>(int userId, int id, Func<User, IEnumerable<T>> getter) where T : Descriptor
         {
             var user = db.GetUser(userId);
-            await auth.VerifyCurrentUser(user, HttpContext);
+            auth.VerifyCurrentUser(user, HttpContext);
 
             var descriptor = getter(user)
                 .SingleOrDefault(it => it.Id == id);

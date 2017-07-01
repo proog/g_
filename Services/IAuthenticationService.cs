@@ -6,14 +6,14 @@ namespace Games.Services
 {
     public interface IAuthenticationService
     {
-        Task<User> GetCurrentUser(HttpContext ctx);
+        User GetCurrentUser(HttpContext ctx);
 
-        Task<string> Authenticate(User user);
+        string Authenticate(User user);
 
         string HashPassword(string plain);
 
-        Task<bool> IsCurrentUser(User user, HttpContext ctx);
+        bool IsCurrentUser(User user, HttpContext ctx);
 
-        Task VerifyCurrentUser(User user, HttpContext ctx);
+        void VerifyCurrentUser(User user, HttpContext ctx);
     }
 }

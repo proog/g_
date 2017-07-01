@@ -73,7 +73,7 @@ namespace Games.Controllers
         {
             apiKey.VerifyExists(NotFoundMessage);
 
-            var user = await auth.GetCurrentUser(HttpContext);
+            var user = auth.GetCurrentUser(HttpContext);
             var uri = GetUri($"game/{id}", new Dictionary<string, string>
             {
                 { "field_list", "name,original_release_date,genres,platforms,image,developers,publishers" }

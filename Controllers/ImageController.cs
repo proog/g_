@@ -31,7 +31,7 @@ namespace Games.Controllers
         public async Task<IActionResult> UploadImage(int userId, int id)
         {
             var user = db.GetUser(userId);
-            await auth.VerifyCurrentUser(user, HttpContext);
+            auth.VerifyCurrentUser(user, HttpContext);
 
             var game = user.Games.SingleOrDefault(g => g.Id == id);
             game.VerifyExists();
@@ -86,10 +86,10 @@ namespace Games.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteImage(int userId, int id)
+        public IActionResult DeleteImage(int userId, int id)
         {
             var user = db.GetUser(userId);
-            await auth.VerifyCurrentUser(user, HttpContext);
+            auth.VerifyCurrentUser(user, HttpContext);
 
             var game = user.Games.SingleOrDefault(g => g.Id == id);
             game.VerifyExists();

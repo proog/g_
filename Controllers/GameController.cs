@@ -27,35 +27,35 @@ namespace Games.Controllers
         }
 
         [HttpGet("games")]
-        public async Task<IActionResult> GetGames(int userId)
+        public IActionResult GetGames(int userId)
         {
             var user = db.GetUser(userId);
             user.VerifyExists();
 
-            var games = (await GetGameQuery(user)).ToList();
+            var games = GetGameQuery(user).ToList();
             games.ForEach(g => g.SerializeDescriptors());
             return Ok(games);
         }
 
         [HttpGet("games/{id}")]
-        public async Task<IActionResult> GetGame(int userId, int id)
+        public IActionResult GetGame(int userId, int id)
         {
             var user = db.GetUser(userId);
             user.VerifyExists();
 
-            var game = await GetGame(user, id);
+            var game = GetGame(user, id);
             game.VerifyExists();
             game.SerializeDescriptors();
             return Ok(game);
         }
 
         [HttpGet("suggestions")]
-        public async Task<IActionResult> GetSuggestions(int userId)
+        public IActionResult GetSuggestions(int userId)
         {
             var user = db.GetUser(userId);
             user.VerifyExists();
 
-            var query = await GetGameQuery(user);
+            var query = GetGameQuery(user);
             var applicableGames = query
                 .Where(g => g.Finished == Completion.NotFinished)
                 .Where(g => g.Rating == null)
@@ -124,10 +124,10 @@ namespace Games.Controllers
         }
 
         [HttpPost("games"), Authorize]
-        public async Task<IActionResult> AddGame(int userId, [FromBody] Game game)
+        public IActionResult AddGame(int userId, [FromBody] Game game)
         {
             var user = db.GetUser(userId);
-            await auth.VerifyCurrentUser(user, HttpContext);
+            auth.VerifyCurrentUser(user, HttpContext);
 
             game.User = user;
             game.DeserializeDescriptors(user.Genres, user.Platforms, user.Tags);
@@ -142,12 +142,12 @@ namespace Games.Controllers
         }
 
         [HttpPut("games/{id}"), Authorize]
-        public async Task<IActionResult> UpdateGame(int userId, int id, [FromBody] Game update)
+        public IActionResult UpdateGame(int userId, int id, [FromBody] Game update)
         {
             var user = db.GetUser(userId);
-            await auth.VerifyCurrentUser(user, HttpContext);
+            auth.VerifyCurrentUser(user, HttpContext);
 
-            var game = await GetGame(user, id);
+            var game = GetGame(user, id);
             game.VerifyExists();
 
             game.Title = update.Title;
@@ -175,12 +175,12 @@ namespace Games.Controllers
         }
 
         [HttpDelete("games/{id}"), Authorize]
-        public async Task<IActionResult> DeleteGame(int userId, int id)
+        public IActionResult DeleteGame(int userId, int id)
         {
             var user = db.GetUser(userId);
-            await auth.VerifyCurrentUser(user, HttpContext);
+            auth.VerifyCurrentUser(user, HttpContext);
 
-            var game = await GetGame(user, id);
+            var game = GetGame(user, id);
             game.VerifyExists();
 
             db.Remove(game);
@@ -192,13 +192,12 @@ namespace Games.Controllers
             return NoContent();
         }
 
-        private async Task<Game> GetGame(User user, int id)
+        private Game GetGame(User user, int id)
         {
-            return (await GetGameQuery(user))
-                .SingleOrDefault(g => g.Id == id);
+            return GetGameQuery(user).SingleOrDefault(g => g.Id == id);
         }
 
-        private async Task<IQueryable<Game>> GetGameQuery(User user)
+        private IQueryable<Game> GetGameQuery(User user)
         {
             IQueryable<Game> query = db.Entry(user)
                 .Collection(u => u.Games)
@@ -207,7 +206,7 @@ namespace Games.Controllers
                 .Include(g => g.GamePlatforms)
                 .Include(g => g.GameTags);
 
-            if (!await auth.IsCurrentUser(user, HttpContext))
+            if (!auth.IsCurrentUser(user, HttpContext))
             {
                 query = query.Where(g => !g.Hidden);
             }

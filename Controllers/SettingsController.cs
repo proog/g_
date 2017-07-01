@@ -44,9 +44,9 @@ namespace Games.Controllers
         }
 
         [HttpPut("settings"), Authorize]
-        public async Task<IActionResult> UpdateSettings([FromBody] AuthorizedSettingsInput settings)
+        public IActionResult UpdateSettings([FromBody] AuthorizedSettingsInput settings)
         {
-            var user = await auth.GetCurrentUser(HttpContext);
+            var user = auth.GetCurrentUser(HttpContext);
             var hash = auth.HashPassword(settings.OldPassword);
 
             if (hash != user.Password)

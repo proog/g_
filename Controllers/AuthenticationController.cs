@@ -22,15 +22,15 @@ namespace Games.Controllers
         }
 
         [HttpGet("login")]
-        public async Task<IActionResult> GetCurrentUser()
+        public IActionResult GetCurrentUser()
         {
-            var user = await auth.GetCurrentUser(HttpContext);
+            var user = auth.GetCurrentUser(HttpContext);
             user.VerifyExists();
             return Ok(user);
         }
 
         [HttpPost("token")]
-        public async Task<IActionResult> Token([FromForm] OAuthCredentials cred)
+        public IActionResult Token([FromForm] OAuthCredentials cred)
         {
             var hash = auth.HashPassword(cred.Password);
             var user = db.Users.SingleOrDefault(
@@ -40,7 +40,7 @@ namespace Games.Controllers
             if (user == null)
                 throw new UnauthorizedException("Invalid credentials");
 
-            var jwt = await auth.Authenticate(user);
+            var jwt = auth.Authenticate(user);
 
             return Ok(new OAuthResponse
             {
