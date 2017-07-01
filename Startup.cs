@@ -65,7 +65,7 @@ namespace Games
             app.MapWhen(
                 ctx => ctx.Request.Path == "/" && !db.IsConfigured,
                 req => req.Run(
-                    ctx => Task.Run(() => ctx.Response.Redirect("/setup"))
+                    ctx => Task.Run(() => ctx.Response.Redirect("setup"))
                 )
             );
             app.UseDefaultFiles() // serve index.html for /
