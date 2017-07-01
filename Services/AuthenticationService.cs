@@ -40,15 +40,17 @@ namespace Games.Services
         public string Authenticate(User user)
         {
             var handler = new JwtSecurityTokenHandler();
+            var identity = new ClaimsIdentity(
+                new[] { new Claim(claimType, user.Id.ToString(), claimValueType) }
+            );
+            var signingCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
+                SecurityAlgorithms.HmacSha256Signature
+            );
             var token = handler.CreateJwtSecurityToken(
-                subject: new ClaimsIdentity(
-                    new[] { new Claim(claimType, user.Id.ToString(), claimValueType) },
-                    authenticationType
-                ),
-                signingCredentials: new SigningCredentials(
-                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
-                    SecurityAlgorithms.HmacSha256Signature
-                )
+                subject: identity,
+                signingCredentials: signingCredentials,
+                expires: DateTime.Now.AddHours(6)
             );
             return handler.WriteToken(token);
         }

@@ -44,6 +44,7 @@ namespace Games
                 {
                     ValidateAudience = false,
                     ValidateIssuer = false,
+                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.Value.SigningKey))
                 }
