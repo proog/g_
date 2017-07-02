@@ -12,18 +12,18 @@ namespace Games.Infrastructure
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            if (!context.ModelState.IsValid)
+            if (context.ModelState.IsValid)
+                return;
+
+            var error = new ApiValidationError
             {
-                var error = new ApiError
-                {
-                    Message = "The input was invalid.",
-                    Errors = context.ModelState.Values
-                        .SelectMany(x => x.Errors)
-                        .Select(e => e.ErrorMessage)
-                        .ToList()
-                };
-                context.Result = new BadRequestObjectResult(error);
-            }
+                Message = "The input was invalid.",
+                Errors = context.ModelState.Values
+                    .SelectMany(x => x.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList()
+            };
+            context.Result = new BadRequestObjectResult(error);
         }
     }
 
