@@ -4,10 +4,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace Games.Models
+namespace Games.ViewModels
 {
-    public class Game : DbModel
+    public class GameViewModel
     {
+        public int Id { get; set; }
+
+        [Required]
         public string Title { get; set; }
 
         public string Developer { get; set; }
@@ -18,16 +21,17 @@ namespace Games.Models
 
         public string Image { get; set; }
 
-        public Completion Finished { get; set; }
+        [Required, Range(0, 3)]
+        public int Finished { get; set; }
 
         public string Comment { get; set; }
 
         public string SortAs { get; set; }
 
-        public string PrivateComment { get; set; }
-
+        [RegularExpression(@"^\d{2,}:\d{2}:\d{2}$")]
         public string Playtime { get; set; }
 
+        [Range(1, 5)]
         public int? Rating { get; set; }
 
         public bool CurrentlyPlaying { get; set; }
@@ -40,12 +44,10 @@ namespace Games.Models
 
         public int UserId { get; set; }
 
-        public User User { get; set; }
+        public List<int> GenreIds { get; set; }
 
-        public List<GameGenre> GameGenres { get; set; }
+        public List<int> PlatformIds { get; set; }
 
-        public List<GamePlatform> GamePlatforms { get; set; }
-
-        public List<GameTag> GameTags { get; set; }
+        public List<int> TagIds { get; set; }
     }
 }
