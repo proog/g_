@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Games.Infrastructure;
 using Games.Models;
+using Games.Models.ViewModels;
 using Games.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,17 +19,19 @@ namespace Games.Controllers
         }
 
         [HttpGet("users")]
-        public List<User> GetUsers()
+        public List<UserViewModel> GetUsers()
         {
-            return db.Users.ToList();
+            return db.Users
+                .Select(ViewModelFactory.MakeUserViewModel)
+                .ToList();
         }
 
         [HttpGet("users/{id}")]
-        public User GetUser(int id)
+        public UserViewModel GetUser(int id)
         {
             var user = db.GetUser(id);
             user.VerifyExists();
-            return user;
+            return ViewModelFactory.MakeUserViewModel(user);
         }
     }
 }

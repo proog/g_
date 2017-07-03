@@ -33,6 +33,25 @@ namespace Games.Infrastructure
             };
         }
 
+        public static UserViewModel MakeUserViewModel(User user)
+        {
+            return new UserViewModel
+            {
+                Id = user.Id,
+                Username = user.Username,
+                View = user.View
+            };
+        }
+
+        public static ConfigViewModel MakeConfigViewModel(Config config)
+        {
+            return new ConfigViewModel
+            {
+                DefaultUserId = config.DefaultUserId,
+                IsAssistedCreationEnabled = !string.IsNullOrEmpty(config.GiantBombApiKey)
+            };
+        }
+
         public static List<GameGenre> MakeGameGenres(Game game, List<int> ids, List<Genre> allGenres)
         {
             return allGenres

@@ -575,7 +575,7 @@ angular.module('games').controller('gamesCtrl', ['$scope', '$routeParams', '$rou
         if(!$routeParams.userId) {
             // no user id specified, load default user and redirect
             gameService.refreshConfig().then(function() {
-                self.userId = gameService.config.default_user.id;
+                self.userId = gameService.config.default_user_id;
                 $location.path('/' + self.userId).replace();
             });
             return;

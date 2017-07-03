@@ -23,13 +23,13 @@ namespace Games.Controllers
         }
 
         [HttpGet("config")]
-        public Config GetConfig()
+        public ConfigViewModel GetConfig()
         {
             var config = db.Configs
                 .Include(c => c.DefaultUser)
                 .SingleOrDefault();
             config.VerifyExists();
-            return config;
+            return ViewModelFactory.MakeConfigViewModel(config);
         }
 
         [HttpGet("settings"), Authorize]

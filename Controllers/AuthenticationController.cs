@@ -22,11 +22,11 @@ namespace Games.Controllers
         }
 
         [HttpGet("login"), Authorize]
-        public User GetCurrentUser()
+        public UserViewModel GetCurrentUser()
         {
             var user = auth.GetCurrentUser(HttpContext);
             user.VerifyExists();
-            return user;
+            return ViewModelFactory.MakeUserViewModel(user);
         }
 
         [HttpPost("token")]
