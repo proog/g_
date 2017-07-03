@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Games.Models
+namespace Games.Models.ViewModels
 {
     public class AuthorizedSettings
     {

@@ -1,5 +1,6 @@
 using System.Linq;
 using Games.Models;
+using Games.Models.ViewModels;
 using Games.Services;
 using Microsoft.AspNetCore.Mvc;
 

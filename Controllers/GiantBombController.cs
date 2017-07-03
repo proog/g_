@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Models;
 using Games.Models.GiantBomb;
+using Games.Models.ViewModels;
 using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

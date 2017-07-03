@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace Games.ViewModels
+namespace Games.Models.ViewModels
 {
     public class GameViewModel
     {

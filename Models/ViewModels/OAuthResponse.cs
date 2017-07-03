@@ -1,4 +1,4 @@
-namespace Games.Models
+namespace Games.Models.ViewModels
 {
     public class OAuthResponse
     {

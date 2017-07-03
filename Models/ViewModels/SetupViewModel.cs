@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Games.Models
+namespace Games.Models.ViewModels
 {
     public class SetupViewModel
     {

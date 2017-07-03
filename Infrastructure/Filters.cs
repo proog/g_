@@ -1,5 +1,5 @@
 using System.Linq;
-using Games.Models;
+using Games.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;

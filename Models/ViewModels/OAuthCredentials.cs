@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace Games.Models
+namespace Games.Models.ViewModels
 {
     public class OAuthCredentials
     {

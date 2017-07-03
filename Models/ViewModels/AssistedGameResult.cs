@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Games.Models
+namespace Games.Models.ViewModels
 {
     public class AssistedGameResult
     {
