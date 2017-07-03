@@ -25,65 +25,65 @@ namespace Games.Controllers
         }
 
         [HttpGet("genres")]
-        public IActionResult GetGenres(int userId)
+        public List<Genre> GetGenres(int userId)
         {
             return All(userId, u => u.Genres);
         }
         [HttpGet("platforms")]
-        public IActionResult GetPlatforms(int userId)
+        public List<Platform> GetPlatforms(int userId)
         {
             return All(userId, u => u.Platforms);
         }
         [HttpGet("tags")]
-        public IActionResult GetTags(int userId)
+        public List<Tag> GetTags(int userId)
         {
             return All(userId, u => u.Tags);
         }
 
         [HttpGet("genres/{id}")]
-        public IActionResult GetGenre(int userId, int id)
+        public Genre GetGenre(int userId, int id)
         {
             return Single(userId, id, u => u.Genres);
         }
         [HttpGet("platforms/{id}")]
-        public IActionResult GetPlatform(int userId, int id)
+        public Platform GetPlatform(int userId, int id)
         {
             return Single(userId, id, u => u.Platforms);
         }
         [HttpGet("tags/{id}")]
-        public IActionResult GetTag(int userId, int id)
+        public Tag GetTag(int userId, int id)
         {
             return Single(userId, id, u => u.Tags);
         }
 
         [HttpPost("genres"), Authorize]
-        public IActionResult AddGenre(int userId, [FromBody] Genre rendition)
+        public Genre AddGenre(int userId, [FromBody] Genre rendition)
         {
             return Add(userId, rendition, () => db.Genres);
         }
         [HttpPost("platforms"), Authorize]
-        public IActionResult AddPlatform(int userId, [FromBody] Platform rendition)
+        public Platform AddPlatform(int userId, [FromBody] Platform rendition)
         {
             return Add(userId, rendition, () => db.Platforms);
         }
         [HttpPost("tags"), Authorize]
-        public IActionResult AddTag(int userId, [FromBody] Tag rendition)
+        public Tag AddTag(int userId, [FromBody] Tag rendition)
         {
             return Add(userId, rendition, () => db.Tags);
         }
 
         [HttpPut("genres/{id}"), Authorize]
-        public IActionResult UpdateGenre(int userId, int id, [FromBody] Genre rendition)
+        public Genre UpdateGenre(int userId, int id, [FromBody] Genre rendition)
         {
             return Update(userId, id, rendition, u => u.Genres);
         }
         [HttpPut("platforms/{id}"), Authorize]
-        public IActionResult UpdatePlatform(int userId, int id, [FromBody] Platform rendition)
+        public Platform UpdatePlatform(int userId, int id, [FromBody] Platform rendition)
         {
             return Update(userId, id, rendition, u => u.Platforms);
         }
         [HttpPut("tags/{id}"), Authorize]
-        public IActionResult UpdateTags(int userId, int id, [FromBody] Tag rendition)
+        public Tag UpdateTag(int userId, int id, [FromBody] Tag rendition)
         {
             return Update(userId, id, rendition, u => u.Tags);
         }
@@ -104,7 +104,7 @@ namespace Games.Controllers
             return Delete(userId, id, u => u.Tags);
         }
 
-        private IActionResult Add<T>(int userId, T descriptor, Func<DbSet<T>> getter) where T : Descriptor
+        private T Add<T>(int userId, T descriptor, Func<DbSet<T>> getter) where T : Descriptor
         {
             var user = db.GetUser(userId);
             auth.VerifyCurrentUser(user, HttpContext);
@@ -116,10 +116,10 @@ namespace Games.Controllers
             getter().Add(descriptor);
             db.SaveChanges();
 
-            return Ok(descriptor);
+            return descriptor;
         }
 
-        private IActionResult Update<T>(int userId, int id, T update, Func<User, IEnumerable<T>> getter) where T : Descriptor
+        private T Update<T>(int userId, int id, T update, Func<User, IEnumerable<T>> getter) where T : Descriptor
         {
             var user = db.GetUser(userId);
             auth.VerifyCurrentUser(user, HttpContext);
@@ -133,7 +133,7 @@ namespace Games.Controllers
             descriptor.UpdatedAt = DateTime.UtcNow;
             db.SaveChanges();
 
-            return Ok(descriptor);
+            return descriptor;
         }
 
         private IActionResult Delete<T>(int userId, int id, Func<User, IEnumerable<T>> getter) where T : Descriptor
@@ -150,20 +150,18 @@ namespace Games.Controllers
             return NoContent();
         }
 
-        private IActionResult All<T>(int userId, Expression<Func<User, IEnumerable<T>>> relation) where T : DbModel
+        private List<T> All<T>(int userId, Expression<Func<User, IEnumerable<T>>> relation) where T : DbModel
         {
             var user = db.GetUser(userId);
             user.VerifyExists();
 
-            var list = db.Entry(user)
+            return db.Entry(user)
                 .Collection(relation)
                 .Query()
                 .ToList();
-
-            return Ok(list);
         }
 
-        private IActionResult Single<T>(int userId, int id, Expression<Func<User, IEnumerable<T>>> relation) where T : DbModel
+        private T Single<T>(int userId, int id, Expression<Func<User, IEnumerable<T>>> relation) where T : DbModel
         {
             var user = db.GetUser(userId);
             user.VerifyExists();
@@ -174,7 +172,7 @@ namespace Games.Controllers
                 .SingleOrDefault(it => it.Id == id);
             descriptor.VerifyExists();
 
-            return Ok(descriptor);
+            return descriptor;
         }
     }
 }

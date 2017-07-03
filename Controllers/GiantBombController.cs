@@ -44,7 +44,7 @@ namespace Games.Controllers
         }
 
         [HttpGet("search/{title}")]
-        public async Task<IActionResult> Search(string title)
+        public async Task<List<AssistedSearchResult>> Search(string title)
         {
             apiKey.VerifyExists(NotFoundMessage);
 
@@ -55,23 +55,22 @@ namespace Games.Controllers
                 { "limit", "20" }
             });
             var json = await httpClient.GetStringAsync(uri);
-            var response = JsonConvert
-                .DeserializeObject<GBResponse<List<GBSearchResult>>>(json, jsonSettings);
+            var response = JsonConvert.DeserializeObject<GBResponse<List<GBSearchResult>>>(json, jsonSettings);
 
             if (!response.IsSuccess)
                 throw new Exception(response.ErrorMessage);
 
-            var results = response.Results
+            return response.Results
                 .Select(it => new AssistedSearchResult
                 {
                     Id = it.Id,
                     Title = it.Name
-                });
-            return Ok(results);
+                })
+                .ToList();
         }
 
         [HttpGet("game/{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<AssistedGameResult> Get(int id)
         {
             apiKey.VerifyExists(NotFoundMessage);
 
@@ -81,8 +80,7 @@ namespace Games.Controllers
                 { "field_list", "name,original_release_date,genres,platforms,image,developers,publishers" }
             });
             var json = await httpClient.GetStringAsync(uri);
-            var response = JsonConvert
-                .DeserializeObject<GBResponse<GBGame>>(json, jsonSettings);
+            var response = JsonConvert.DeserializeObject<GBResponse<GBGame>>(json, jsonSettings);
 
             if (!response.IsSuccess)
                 throw new Exception(response.ErrorMessage);
@@ -109,9 +107,7 @@ namespace Games.Controllers
             if (gb.Genres != null)
             {
                 result.GenreIds = user.Genres
-                    .Where(it => gb.Genres.Exists(gbGenre =>
-                        MatchesDescriptor(gbGenre, it)
-                    ))
+                    .Where(it => gb.Genres.Any(gbGenre => MatchesDescriptor(gbGenre, it)))
                     .Select(it => it.Id)
                     .ToList();
             }
@@ -119,9 +115,7 @@ namespace Games.Controllers
             if (gb.Platforms != null)
             {
                 result.PlatformIds = user.Platforms
-                    .Where(it => gb.Platforms.Exists(gbPlatform =>
-                        MatchesDescriptor(gbPlatform, it)
-                    ))
+                    .Where(it => gb.Platforms.Any(gbPlatform => MatchesDescriptor(gbPlatform, it)))
                     .Select(it => it.Id)
                     .ToList();
             }
@@ -131,7 +125,7 @@ namespace Games.Controllers
             if (result.PlatformIds.Count > 1)
                 result.PlatformIds.Clear();
 
-            return Ok(result);
+            return result;
         }
 
         private bool MatchesDescriptor(GBDescriptor gb, Descriptor d)

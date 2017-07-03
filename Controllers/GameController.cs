@@ -29,19 +29,18 @@ namespace Games.Controllers
         }
 
         [HttpGet("games")]
-        public IActionResult GetGames(int userId)
+        public List<GameViewModel> GetGames(int userId)
         {
             var user = db.GetUser(userId);
             user.VerifyExists();
 
-            var games = GetGameQuery(user)
-                .Select(MakeViewModel)
+            return GetGameQuery(user)
+                .Select(ViewModelFactory.MakeGameViewModel)
                 .ToList();
-            return Ok(games);
         }
 
         [HttpGet("games/{id}")]
-        public IActionResult GetGame(int userId, int id)
+        public GameViewModel GetGame(int userId, int id)
         {
             var user = db.GetUser(userId);
             user.VerifyExists();
@@ -49,11 +48,11 @@ namespace Games.Controllers
             var game = GetGame(user, id);
             game.VerifyExists();
 
-            return Ok(MakeViewModel(game));
+            return ViewModelFactory.MakeGameViewModel(game);
         }
 
         [HttpGet("suggestions")]
-        public IActionResult GetSuggestions(int userId)
+        public List<Suggestion> GetSuggestions(int userId)
         {
             var user = db.GetUser(userId);
             user.VerifyExists();
@@ -81,7 +80,7 @@ namespace Games.Controllers
                 .ToDictionary(it => it.Key, it => it.Count());
 
             var random = new Random();
-            var suggestions = applicableGames
+            return applicableGames
                 .Select(game =>
                 {
                     var score = 0;
@@ -92,9 +91,7 @@ namespace Games.Controllers
                         var id = genre.GenreId;
 
                         if (topGenres.ContainsKey(id))
-                        {
                             score += topGenres[id];
-                        }
                     }
 
                     // how similar is the title on average to top 10
@@ -110,9 +107,7 @@ namespace Games.Controllers
 
                     // 30% chance of getting score boosted by 33%
                     if (random.Next(10) > 7)
-                    {
                         score += score / 3;
-                    }
 
                     return new Suggestion
                     {
@@ -121,13 +116,12 @@ namespace Games.Controllers
                     };
                 })
                 .OrderByDescending(it => it.Score)
-                .Take(5);
-
-            return Ok(suggestions);
+                .Take(5)
+                .ToList();
         }
 
         [HttpPost("games"), Authorize]
-        public IActionResult AddGame(int userId, [FromBody] GameViewModel vm)
+        public GameViewModel AddGame(int userId, [FromBody] GameViewModel vm)
         {
             var user = db.GetUser(userId);
             auth.VerifyCurrentUser(user, HttpContext);
@@ -151,19 +145,19 @@ namespace Games.Controllers
             };
 
             game.User = user;
-            game.GameGenres = MakeGameGenres(game, vm.GenreIds, user.Genres);
-            game.GamePlatforms = MakeGamePlatforms(game, vm.GenreIds, user.Platforms);
-            game.GameTags = MakeGameTags(game, vm.GenreIds, user.Tags);
+            game.GameGenres = ViewModelFactory.MakeGameGenres(game, vm.GenreIds, user.Genres);
+            game.GamePlatforms = ViewModelFactory.MakeGamePlatforms(game, vm.GenreIds, user.Platforms);
+            game.GameTags = ViewModelFactory.MakeGameTags(game, vm.GenreIds, user.Tags);
             game.CreatedAt = DateTime.UtcNow;
             game.UpdatedAt = DateTime.UtcNow;
 
             db.Games.Add(game);
             db.SaveChanges();
-            return Ok(MakeViewModel(game));
+            return ViewModelFactory.MakeGameViewModel(game);
         }
 
         [HttpPut("games/{id}"), Authorize]
-        public IActionResult UpdateGame(int userId, int id, [FromBody] GameViewModel vm)
+        public GameViewModel UpdateGame(int userId, int id, [FromBody] GameViewModel vm)
         {
             var user = db.GetUser(userId);
             auth.VerifyCurrentUser(user, HttpContext);
@@ -185,13 +179,13 @@ namespace Games.Controllers
             game.Hidden = vm.Hidden;
             game.WishlistPosition = vm.WishlistPosition;
 
-            game.GameGenres = MakeGameGenres(game, vm.GenreIds, user.Genres);
-            game.GamePlatforms = MakeGamePlatforms(game, vm.PlatformIds, user.Platforms);
-            game.GameTags = MakeGameTags(game, vm.TagIds, user.Tags);
+            game.GameGenres = ViewModelFactory.MakeGameGenres(game, vm.GenreIds, user.Genres);
+            game.GamePlatforms = ViewModelFactory.MakeGamePlatforms(game, vm.PlatformIds, user.Platforms);
+            game.GameTags = ViewModelFactory.MakeGameTags(game, vm.TagIds, user.Tags);
             game.UpdatedAt = DateTime.UtcNow;
 
             db.SaveChanges();
-            return Ok(MakeViewModel(game));
+            return ViewModelFactory.MakeGameViewModel(game);
         }
 
         [HttpDelete("games/{id}"), Authorize]
@@ -227,67 +221,9 @@ namespace Games.Controllers
                 .Include(g => g.GameTags);
 
             if (!auth.IsCurrentUser(user, HttpContext))
-            {
                 query = query.Where(g => !g.Hidden);
-            }
 
             return query;
-        }
-
-        private static GameViewModel MakeViewModel(Game game)
-        {
-            return new GameViewModel
-            {
-                Id = game.Id,
-                Title = game.Title,
-                Developer = game.Developer,
-                Publisher = game.Publisher,
-                Year = game.Year,
-                Image = game.Image,
-                Finished = (int)game.Finished,
-                Comment = game.Comment,
-                SortAs = game.SortAs,
-                Playtime = game.Playtime,
-                Rating = game.Rating,
-                CurrentlyPlaying = game.CurrentlyPlaying,
-                QueuePosition = game.QueuePosition,
-                Hidden = game.Hidden,
-                WishlistPosition = game.WishlistPosition,
-                UserId = game.UserId,
-                GenreIds = game.GameGenres.Select(g => g.GenreId).ToList(),
-                PlatformIds = game.GamePlatforms.Select(p => p.PlatformId).ToList(),
-                TagIds = game.GameTags.Select(t => t.TagId).ToList()
-            };
-        }
-
-        private static List<GameGenre> MakeGameGenres(Game game, List<int> ids, List<Genre> allGenres)
-        {
-            return allGenres
-                .Where(it => ids.Contains(it.Id))
-                .Select(it =>
-                    game.GameGenres?.FirstOrDefault(gg => gg.GenreId == it.Id)
-                    ?? new GameGenre { Game = game, Genre = it })
-                .ToList();
-        }
-
-        private static List<GamePlatform> MakeGamePlatforms(Game game, List<int> ids, List<Platform> allPlatforms)
-        {
-            return allPlatforms
-                .Where(it => ids.Contains(it.Id))
-                .Select(it =>
-                    game.GamePlatforms?.FirstOrDefault(gp => gp.PlatformId == it.Id)
-                    ?? new GamePlatform { Game = game, Platform = it })
-                .ToList();
-        }
-
-        private static List<GameTag> MakeGameTags(Game game, List<int> ids, List<Tag> allTags)
-        {
-            return allTags
-                .Where(it => ids.Contains(it.Id))
-                .Select(it =>
-                    game.GameTags?.FirstOrDefault(gt => gt.TagId == it.Id)
-                    ?? new GameTag { Game = game, Tag = it })
-                .ToList();
         }
     }
 }

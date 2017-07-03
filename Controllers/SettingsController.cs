@@ -23,29 +23,28 @@ namespace Games.Controllers
         }
 
         [HttpGet("config")]
-        public IActionResult GetConfig()
+        public Config GetConfig()
         {
             var config = db.Configs
                 .Include(c => c.DefaultUser)
                 .SingleOrDefault();
             config.VerifyExists();
-            return Ok(config);
+            return config;
         }
 
         [HttpGet("settings"), Authorize]
-        public IActionResult GetSettings()
+        public AuthorizedSettings GetSettings()
         {
             var config = db.Configs.SingleOrDefault();
-            var settings = new AuthorizedSettings
+            return new AuthorizedSettings
             {
                 DefaultUserId = config.DefaultUserId,
                 GiantBombApiKey = config.GiantBombApiKey
             };
-            return Ok(settings);
         }
 
         [HttpPut("settings"), Authorize]
-        public IActionResult UpdateSettings([FromBody] AuthorizedSettingsInput settings)
+        public AuthorizedSettings UpdateSettings([FromBody] AuthorizedSettingsInput settings)
         {
             var user = auth.GetCurrentUser(HttpContext);
             var hash = auth.HashPassword(settings.OldPassword);

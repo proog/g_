@@ -22,15 +22,15 @@ namespace Games.Controllers
         }
 
         [HttpGet("login"), Authorize]
-        public IActionResult GetCurrentUser()
+        public User GetCurrentUser()
         {
             var user = auth.GetCurrentUser(HttpContext);
             user.VerifyExists();
-            return Ok(user);
+            return user;
         }
 
         [HttpPost("token")]
-        public IActionResult Token([FromForm] OAuthCredentials cred)
+        public OAuthResponse Token([FromForm] OAuthCredentials cred)
         {
             var hash = auth.HashPassword(cred.Password);
             var user = db.Users.SingleOrDefault(
@@ -42,11 +42,11 @@ namespace Games.Controllers
 
             var jwt = auth.Authenticate(user);
 
-            return Ok(new OAuthResponse
+            return new OAuthResponse
             {
                 AccessToken = jwt,
                 TokenType = "Bearer"
-            });
+            };
         }
     }
 }

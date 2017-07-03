@@ -19,7 +19,7 @@ namespace Games.Controllers
         }
 
         [HttpGet]
-        public IActionResult Show()
+        public ViewResult Show()
         {
             return Render(new SetupViewModel
             {
@@ -28,7 +28,7 @@ namespace Games.Controllers
         }
 
         [HttpPost]
-        public IActionResult Do([FromForm] SetupViewModel vm)
+        public ViewResult Do([FromForm] SetupViewModel vm)
         {
             if (db.IsConfigured)
             {
@@ -65,7 +65,7 @@ namespace Games.Controllers
             return Render(vm);
         }
 
-        private IActionResult Render(SetupViewModel vm)
+        private ViewResult Render(SetupViewModel vm)
         {
             return View("~/Views/Setup.cshtml", vm);
         }

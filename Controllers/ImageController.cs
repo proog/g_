@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Games.Infrastructure;
+using Games.Models.ViewModels;
 using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +30,7 @@ namespace Games.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadImage(int userId, int id)
+        public async Task<GameViewModel> UploadImage(int userId, int id)
         {
             var user = db.GetUser(userId);
             auth.VerifyCurrentUser(user, HttpContext);
@@ -83,7 +84,7 @@ namespace Games.Controllers
 
             game.Image = path;
             db.SaveChanges();
-            return Ok(game);
+            return ViewModelFactory.MakeGameViewModel(game);
         }
 
         [HttpDelete]
