@@ -1,15 +1,15 @@
 using Newtonsoft.Json;
 
-namespace Games.Models
+namespace Games.Models.ViewModels
 {
-    public abstract class Descriptor : DbModel
+    public class DescriptorViewModel
     {
+        public int Id { get; set; }
+
         public string Name { get; set; }
 
         public string ShortName { get; set; }
 
         public int UserId { get; set; }
-
-        public User User { get; set; }
     }
 }

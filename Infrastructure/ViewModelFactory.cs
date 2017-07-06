@@ -52,6 +52,17 @@ namespace Games.Infrastructure
             };
         }
 
+        public static DescriptorViewModel MakeDescriptorViewModel(Descriptor descriptor)
+        {
+            return new DescriptorViewModel
+            {
+                Id = descriptor.Id,
+                UserId = descriptor.UserId,
+                Name = descriptor.Name,
+                ShortName = descriptor.ShortName
+            };
+        }
+
         public static List<GameGenre> MakeGameGenres(Game game, List<int> ids, List<Genre> allGenres)
         {
             return allGenres

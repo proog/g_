@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Models;
+using Games.Models.ViewModels;
 using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,65 +26,65 @@ namespace Games.Controllers
         }
 
         [HttpGet("genres")]
-        public List<Genre> GetGenres(int userId)
+        public List<DescriptorViewModel> GetGenres(int userId)
         {
             return All(userId, u => u.Genres);
         }
         [HttpGet("platforms")]
-        public List<Platform> GetPlatforms(int userId)
+        public List<DescriptorViewModel> GetPlatforms(int userId)
         {
             return All(userId, u => u.Platforms);
         }
         [HttpGet("tags")]
-        public List<Tag> GetTags(int userId)
+        public List<DescriptorViewModel> GetTags(int userId)
         {
             return All(userId, u => u.Tags);
         }
 
         [HttpGet("genres/{id}")]
-        public Genre GetGenre(int userId, int id)
+        public DescriptorViewModel GetGenre(int userId, int id)
         {
             return Single(userId, id, u => u.Genres);
         }
         [HttpGet("platforms/{id}")]
-        public Platform GetPlatform(int userId, int id)
+        public DescriptorViewModel GetPlatform(int userId, int id)
         {
             return Single(userId, id, u => u.Platforms);
         }
         [HttpGet("tags/{id}")]
-        public Tag GetTag(int userId, int id)
+        public DescriptorViewModel GetTag(int userId, int id)
         {
             return Single(userId, id, u => u.Tags);
         }
 
         [HttpPost("genres"), Authorize]
-        public Genre AddGenre(int userId, [FromBody] Genre rendition)
+        public DescriptorViewModel AddGenre(int userId, [FromBody] DescriptorViewModel rendition)
         {
             return Add(userId, rendition, () => db.Genres);
         }
         [HttpPost("platforms"), Authorize]
-        public Platform AddPlatform(int userId, [FromBody] Platform rendition)
+        public DescriptorViewModel AddPlatform(int userId, [FromBody] DescriptorViewModel rendition)
         {
             return Add(userId, rendition, () => db.Platforms);
         }
         [HttpPost("tags"), Authorize]
-        public Tag AddTag(int userId, [FromBody] Tag rendition)
+        public DescriptorViewModel AddTag(int userId, [FromBody] DescriptorViewModel rendition)
         {
             return Add(userId, rendition, () => db.Tags);
         }
 
         [HttpPut("genres/{id}"), Authorize]
-        public Genre UpdateGenre(int userId, int id, [FromBody] Genre rendition)
+        public DescriptorViewModel UpdateGenre(int userId, int id, [FromBody] DescriptorViewModel rendition)
         {
             return Update(userId, id, rendition, u => u.Genres);
         }
         [HttpPut("platforms/{id}"), Authorize]
-        public Platform UpdatePlatform(int userId, int id, [FromBody] Platform rendition)
+        public DescriptorViewModel UpdatePlatform(int userId, int id, [FromBody] DescriptorViewModel rendition)
         {
             return Update(userId, id, rendition, u => u.Platforms);
         }
         [HttpPut("tags/{id}"), Authorize]
-        public Tag UpdateTag(int userId, int id, [FromBody] Tag rendition)
+        public DescriptorViewModel UpdateTag(int userId, int id, [FromBody] DescriptorViewModel rendition)
         {
             return Update(userId, id, rendition, u => u.Tags);
         }
@@ -104,22 +105,26 @@ namespace Games.Controllers
             return Delete(userId, id, u => u.Tags);
         }
 
-        private T Add<T>(int userId, T descriptor, Func<DbSet<T>> getter) where T : Descriptor
+        private DescriptorViewModel Add<T>(int userId, DescriptorViewModel vm, Func<DbSet<T>> getter) where T : Descriptor, new()
         {
             var user = db.GetUser(userId);
             auth.VerifyCurrentUser(user, HttpContext);
 
-            descriptor.Id = 0;
-            descriptor.User = user;
-            descriptor.CreatedAt = DateTime.UtcNow;
-            descriptor.UpdatedAt = DateTime.UtcNow;
+            var descriptor = new T
+            {
+                Name = vm.Name,
+                ShortName = vm.ShortName,
+                User = user,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
             getter().Add(descriptor);
             db.SaveChanges();
 
-            return descriptor;
+            return ViewModelFactory.MakeDescriptorViewModel(descriptor);
         }
 
-        private T Update<T>(int userId, int id, T update, Func<User, IEnumerable<T>> getter) where T : Descriptor
+        private DescriptorViewModel Update<T>(int userId, int id, DescriptorViewModel vm, Func<User, IEnumerable<T>> getter) where T : Descriptor
         {
             var user = db.GetUser(userId);
             auth.VerifyCurrentUser(user, HttpContext);
@@ -128,12 +133,12 @@ namespace Games.Controllers
                 .SingleOrDefault(it => it.Id == id);
             descriptor.VerifyExists();
 
-            descriptor.Name = update.Name;
-            descriptor.ShortName = update.ShortName;
+            descriptor.Name = vm.Name;
+            descriptor.ShortName = vm.ShortName;
             descriptor.UpdatedAt = DateTime.UtcNow;
             db.SaveChanges();
 
-            return descriptor;
+            return ViewModelFactory.MakeDescriptorViewModel(descriptor);
         }
 
         private IActionResult Delete<T>(int userId, int id, Func<User, IEnumerable<T>> getter) where T : Descriptor
@@ -150,7 +155,7 @@ namespace Games.Controllers
             return NoContent();
         }
 
-        private List<T> All<T>(int userId, Expression<Func<User, IEnumerable<T>>> relation) where T : DbModel
+        private List<DescriptorViewModel> All<T>(int userId, Expression<Func<User, IEnumerable<T>>> relation) where T : Descriptor
         {
             var user = db.GetUser(userId);
             user.VerifyExists();
@@ -158,10 +163,11 @@ namespace Games.Controllers
             return db.Entry(user)
                 .Collection(relation)
                 .Query()
+                .Select(ViewModelFactory.MakeDescriptorViewModel)
                 .ToList();
         }
 
-        private T Single<T>(int userId, int id, Expression<Func<User, IEnumerable<T>>> relation) where T : DbModel
+        private DescriptorViewModel Single<T>(int userId, int id, Expression<Func<User, IEnumerable<T>>> relation) where T : Descriptor
         {
             var user = db.GetUser(userId);
             user.VerifyExists();
@@ -172,7 +178,7 @@ namespace Games.Controllers
                 .SingleOrDefault(it => it.Id == id);
             descriptor.VerifyExists();
 
-            return descriptor;
+            return ViewModelFactory.MakeDescriptorViewModel(descriptor);
         }
     }
 }
