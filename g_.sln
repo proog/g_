@@ -1,7 +1,7 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "g_", "g_.csproj", "{D984A021-75E8-455F-9A20-0EB324BAF8C4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "g_", "src/g_.csproj", "{D984A021-75E8-455F-9A20-0EB324BAF8C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
