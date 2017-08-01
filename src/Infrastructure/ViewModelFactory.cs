@@ -27,9 +27,9 @@ namespace Games.Infrastructure
                 Hidden = game.Hidden,
                 WishlistPosition = game.WishlistPosition,
                 UserId = game.UserId,
-                GenreIds = game.GameGenres.Select(g => g.GenreId).ToList(),
-                PlatformIds = game.GamePlatforms.Select(p => p.PlatformId).ToList(),
-                TagIds = game.GameTags.Select(t => t.TagId).ToList()
+                GenreIds = game.GameGenres?.Select(g => g.GenreId).ToList() ?? new List<int>(),
+                PlatformIds = game.GamePlatforms?.Select(p => p.PlatformId).ToList() ?? new List<int>(),
+                TagIds = game.GameTags?.Select(t => t.TagId).ToList() ?? new List<int>()
             };
         }
 
