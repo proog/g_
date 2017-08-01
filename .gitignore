@@ -1,7 +1,7 @@
 src/public/vendor
 src/public/g.min.js
 src/public/g.min.js.map
-src/data
+data
 appsettings.*.json
 bin
 obj
