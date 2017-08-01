@@ -146,8 +146,8 @@ namespace Games.Controllers
 
             game.User = user;
             game.GameGenres = ViewModelFactory.MakeGameGenres(game, vm.GenreIds, user.Genres);
-            game.GamePlatforms = ViewModelFactory.MakeGamePlatforms(game, vm.GenreIds, user.Platforms);
-            game.GameTags = ViewModelFactory.MakeGameTags(game, vm.GenreIds, user.Tags);
+            game.GamePlatforms = ViewModelFactory.MakeGamePlatforms(game, vm.PlatformIds, user.Platforms);
+            game.GameTags = ViewModelFactory.MakeGameTags(game, vm.TagIds, user.Tags);
             game.CreatedAt = DateTime.UtcNow;
             game.UpdatedAt = DateTime.UtcNow;
 
