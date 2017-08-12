@@ -31,6 +31,8 @@ Vue.component('game-item', {
     edit: function () {
       this.isEditing = true
       this.edited = _.cloneDeep(this.game)
+      this.imageFile = null
+      this.imageRemoved = false
     },
     save: function () {
       if (this.isNew) {
