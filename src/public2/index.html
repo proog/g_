@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/vue/2.3.2/vue.js"></script>
+  <title>g_</title>
+  <style>
+    body {
+      padding: 20px;
+    }
+    .cover {
+      height: 200px;
+      text-align: center;
+    }
+    .cover img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="app">
+    <div class="row">
+      <div class="col-xs-4">
+        <h4 v-if="selectedUser">{{ selectedUser.username }}'s games</h4>
+      </div>
+      <div class="col-xs-4">
+        <button type="button"
+                class="btn btn-primary"
+                :disabled="!!newGame"
+                @click="addGame"
+                v-if="canEdit">
+          Add
+        </button>
+        <button type="button"
+                class="btn btn-default"
+                :disabled="!!isSettingsOpen"
+                @click="openSettings"
+                v-if="canEdit">
+          Settings
+        </button>
+      </div>
+      <div class="col-xs-4">
+        <div class="inline-form">
+          <input type="search"
+                 class="form-control"
+                 placeholder="Search"
+                 v-model="search">
+        </div>
+      </div>
+    </div>
+    <div class="row" v-if="isSettingsOpen">
+      <div class="col-xs-12">
+        <h2>Settings</h2>
+        <system-settings :genres="genres"
+                         :platforms="platforms"
+                         :tags="tags"
+                         @remove-genre="genreRemoved"
+                         @remove-platform="platformRemoved"
+                         @remove-tag="tagRemoved"
+                         @close="closeSettings">
+        </system-settings>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <game-item v-if="!!newGame"
+                   :game="newGame"
+                   :all-genres="genres"
+                   :all-platforms="platforms"
+                   :all-tags="tags"
+                   :is-editable="canEdit"
+                   :is-new="true"
+                   @save="gameSaved"
+                   @cancel="newGameCancelled">
+        </game-item>
+        <hr v-if="!!newGame">
+        <game-item v-for="game in filteredGames"
+                   :key="game.id"
+                   :game="game"
+                   :all-genres="genres"
+                   :all-platforms="platforms"
+                   :all-tags="tags"
+                   :is-editable="canEdit"
+                   :is-new="false"
+                   @save="gameSaved"
+                   @remove="gameRemoved">
+        </game-item>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/x-template" id="game-item-template">
+    <div class="panel panel-default">
+      <div class="row panel-body">
+        <div class="col-xs-4">
+          <div class="cover">
+            <img :src="game.image" class="img-rounded" v-if="game.image">
+            <h4 v-else>No image</h4>
+          </div>
+          <form ref="imageForm" @submit.prevent @keyup.esc="cancel" v-if="isEditing">
+            <input type="file" @change="updateImage"><br>
+            <button type="button"
+                    class="btn btn-danger"
+                    @click="removeImage"
+                    v-if="(edited.image || imageFile) && !imageRemoved">
+              Delete
+            </button>
+          </form>
+        </div>
+        <div class="col-xs-8">
+          <form class="form-horizontal" @submit.prevent="save" @keyup.esc="cancel" v-if="isEditing">
+            <div class="form-group">
+              <div class="col-xs-8">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Title"
+                       required
+                       v-model="edited.title"
+                       v-focus>
+              </div>
+              <div class="col-xs-4">
+                <input type="number"
+                       class="form-control"
+                       placeholder="Release year"
+                       required
+                       v-model.number="edited.year">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-xs-8">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Sort as"
+                       v-model="edited.sort_as">
+              </div>
+              <div class="col-xs-4">
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" v-model="edited.currently_playing">
+                    Playing
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-xs-6">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Developer"
+                       v-model="edited.developer">
+              </div>
+              <div class="col-xs-6">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Publisher"
+                       v-model="edited.publisher">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-xs-6">
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" v-model="edited.finished">
+                    Finished
+                  </label>
+                </div>
+              </div>
+              <div class="col-xs-6">
+                <input type="text"
+                       class="form-control"
+                       placeholder="--:--:-- (playtime)"
+                       v-model="edited.playtime">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-xs-4">
+                <h5>Platforms</h5>
+                <descriptor-list :items="allPlatforms" v-model="edited.platform_ids"></descriptor-list>
+              </div>
+              <div class="col-xs-4">
+                <h5>Genres</h5>
+                <descriptor-list :items="allGenres" v-model="edited.genre_ids"></descriptor-list>
+              </div>
+              <div class="col-xs-4">
+                <h5>Tags</h5>
+                <descriptor-list :items="allTags" v-model="edited.tag_ids"></descriptor-list>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              Save
+            </button>
+            <button type="button" class="btn btn-danger" @click="remove" v-if="!isNew">
+              Delete
+            </button>
+            <button type="button" class="btn btn-default" @click="cancel">
+              Cancel
+            </button>
+          </form>
+          <div v-else>
+            <h4>
+              <span class="glyphicon glyphicon-play-circle" v-if="game.currently_playing"></span>
+              {{ game.title }}
+              <small v-if="game.year">({{ game.year }})</small>
+            </h4>
+            <p>
+              {{ game.developer }}
+              <span v-if="game.developer && game.publisher"> / </span>
+              {{ game.publisher }}
+            </p>
+            <p>
+              <span class="glyphicon glyphicon-check" v-if="game.finished === 1"></span>
+              <span class="glyphicon glyphicon-unchecked" v-else></span>
+              <span v-if="game.playtime">{{ game.playtime }}</span>
+              <span v-else>--:--:--</span>
+            </p>
+            <p>
+              <span class="glyphicon glyphicon-hdd"></span> {{ platforms }}
+            </p>
+            <p>
+              <span class="glyphicon glyphicon-knight"></span> {{ genres }}
+            </p>
+            <p>
+              <span class="glyphicon glyphicon-tag"></span> {{ tags }}
+            </p>
+            <div v-if="isEditable">
+              <button type="button" class="btn btn-default" @click="edit">
+                Edit
+              </button>
+              <button type="button" class="btn btn-danger" @click="remove">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/x-template" id="descriptor-list-template">
+    <div>
+      <div class="checkbox" v-for="item in items">
+        <label>
+          <input type="checkbox" v-model="cloned" :value="item.id" @change="update">
+          {{ item.name }}
+        </label>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/x-template" id="system-settings-template">
+    <div>
+      <div class="row">
+        <div class="col-xs-4">
+          <descriptors-editor :items="genres"
+                              @remove="removeGenre">
+          </descriptors-editor>
+        </div>
+        <div class="col-xs-4">
+          <descriptors-editor :items="platforms"
+                              @remove="removePlatform">
+          </descriptors-editor>
+        </div>
+        <div class="col-xs-4">
+          <descriptors-editor :items="tags"
+                              @remove="removeTag">
+          </descriptors-editor>
+        </div>
+      </div>
+      <button type="button" class="btn btn-default" @click="close">
+        Close
+      </button>
+    </div>
+  </script>
+
+  <script type="text/x-template" id="descriptors-editor-template">
+    <ul class="list-unstyled">
+      <li v-for="item in items">
+        <a href="" @click.prevent="remove(item)">
+          <span class="glyphicon glyphicon-remove"></span>
+        </a>
+        {{ item.name }} ({{ item.short_name }})
+      </li>
+    </ul>
+  </script>
+
+  <script src="api.js"></script>
+  <script src="focus.js"></script>
+  <script src="descriptor-list.js"></script>
+  <script src="game-item.js"></script>
+  <script src="descriptors-editor.js"></script>
+  <script src="system-settings.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

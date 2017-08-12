@@ -13,7 +13,7 @@ namespace Games
         public static IWebHost BuildWebHost(string[] args)
         {
             return WebHost.CreateDefaultBuilder(args)
-                .UseWebRoot("public")
+                .UseWebRoot("public2")
                 .UseStartup<Startup>()
                 .Build();
         }
