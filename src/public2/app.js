@@ -42,11 +42,15 @@ let app = new Vue({
       this.newGame = null
     },
     gameSaved: function (original, edited) {
-      _.assign(original, edited)
+      let updated = _.assign({}, original, edited)
 
       if (original === this.newGame) {
         this.newGame = null
-        this.games.push(original)
+        this.games.push(updated)
+      }
+      else {
+        let index = _.indexOf(this.games, original)
+        Vue.set(this.games, index, updated)
       }
     },
     gameRemoved: function (game) {
