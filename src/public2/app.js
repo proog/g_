@@ -15,13 +15,13 @@ let app = new Vue({
   },
   computed: {
     sortedGenres() {
-      return _.orderBy(this.genres, x => x.name)
+      return _.orderBy(this.genres, x => _.toLower(x.name))
     },
     sortedPlatforms() {
-      return _.orderBy(this.platforms, x => x.name)
+      return _.orderBy(this.platforms, x => _.toLower(x.name))
     },
     sortedTags() {
-      return _.orderBy(this.tags, x => x.name)
+      return _.orderBy(this.tags, x => _.toLower(x.name))
     },
     filteredGames() {
       return filterGames(
