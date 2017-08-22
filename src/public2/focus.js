@@ -1,5 +1,5 @@
 Vue.directive('focus', {
-  inserted: function (el) {
+  inserted(el) {
     el.focus()
   }
 })

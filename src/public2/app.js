@@ -14,16 +14,16 @@ let app = new Vue({
     isSettingsOpen: false
   },
   computed: {
-    sortedGenres: function () {
+    sortedGenres() {
       return _.orderBy(this.genres, x => x.name)
     },
-    sortedPlatforms: function () {
+    sortedPlatforms() {
       return _.orderBy(this.platforms, x => x.name)
     },
-    sortedTags: function () {
+    sortedTags() {
       return _.orderBy(this.tags, x => x.name)
     },
-    filteredGames: function () {
+    filteredGames() {
       return filterGames(
         this.games,
         this.genres,
@@ -32,14 +32,14 @@ let app = new Vue({
         this.search
       )
     },
-    canEdit: function () {
+    canEdit() {
       return this.currentUser
         && this.selectedUser
         && this.currentUser.id === this.selectedUser.id
     }
   },
   methods: {
-    addGame: function () {
+    addGame() {
       this.newGame = {
         finished: 0,
         platform_ids: [],
@@ -47,10 +47,10 @@ let app = new Vue({
         tag_ids: []
       }
     },
-    newGameCancelled: function (game) {
+    newGameCancelled(game) {
       this.newGame = null
     },
-    gameSaved: function (original, edited) {
+    gameSaved(original, edited) {
       let updated = _.assign({}, original, edited)
 
       if (original === this.newGame) {
@@ -62,19 +62,19 @@ let app = new Vue({
         Vue.set(this.games, index, updated)
       }
     },
-    gameRemoved: function (game) {
+    gameRemoved(game) {
       this.games = _.without(this.games, game)
     },
-    imageSaved: function (game, url) {
+    imageSaved(game, url) {
       game.image = url
     },
-    imageRemoved: function (game) {
+    imageRemoved(game) {
       game.image = null
     },
-    openSettings: function () {
+    openSettings() {
       this.isSettingsOpen = true
     },
-    settingsSaved: function (genres, platforms, tags) {
+    settingsSaved(genres, platforms, tags) {
       this.isSettingsOpen = false
       this.genres = genres
       this.platforms = platforms
@@ -86,11 +86,11 @@ let app = new Vue({
         game.tag_ids = pruneGameDescriptors(game.tag_ids, tags)
       }
     },
-    settingsCancelled: function () {
+    settingsCancelled() {
       this.isSettingsOpen = false
     }
   },
-  mounted: function () {
+  mounted() {
     this.currentUser = { id: 1 }
 
     getUsers()

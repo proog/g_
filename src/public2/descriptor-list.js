@@ -4,11 +4,11 @@ Vue.component('descriptor-list', {
     value: Array,
     items: Array
   },
-  data: function () {
+  data() {
     return { cloned: _.clone(this.value) }
   },
   methods: {
-    update: function () {
+    update() {
       this.$emit('input', this.cloned)
     }
   }

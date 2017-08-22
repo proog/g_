@@ -8,7 +8,7 @@ Vue.component('game-item', {
     isEditable: Boolean,
     isNew: Boolean
   },
-  data: function () {
+  data() {
     return {
       isEditing: false,
       edited: null,
@@ -17,24 +17,24 @@ Vue.component('game-item', {
     }
   },
   computed: {
-    genres: function () {
+    genres() {
       return summary(this.allGenres, this.game.genre_ids)
     },
-    platforms: function () {
+    platforms() {
       return summary(this.allPlatforms, this.game.platform_ids)
     },
-    tags: function () {
+    tags() {
       return summary(this.allTags, this.game.tag_ids)
     }
   },
   methods: {
-    edit: function () {
+    edit() {
       this.isEditing = true
       this.edited = _.cloneDeep(this.game)
       this.imageFile = null
       this.imageRemoved = false
     },
-    save: function () {
+    save() {
       if (this.isNew) {
         // POST
         // _.assign(this.edited, created)
@@ -57,7 +57,7 @@ Vue.component('game-item', {
       this.isEditing = false
       this.$emit('save', this.game, this.edited)
     },
-    remove: function () {
+    remove() {
       if (!confirm(`Are you sure you want to delete ${this.game.title}?`))
         return
 
@@ -65,15 +65,15 @@ Vue.component('game-item', {
       this.isEditing = false
       this.$emit('remove', this.game)
     },
-    cancel: function () {
+    cancel() {
       this.isEditing = false
       this.$emit('cancel', this.game)
     },
-    updateImage: function (fileEvent) {
+    updateImage(fileEvent) {
       this.imageRemoved = false
       this.imageFile = _.head(fileEvent.target.files)
     },
-    removeImage: function () {
+    removeImage() {
       // ask for confirmation for existing games (because we can't easily get the image back)
       if (!this.isNew && !confirm('Are you sure you want to delete this image?'))
         return
@@ -85,7 +85,7 @@ Vue.component('game-item', {
       this.$refs.imageForm.reset()
     }
   },
-  mounted: function () {
+  mounted() {
     // if adding a new game, go directly to edit mode
     if (this.isNew)
       this.edit()
