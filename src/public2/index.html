@@ -51,24 +51,22 @@
     </nav>
     <div class="container-fluid">
       <div class="row" v-if="isSettingsOpen">
-        <div class="col">
+        <div class="col pb-3 px-2">
           <h2>Settings</h2>
-          <system-settings :genres="genres"
-                          :platforms="platforms"
-                          :tags="tags"
-                          @remove-genre="genreRemoved"
-                          @remove-platform="platformRemoved"
-                          @remove-tag="tagRemoved"
-                          @close="closeSettings">
+          <system-settings :genres="sortedGenres"
+                           :platforms="sortedPlatforms"
+                           :tags="sortedTags"
+                           @save="settingsSaved"
+                           @cancel="settingsCancelled">
           </system-settings>
         </div>
       </div>
       <div class="row" v-if="!!newGame">
         <div class="col col-lg-10 col-xl-8 mx-lg-auto pb-3 px-2">
           <game-item :game="newGame"
-                     :all-genres="genres"
-                     :all-platforms="platforms"
-                     :all-tags="tags"
+                     :all-genres="sortedGenres"
+                     :all-platforms="sortedPlatforms"
+                     :all-tags="sortedTags"
                      :is-editable="canEdit"
                      :is-new="true"
                      @save="gameSaved"
@@ -81,9 +79,9 @@
              v-for="game in filteredGames">
           <game-item :key="game.id"
                      :game="game"
-                     :all-genres="genres"
-                     :all-platforms="platforms"
-                     :all-tags="tags"
+                     :all-genres="sortedGenres"
+                     :all-platforms="sortedPlatforms"
+                     :all-tags="sortedTags"
                      :is-editable="canEdit"
                      :is-new="false"
                      @save="gameSaved"
@@ -262,42 +260,66 @@
   </script>
 
   <script type="text/x-template" id="system-settings-template">
-    <div>
-      <div class="row">
-        <div class="col-4">
-          <h4>Genres</h4>
-          <descriptors-editor :items="genres"
-                              @remove="removeGenre">
-          </descriptors-editor>
+    <form class="card" @submit.prevent="save" @keyup.esc="cancel">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 col-lg-4">
+            <h4>Genres</h4>
+            <descriptors-editor :items="editedGenres"
+                                @add="addGenre"
+                                @remove="removeGenre">
+            </descriptors-editor>
+          </div>
+          <div class="col-12 col-lg-4">
+            <h4>Platforms</h4>
+            <descriptors-editor :items="editedPlatforms"
+                                @add="addPlatform"
+                                @remove="removePlatform">
+            </descriptors-editor>
+          </div>
+          <div class="col-12 col-lg-4">
+            <h4>Tags</h4>
+            <descriptors-editor :items="editedTags"
+                                @add="addTag"
+                                @remove="removeTag">
+            </descriptors-editor>
+          </div>
         </div>
-        <div class="col-4">
-          <h4>Platforms</h4>
-          <descriptors-editor :items="platforms"
-                              @remove="removePlatform">
-          </descriptors-editor>
-        </div>
-        <div class="col-4">
-          <h4>Tags</h4>
-          <descriptors-editor :items="tags"
-                              @remove="removeTag">
-          </descriptors-editor>
+        <div>
+          <button type="submit" class="btn btn-success">
+            Save
+          </button>
+          <button type="button" class="btn btn-outline-secondary" @click="cancel">
+            Cancel
+          </button>
         </div>
       </div>
-      <button type="button" class="btn btn-outline-secondary" @click="close">
-        Close
-      </button>
-    </div>
+    </form>
   </script>
 
   <script type="text/x-template" id="descriptors-editor-template">
-    <ul class="list-unstyled">
-      <li v-for="item in items">
-        <a href="" @click.prevent="remove(item)">
-          <span class="fa fa-times"></span>
-        </a>
-        {{ item.name }} ({{ item.short_name }})
-      </li>
-    </ul>
+    <div>
+      <div class="form-row" v-for="item in items">
+        <div class="col-5 form-group">
+          <input type="text" class="form-control" required v-model="item.name">
+        </div>
+        <div class="col-5 form-group">
+          <input type="text" class="form-control" required v-model="item.short_name">
+        </div>
+        <div class="col-2 form-group">
+          <button type="button" class="btn btn-outline-danger" @click="remove(item)">
+            <i class="fa fa-times"></i>
+          </button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col form-group">
+          <button type="button" class="btn btn-outline-success" @click="add">
+            <i class="fa fa-plus"></i>
+          </button>
+        </div>
+      </div>
+    </div>
   </script>
 
   <script src="api.js"></script>

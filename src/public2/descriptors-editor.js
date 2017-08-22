@@ -4,7 +4,10 @@ Vue.component('descriptors-editor', {
     items: Array
   },
   methods: {
-    remove: function (item) {
+    add() {
+      this.$emit('add')
+    },
+    remove(item) {
       this.$emit('remove', item)
     }
   }

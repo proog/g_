@@ -1,34 +1,71 @@
 function getUsers() {
-  return getJson('/api/users')
+  return get('/api/users')
 }
 
 function getGames(userId) {
-  return getJson(`/api/users/${userId}/games`)
+  return get(`/api/users/${userId}/games`)
 }
 
 function getGenres(userId) {
-  return getJson(`/api/users/${userId}/genres`)
-    .then(genres => _.orderBy(genres, x => x.name))
+  return get(`/api/users/${userId}/genres`)
 }
-
 function getPlatforms(userId) {
-  return getJson(`/api/users/${userId}/platforms`)
-    .then(platforms => _.orderBy(platforms, x => x.name))
+  return get(`/api/users/${userId}/platforms`)
 }
-
 function getTags(userId) {
-  return getJson(`/api/users/${userId}/tags`)
-    .then(tags => _.orderBy(tags, x => x.name))
+  return get(`/api/users/${userId}/tags`)
 }
 
-function getJson(url, accessToken) {
-  let options = {
+function postGenre(userId, genre) {
+  return post(`/api/users/${userId}/genres`, genre)
+}
+function postPlatform(userId, platform) {
+  return post(`/api/users/${userId}/platforms`, platform)
+}
+function postTag(userId, tag) {
+  return post(`/api/users/${userId}/tags`, tag)
+}
+
+function putGenre(userId, genre) {
+  return put(`/api/users/${userId}/genres/${genre.id}`, genre)
+}
+function putPlatform(userId, platform) {
+  return put(`/api/users/${userId}/platforms/${platform.id}`, platform)
+}
+function putTag(userId, tag) {
+  return put(`/api/users/${userId}/tags/${tag.id}`, tag)
+}
+
+function get(url, accessToken) {
+  return send(url, {
     method: 'GET',
     headers: accessToken
       ? { 'Authorization': `Bearer ${accessToken}` }
       : {}
-  }
+  })
+}
 
+function post(url, data, accessToken) {
+  return send(url, {
+    method: 'POST',
+    data: JSON.stringify(data),
+    headers: accessToken
+      ? { 'Authorization': `Bearer ${accessToken}` }
+      : {}
+  })
+}
+
+function put(url, data, accessToken) {
+  return send(url, {
+    method: 'PUT',
+    data: JSON.stringify(data),
+    headers: accessToken
+      ? { 'Authorization': `Bearer ${accessToken}` }
+      : {}
+  })
+}
+
+function send(url, options) {
   return fetch(url, options)
     .then(response => response.json())
 }

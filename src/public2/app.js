@@ -14,6 +14,15 @@ let app = new Vue({
     isSettingsOpen: false
   },
   computed: {
+    sortedGenres: function () {
+      return _.orderBy(this.genres, x => x.name)
+    },
+    sortedPlatforms: function () {
+      return _.orderBy(this.platforms, x => x.name)
+    },
+    sortedTags: function () {
+      return _.orderBy(this.tags, x => x.name)
+    },
     filteredGames: function () {
       return filterGames(
         this.games,
@@ -62,31 +71,22 @@ let app = new Vue({
     imageRemoved: function (game) {
       game.image = null
     },
-    genreRemoved: function (genre) {
-      this.genres = _.without(this.genres, genre)
-
-      for (let game of this.games) {
-        game.genre_ids = _.without(game.genre_ids, genre.id)
-      }
-    },
-    platformRemoved: function (platform) {
-      this.platforms = _.without(this.platforms, platform)
-
-      for (let game of this.games) {
-        game.platform_ids = _.without(game.platform_ids, platform.id)
-      }
-    },
-    tagRemoved: function (tag) {
-      this.tags = _.without(this.tags, tag)
-
-      for (let game of this.games) {
-        game.tag_ids = _.without(game.tag_ids, tag.id)
-      }
-    },
     openSettings: function () {
       this.isSettingsOpen = true
     },
-    closeSettings: function () {
+    settingsSaved: function (genres, platforms, tags) {
+      this.isSettingsOpen = false
+      this.genres = genres
+      this.platforms = platforms
+      this.tags = tags
+
+      for (let game of this.games) {
+        game.genre_ids = pruneGameDescriptors(game.genre_ids, genres)
+        game.platform_ids = pruneGameDescriptors(game.platform_ids, platforms)
+        game.tag_ids = pruneGameDescriptors(game.tag_ids, tags)
+      }
+    },
+    settingsCancelled: function () {
       this.isSettingsOpen = false
     }
   },
@@ -144,4 +144,9 @@ function filterGames(games, genres, platforms, tags, searchQuery) {
 
     return false
   }
+}
+
+function pruneGameDescriptors(ids, descriptors) {
+  let invalidIds = _.difference(ids, _.map(descriptors, x => x.id))
+  return _.without(ids, invalidIds)
 }
