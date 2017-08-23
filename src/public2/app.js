@@ -11,7 +11,8 @@ let app = new Vue({
     newGame: null,
     search: '',
     accessToken: '',
-    isSettingsOpen: false
+    isSettingsOpen: false,
+    isLoginOpen: false
   },
   computed: {
     sortedGenres() {
@@ -32,6 +33,9 @@ let app = new Vue({
         this.search
       )
     },
+    isLoggedIn() {
+      return !!this.currentUser
+    },
     canEdit() {
       return this.currentUser
         && this.selectedUser
@@ -41,6 +45,7 @@ let app = new Vue({
   methods: {
     addGame() {
       this.newGame = {
+        currently_playing: false,
         finished: 0,
         platform_ids: [],
         genre_ids: [],
@@ -86,8 +91,22 @@ let app = new Vue({
         game.tag_ids = pruneGameDescriptors(game.tag_ids, tags)
       }
     },
-    settingsCancelled() {
+    closeSettings() {
       this.isSettingsOpen = false
+    },
+    openLogin() {
+      this.isLoginOpen = true
+    },
+    closeLogin() {
+      this.isLoginOpen = false
+    },
+    loggedIn(userId, accessToken) {
+      this.accessToken = accessToken
+      this.currentUser = _.find(this.users, x => x.id === userId)
+    },
+    logOut() {
+      this.accessToken = ''
+      this.currentUser = null
     }
   },
   mounted() {

@@ -16,6 +16,16 @@ function getTags(userId) {
   return get(`/api/users/${userId}/tags`)
 }
 
+function postGame(userId, game) {
+  return post(`/api/users/${userId}/games`, game)
+}
+function putGame(userId, game) {
+  return put(`/api/users/${userId}/games/${game.id}`, game)
+}
+function deleteGame(userId, game) {
+  return del(`/api/users/${userId}/games/${game.id}`)
+}
+
 function postGenre(userId, genre) {
   return post(`/api/users/${userId}/genres`, genre)
 }
@@ -36,36 +46,48 @@ function putTag(userId, tag) {
   return put(`/api/users/${userId}/tags/${tag.id}`, tag)
 }
 
+function deleteGenre(userId, genre) {
+  return del(`/api/users/${userId}/genres/${genre.id}`)
+}
+function deletePlatform(userId, platform) {
+  return del(`/api/users/${userId}/platforms/${platform.id}`)
+}
+function deleteTag(userId, tag) {
+  return del(`/api/users/${userId}/tags/${tag.id}`)
+}
+
+function getAccessToken(username, password) {
+  let form = new FormData()
+  form.append('grant_type', 'password')
+  form.append('username', username)
+  form.append('password', password)
+
+  return post('/api/login', form)
+}
+
 function get(url, accessToken) {
-  return send(url, {
-    method: 'GET',
-    headers: accessToken
-      ? { 'Authorization': `Bearer ${accessToken}` }
-      : {}
-  })
+  return send(url, 'GET', null, accessToken)
 }
-
 function post(url, data, accessToken) {
-  return send(url, {
-    method: 'POST',
-    data: JSON.stringify(data),
-    headers: accessToken
-      ? { 'Authorization': `Bearer ${accessToken}` }
-      : {}
-  })
+  return send(url, 'POST', JSON.stringify(data), accessToken)
 }
-
 function put(url, data, accessToken) {
-  return send(url, {
-    method: 'PUT',
-    data: JSON.stringify(data),
-    headers: accessToken
-      ? { 'Authorization': `Bearer ${accessToken}` }
-      : {}
-  })
+  return send(url, 'PUT', JSON.stringify(data), accessToken)
+}
+function del(url, accessToken) {
+  return send(url, 'DELETE', null, accessToken)
 }
 
-function send(url, options) {
+function send(url, method, body, accessToken) {
+  let options = {
+    method: method,
+    body: body,
+    headers: new Headers()
+  }
+
+  if (accessToken)
+    options.headers.append('Authorization', `Bearer ${accessToken}`)
+
   return fetch(url, options)
     .then(response => response.json())
 }

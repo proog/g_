@@ -43,6 +43,18 @@
                 v-if="canEdit">
           Settings
         </button>
+        <button type="button"
+                class="btn btn-outline-primary mr-2"
+                @click="logOut"
+                v-if="isLoggedIn">
+          Log out
+        </button>
+        <button type="button"
+                class="btn btn-outline-primary mr-2"
+                @click="openLogin"
+                v-else>
+          Log in
+        </button>
         <input type="search"
                 class="form-control"
                 placeholder="Search"
@@ -57,7 +69,7 @@
                            :platforms="sortedPlatforms"
                            :tags="sortedTags"
                            @save="settingsSaved"
-                           @cancel="settingsCancelled">
+                           @cancel="closeSettings">
           </system-settings>
         </div>
       </div>
@@ -215,8 +227,9 @@
               </h4>
               <p>
                 {{ game.developer }}
-                <span v-if="game.developer && game.publisher"> / </span>
-                {{ game.publisher }}
+                <span v-if="game.publisher && game.publisher !== game.developer">
+                  / {{ game.publisher }}
+                </span>
               </p>
               <p>
                 <i class="fa fa-check-square-o" v-if="game.finished === 1"></i>
@@ -300,10 +313,10 @@
   <script type="text/x-template" id="descriptors-editor-template">
     <div>
       <div class="form-row" v-for="item in items">
-        <div class="col-5 form-group">
+        <div class="col-6 form-group">
           <input type="text" class="form-control" required v-model="item.name">
         </div>
-        <div class="col-5 form-group">
+        <div class="col-4 form-group">
           <input type="text" class="form-control" required v-model="item.short_name">
         </div>
         <div class="col-2 form-group">
