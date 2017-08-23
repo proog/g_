@@ -192,6 +192,14 @@
             </div>
             <div class="form-row">
               <div class="col form-group">
+                <textarea rows="10"
+                          class="form-control"
+                          placeholder="Comment"
+                          v-model="edited.comment"></textarea>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="col form-group">
                 <h5>Platforms</h5>
                 <descriptor-list :items="allPlatforms" v-model="edited.platform_ids"></descriptor-list>
               </div>
@@ -228,7 +236,7 @@
               <p>
                 {{ game.developer }}
                 <span v-if="game.publisher && game.publisher !== game.developer">
-                  / {{ game.publisher }}
+                  <span v-if="game.developer">/</span> {{ game.publisher }}
                 </span>
               </p>
               <p>
@@ -236,6 +244,10 @@
                 <i class="fa fa-square-o" v-else></i>
                 <span v-if="game.playtime">{{ game.playtime }}</span>
                 <span v-else>--:--:--</span>
+                <br>
+                <i class="fa fa-comment"></i>
+                <span v-if="game.comment">{{ game.comment }}</span>
+                <span v-else>-</span>
               </p>
               <p>
                 <i class="fa fa-gamepad"></i> {{ platforms }}<br>
