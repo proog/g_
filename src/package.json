@@ -19,7 +19,10 @@
     "uglify-js": "^3.0.6",
     "watch": "^1.0.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.0"
+  },
   "scripts": {
     "vendor:clean": "rm -rf public/vendor",
     "vendor:copy": "mkdir public/vendor && mkdir public/vendor/js && mkdir public/vendor/css && mkdir public/vendor/fonts && npm run vendor:js && npm run vendor:css && npm run vendor:fonts",
@@ -29,7 +32,8 @@
     "js:uglify": "cd public && uglifyjs js/app.js js/*/*.js -o g.min.js --source-map filename=g.min.js.map",
     "build": "npm run vendor:clean && npm run vendor:copy && npm run js:uglify",
     "watch": "npm run build && watch 'npm run js:uglify' public/js",
-    "postinstall": "npm run build"
+    "postinstall": "npm run build",
+    "bwatch": "babel public2src --watch --out-dir public2/js"
   },
   "author": "Per Mortensen",
   "license": "ISC"
