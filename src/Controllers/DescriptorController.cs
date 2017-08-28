@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Models;
 using Games.Models.ViewModels;
+using Games.Repositories;
 using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,11 +18,13 @@ namespace Games.Controllers
     public class DescriptorController : Controller
     {
         private readonly GamesContext db;
+        private readonly IUserRepository userRepository;
         private readonly IAuthenticationService auth;
 
-        public DescriptorController(GamesContext db, IAuthenticationService auth)
+        public DescriptorController(GamesContext db, IUserRepository userRepository, IAuthenticationService auth)
         {
             this.db = db;
+            this.userRepository = userRepository;
             this.auth = auth;
         }
 
@@ -107,7 +110,7 @@ namespace Games.Controllers
 
         private DescriptorViewModel Add<T>(int userId, DescriptorViewModel vm, Func<DbSet<T>> getter) where T : Descriptor, new()
         {
-            var user = db.GetUser(userId);
+            var user = userRepository.Get(userId);
             auth.VerifyCurrentUser(user, HttpContext);
 
             var descriptor = new T
@@ -126,7 +129,7 @@ namespace Games.Controllers
 
         private DescriptorViewModel Update<T>(int userId, int id, DescriptorViewModel vm, Func<User, IEnumerable<T>> getter) where T : Descriptor
         {
-            var user = db.GetUser(userId);
+            var user = userRepository.Get(userId);
             auth.VerifyCurrentUser(user, HttpContext);
 
             var descriptor = getter(user)
@@ -143,7 +146,7 @@ namespace Games.Controllers
 
         private IActionResult Delete<T>(int userId, int id, Func<User, IEnumerable<T>> getter) where T : Descriptor
         {
-            var user = db.GetUser(userId);
+            var user = userRepository.Get(userId);
             auth.VerifyCurrentUser(user, HttpContext);
 
             var descriptor = getter(user)
@@ -157,7 +160,7 @@ namespace Games.Controllers
 
         private List<DescriptorViewModel> All<T>(int userId, Expression<Func<User, IEnumerable<T>>> relation) where T : Descriptor
         {
-            var user = db.GetUser(userId);
+            var user = userRepository.Get(userId);
             user.VerifyExists();
 
             return db.Entry(user)
@@ -169,7 +172,7 @@ namespace Games.Controllers
 
         private DescriptorViewModel Single<T>(int userId, int id, Expression<Func<User, IEnumerable<T>>> relation) where T : Descriptor
         {
-            var user = db.GetUser(userId);
+            var user = userRepository.Get(userId);
             user.VerifyExists();
 
             var descriptor = db.Entry(user)

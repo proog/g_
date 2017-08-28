@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Models;
+using Games.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -15,15 +16,15 @@ namespace Games.Services
 {
     class AuthenticationService : IAuthenticationService
     {
-        private readonly GamesContext db;
         private readonly string signingKey;
         private const string claimType = "id";
         private const string claimValueType = ClaimValueTypes.Integer;
         private const string authenticationType = "Password";
+        private readonly IUserRepository userRepository;
 
-        public AuthenticationService(GamesContext db, IOptions<AppSettings> appSettings)
+        public AuthenticationService(IUserRepository userRepository, IOptions<AppSettings> appSettings)
         {
-            this.db = db;
+            this.userRepository = userRepository;
             this.signingKey = appSettings.Value.SigningKey;
         }
 
@@ -33,7 +34,7 @@ namespace Games.Services
                 c => c.Type == claimType && c.ValueType == claimValueType
             );
             return idClaim != null
-                ? db.GetUser(int.Parse(idClaim.Value))
+                ? userRepository.Get(int.Parse(idClaim.Value))
                 : null;
         }
 

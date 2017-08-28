@@ -1,0 +1,18 @@
+using System.Collections.Generic;
+using Games.Models;
+
+namespace Games.Repositories
+{
+    public interface IGameRepository
+    {
+        IEnumerable<Game> All(User user);
+
+        Game Get(User user, int id);
+
+        void Add(Game game);
+
+        void Update(Game game);
+
+        void Delete(Game game);
+    }
+}

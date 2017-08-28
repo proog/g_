@@ -23,16 +23,6 @@ namespace Games.Services
 
         public GamesContext(DbContextOptions<GamesContext> options) : base(options) { }
 
-        public User GetUser(int id)
-        {
-            return Users
-                .Include(u => u.Games)
-                .Include(u => u.Genres)
-                .Include(u => u.Platforms)
-                .Include(u => u.Tags)
-                .SingleOrDefault(u => u.Id == id);
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Game>(it =>

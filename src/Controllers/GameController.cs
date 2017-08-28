@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Models;
 using Games.Models.ViewModels;
+using Games.Repositories;
 using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,24 +18,29 @@ namespace Games.Controllers
     [Route("api/users/{userId}")]
     public class GameController : Controller
     {
-        private readonly GamesContext db;
-        private readonly IFileProvider data;
+        private readonly IGameRepository gameRepository;
+        private readonly IUserRepository userRepository;
         private readonly IAuthenticationService auth;
 
-        public GameController(GamesContext db, IFileProvider data, IAuthenticationService auth)
+        public GameController(IGameRepository games, IUserRepository users, IAuthenticationService auth)
         {
-            this.db = db;
-            this.data = data;
+            this.gameRepository = games;
+            this.userRepository = users;
             this.auth = auth;
         }
 
         [HttpGet("games")]
         public List<GameViewModel> GetGames(int userId)
         {
-            var user = db.GetUser(userId);
+            var user = userRepository.Get(userId);
             user.VerifyExists();
 
-            return GetGameQuery(user)
+            var games = gameRepository.All(user);
+
+            if (!auth.IsCurrentUser(user, HttpContext))
+                games = games.Where(game => !game.Hidden);
+
+            return games
                 .Select(ViewModelFactory.MakeGameViewModel)
                 .ToList();
         }
@@ -42,11 +48,14 @@ namespace Games.Controllers
         [HttpGet("games/{id}")]
         public GameViewModel GetGame(int userId, int id)
         {
-            var user = db.GetUser(userId);
+            var user = userRepository.Get(userId);
             user.VerifyExists();
 
-            var game = GetGame(user, id);
+            var game = gameRepository.Get(user, id);
             game.VerifyExists();
+
+            if (game.Hidden && !auth.IsCurrentUser(user, HttpContext))
+                (null as object).VerifyExists();
 
             return ViewModelFactory.MakeGameViewModel(game);
         }
@@ -54,11 +63,15 @@ namespace Games.Controllers
         [HttpGet("suggestions")]
         public List<Suggestion> GetSuggestions(int userId)
         {
-            var user = db.GetUser(userId);
+            var user = userRepository.Get(userId);
             user.VerifyExists();
 
-            var query = GetGameQuery(user);
-            var applicableGames = query
+            var allGames = gameRepository.All(user);
+
+            if (!auth.IsCurrentUser(user, HttpContext))
+                allGames = allGames.Where(game => !game.Hidden);
+
+            var applicableGames = allGames
                 .Where(g => g.Finished == Completion.NotFinished)
                 .Where(g => g.Rating == null)
                 .Where(g => g.Playtime == null)
@@ -66,10 +79,10 @@ namespace Games.Controllers
                 .Where(g => !g.CurrentlyPlaying)
                 .Where(g => g.WishlistPosition == null)
                 .ToList();
-            var topGames = query
+            var topGames = allGames
                 .OrderByDescending(g => g.Rating)
                 .OrderByDescending(g => g.Playtime)
-                .Take(query.Count() / 10) // top 10% of all games
+                .Take(allGames.Count() / 10) // top 10% of all games
                 .ToList();
 
             // collect genres from top 10 and the occurrences of each
@@ -123,7 +136,7 @@ namespace Games.Controllers
         [HttpPost("games"), Authorize]
         public GameViewModel AddGame(int userId, [FromBody] GameViewModel vm)
         {
-            var user = db.GetUser(userId);
+            var user = userRepository.Get(userId);
             auth.VerifyCurrentUser(user, HttpContext);
 
             var game = new Game
@@ -148,21 +161,18 @@ namespace Games.Controllers
             game.GameGenres = ViewModelFactory.MakeGameGenres(game, vm.GenreIds, user.Genres);
             game.GamePlatforms = ViewModelFactory.MakeGamePlatforms(game, vm.PlatformIds, user.Platforms);
             game.GameTags = ViewModelFactory.MakeGameTags(game, vm.TagIds, user.Tags);
-            game.CreatedAt = DateTime.UtcNow;
-            game.UpdatedAt = DateTime.UtcNow;
 
-            db.Games.Add(game);
-            db.SaveChanges();
+            gameRepository.Add(game);
             return ViewModelFactory.MakeGameViewModel(game);
         }
 
         [HttpPut("games/{id}"), Authorize]
         public GameViewModel UpdateGame(int userId, int id, [FromBody] GameViewModel vm)
         {
-            var user = db.GetUser(userId);
+            var user = userRepository.Get(userId);
             auth.VerifyCurrentUser(user, HttpContext);
 
-            var game = GetGame(user, id);
+            var game = gameRepository.Get(user, id);
             game.VerifyExists();
 
             game.Title = vm.Title;
@@ -182,48 +192,22 @@ namespace Games.Controllers
             game.GameGenres = ViewModelFactory.MakeGameGenres(game, vm.GenreIds, user.Genres);
             game.GamePlatforms = ViewModelFactory.MakeGamePlatforms(game, vm.PlatformIds, user.Platforms);
             game.GameTags = ViewModelFactory.MakeGameTags(game, vm.TagIds, user.Tags);
-            game.UpdatedAt = DateTime.UtcNow;
 
-            db.SaveChanges();
+            gameRepository.Update(game);
             return ViewModelFactory.MakeGameViewModel(game);
         }
 
         [HttpDelete("games/{id}"), Authorize]
         public IActionResult DeleteGame(int userId, int id)
         {
-            var user = db.GetUser(userId);
+            var user = userRepository.Get(userId);
             auth.VerifyCurrentUser(user, HttpContext);
 
-            var game = GetGame(user, id);
+            var game = gameRepository.Get(user, id);
             game.VerifyExists();
 
-            db.Remove(game);
-            db.SaveChanges();
-
-            var imageDir = data.GetFileInfo($"images/{game.Id}");
-            Directory.Delete(imageDir.PhysicalPath, true);
-
+            gameRepository.Delete(game);
             return NoContent();
-        }
-
-        private Game GetGame(User user, int id)
-        {
-            return GetGameQuery(user).SingleOrDefault(g => g.Id == id);
-        }
-
-        private IQueryable<Game> GetGameQuery(User user)
-        {
-            IQueryable<Game> query = db.Entry(user)
-                .Collection(u => u.Games)
-                .Query()
-                .Include(g => g.GameGenres)
-                .Include(g => g.GamePlatforms)
-                .Include(g => g.GameTags);
-
-            if (!auth.IsCurrentUser(user, HttpContext))
-                query = query.Where(g => !g.Hidden);
-
-            return query;
         }
     }
 }

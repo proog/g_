@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Models;
 using Games.Models.ViewModels;
+using Games.Repositories;
 using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +15,13 @@ namespace Games.Controllers
     public class SettingsController : Controller
     {
         private readonly GamesContext db;
+        private readonly IUserRepository userRepository;
         private readonly IAuthenticationService auth;
 
-        public SettingsController(GamesContext db, IAuthenticationService auth)
+        public SettingsController(GamesContext db, IUserRepository userRepository, IAuthenticationService auth)
         {
             this.db = db;
+            this.userRepository = userRepository;
             this.auth = auth;
         }
 
@@ -52,7 +55,7 @@ namespace Games.Controllers
             if (hash != user.Password)
                 throw new UnauthorizedException();
 
-            var defaultUser = db.GetUser(settings.DefaultUserId);
+            var defaultUser = userRepository.Get(settings.DefaultUserId);
 
             if (defaultUser == null)
                 throw new BadRequestException();

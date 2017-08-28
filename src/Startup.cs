@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Games.Infrastructure;
+using Games.Repositories;
 using Games.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -82,6 +83,8 @@ namespace Games
                 .Configure<AppSettings>(configuration)
                 .AddOptions()
                 .AddTransient<IAuthenticationService, AuthenticationService>()
+                .AddTransient<IGameRepository, GameRepository>()
+                .AddTransient<IUserRepository, UserRepository>()
                 .AddSingleton<HttpClient>(CreateHttpClient())
                 .AddSingleton<IFileProvider>(new PhysicalFileProvider(dataDirectory))
                 .AddDbContext<GamesContext>(options => options.UseSqlite(connectionString))

@@ -5,8 +5,10 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Models.ViewModels;
+using Games.Repositories;
 using Games.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json.Linq;
@@ -16,14 +18,16 @@ namespace Games.Controllers
     [Route("api/users/{userId}/games/{id}/image"), Authorize]
     public class ImageController : Controller
     {
-        private readonly GamesContext db;
+        private readonly IGameRepository gameRepository;
+        private readonly IUserRepository userRepository;
         private readonly HttpClient httpClient;
         private readonly IAuthenticationService auth;
         private readonly IFileProvider data;
 
-        public ImageController(GamesContext db, IAuthenticationService auth, IFileProvider data, HttpClient httpClient)
+        public ImageController(IGameRepository gameRepository, IUserRepository userRepository, IAuthenticationService auth, IFileProvider data, HttpClient httpClient)
         {
-            this.db = db;
+            this.gameRepository = gameRepository;
+            this.userRepository = userRepository;
             this.auth = auth;
             this.data = data;
             this.httpClient = httpClient;
@@ -32,45 +36,17 @@ namespace Games.Controllers
         [HttpPost]
         public async Task<GameViewModel> UploadImage(int userId, int id)
         {
-            var user = db.GetUser(userId);
+            var user = userRepository.Get(userId);
             auth.VerifyCurrentUser(user, HttpContext);
 
-            var game = user.Games.SingleOrDefault(g => g.Id == id);
+            var game = gameRepository.Get(user, id);
             game.VerifyExists();
-            Stream imageStream;
-
-            if (Request.HasFormContentType)
-            {
-                var form = await Request.ReadFormAsync();
-                var file = form.Files["image"];
-
-                if (file == null)
-                    throw new BadRequestException("No image supplied");
-
-                imageStream = file.OpenReadStream();
-            }
-            else
-            {
-                string url;
-                using (var reader = new StreamReader(Request.Body))
-                {
-                    var json = reader.ReadToEnd();
-                    url = (string)JObject.Parse(json)["image_url"];
-                }
-
-                if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
-                    throw new BadRequestException("Not a valid url");
-
-                var response = await httpClient.GetAsync(url);
-
-                if (!response.IsSuccessStatusCode)
-                    throw new Exception("Giant Bomb returned non-success status code");
-
-                imageStream = await response.Content.ReadAsStreamAsync();
-            }
 
             var path = $"images/{game.Id}/image.jpg";
             var fileInfo = data.GetFileInfo(path);
+            var imageStream = Request.HasFormContentType
+                ? await ReadFormImage(Request)
+                : await ReadGiantBombImage(Request);
 
             using (imageStream)
             {
@@ -83,26 +59,55 @@ namespace Games.Controllers
             }
 
             game.Image = path;
-            db.SaveChanges();
+            gameRepository.Update(game);
+
             return ViewModelFactory.MakeGameViewModel(game);
         }
 
         [HttpDelete]
         public IActionResult DeleteImage(int userId, int id)
         {
-            var user = db.GetUser(userId);
+            var user = userRepository.Get(userId);
             auth.VerifyCurrentUser(user, HttpContext);
 
-            var game = user.Games.SingleOrDefault(g => g.Id == id);
+            var game = gameRepository.Get(user, id);
             game.VerifyExists();
 
             game.Image = null;
-            db.SaveChanges();
-
-            var imageDir = data.GetFileInfo($"images/{game.Id}");
-            Directory.Delete(imageDir.PhysicalPath, true);
+            gameRepository.Update(game);
 
             return NoContent();
+        }
+
+        private async Task<Stream> ReadFormImage(HttpRequest request)
+        {
+            var form = await request.ReadFormAsync();
+            var file = form.Files["image"];
+
+            if (file == null)
+                throw new BadRequestException("No image supplied");
+
+            return file.OpenReadStream();
+        }
+
+        private async Task<Stream> ReadGiantBombImage(HttpRequest request)
+        {
+            string url;
+            using (var reader = new StreamReader(Request.Body))
+            {
+                var json = reader.ReadToEnd();
+                url = (string)JObject.Parse(json)["image_url"];
+            }
+
+            if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+                throw new BadRequestException("Not a valid url");
+
+            var response = await httpClient.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception("Giant Bomb returned non-success status code");
+
+            return await response.Content.ReadAsStreamAsync();
         }
     }
 }
