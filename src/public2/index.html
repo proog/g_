@@ -178,7 +178,11 @@
               <div class="col form-group">
                 <div class="form-check">
                   <label class="form-check-label">
-                    <input type="checkbox" class="form-check-input" v-model="edited.finished">
+                    <input type="checkbox"
+                           class="form-check-input"
+                           v-model="edited.finished"
+                           :true-value="1"
+                           :false-value="0">
                     Finished
                   </label>
                 </div>
@@ -235,8 +239,7 @@
               </h4>
               <p>{{ byLine }}</p>
               <p>
-                <i class="fa fa-check-square-o" v-if="game.finished === 1"></i>
-                <i class="fa fa-square-o" v-else></i>
+                <i class="fa" :class="game.finished === 1 ? 'fa-check-square-o' : 'fa-square-o'"></i>
                 {{ playtime }}
                 <br>
                 <i class="fa fa-comment"></i> {{ comment }}
