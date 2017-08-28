@@ -233,21 +233,13 @@
                 {{ game.title }}
                 <small v-if="game.year">({{ game.year }})</small>
               </h4>
-              <p>
-                {{ game.developer }}
-                <span v-if="game.publisher && game.publisher !== game.developer">
-                  <span v-if="game.developer">/</span> {{ game.publisher }}
-                </span>
-              </p>
+              <p>{{ byLine }}</p>
               <p>
                 <i class="fa fa-check-square-o" v-if="game.finished === 1"></i>
                 <i class="fa fa-square-o" v-else></i>
-                <span v-if="game.playtime">{{ game.playtime }}</span>
-                <span v-else>--:--:--</span>
+                {{ playtime }}
                 <br>
-                <i class="fa fa-comment"></i>
-                <span v-if="game.comment">{{ game.comment }}</span>
-                <span v-else>-</span>
+                <i class="fa fa-comment"></i> {{ comment }}
               </p>
               <p>
                 <i class="fa fa-gamepad"></i> {{ platforms }}<br>

@@ -17,6 +17,21 @@ Vue.component('game-item', {
     }
   },
   computed: {
+    byLine() {
+      let developer = this.game.developer
+        , publisher = this.game.publisher
+
+      if (developer && publisher && developer !== publisher)
+        return `${developer} / ${publisher}`
+
+      return developer ? developer : publisher
+    },
+    playtime() {
+      return this.game.playtime || '--:--:--'
+    },
+    comment() {
+      return this.game.comment || '-'
+    },
     genres() {
       return summary(this.allGenres, this.game.genre_ids)
     },
