@@ -63,9 +63,15 @@
       </form>
     </nav>
     <div class="container-fluid">
+      <div class="row" v-if="isLoginOpen">
+        <div class="col pb-3 px-2">
+          <login-form @login="loggedIn"
+                      @cancel="closeLogin">
+          </login-form>
+        </div>
+      </div>
       <div class="row" v-if="isSettingsOpen">
         <div class="col pb-3 px-2">
-          <h2>Settings</h2>
           <system-settings :genres="sortedGenres"
                            :platforms="sortedPlatforms"
                            :tags="sortedTags"
@@ -322,10 +328,18 @@
     <div>
       <div class="form-row" v-for="item in items">
         <div class="col-6 form-group">
-          <input type="text" class="form-control" required v-model="item.name">
+          <input type="text"
+                 class="form-control"
+                 required
+                 placeholder="Name"
+                 v-model="item.name">
         </div>
         <div class="col-4 form-group">
-          <input type="text" class="form-control" required v-model="item.short_name">
+          <input type="text"
+                 class="form-control"
+                 required
+                 placeholder="Short name"
+                 v-model="item.short_name">
         </div>
         <div class="col-2 form-group">
           <button type="button" class="btn btn-outline-danger" @click="remove(item)">
@@ -343,12 +357,41 @@
     </div>
   </script>
 
+  <script type="text/x-template" id="login-form-template">
+    <form class="card" @submit.prevent="login" @keyup.esc="cancel">
+      <div class="card-body">
+        <div class="form-group">
+          <input type="text"
+                 class="form-control"
+                 required
+                 placeholder="Username"
+                 v-model="username"
+                 :class="{ 'is-invalid': !!error }"
+                 @input="clearError">
+        </div>
+        <div class="form-group">
+          <input type="password"
+                 class="form-control"
+                 required
+                 placeholder="Password"
+                 v-model="password"
+                 :class="{ 'is-invalid': !!error }"
+                 @input="clearError">
+        </div>
+        <button type="submit" class="btn btn-success">
+          Log in
+        </button>
+      </div>
+    </form>
+  </script>
+
   <script src="js/api.js"></script>
   <script src="js/focus.js"></script>
   <script src="js/descriptor-list.js"></script>
   <script src="js/game-item.js"></script>
   <script src="js/descriptors-editor.js"></script>
   <script src="js/system-settings.js"></script>
+  <script src="js/login-form.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

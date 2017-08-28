@@ -100,9 +100,10 @@ let app = new Vue({
     closeLogin() {
       this.isLoginOpen = false
     },
-    loggedIn(userId, accessToken) {
+    loggedIn(username, accessToken) {
       this.accessToken = accessToken
-      this.currentUser = _.find(this.users, x => x.id === userId)
+      this.currentUser = _.find(this.users, x => x.username === username)
+      this.closeLogin()
     },
     logOut() {
       this.accessToken = ''

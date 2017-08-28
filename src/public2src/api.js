@@ -62,7 +62,7 @@ function getAccessToken(username, password) {
   form.append('username', username)
   form.append('password', password)
 
-  return post('/api/login', form)
+  return send('/api/token', 'POST', form)
 }
 
 function get(url, accessToken) {
@@ -89,5 +89,11 @@ function send(url, method, body, accessToken) {
     options.headers.append('Authorization', `Bearer ${accessToken}`)
 
   return fetch(url, options)
-    .then(response => response.json())
+    .then(response => {
+      let json = response.json()
+
+      return response.ok
+        ? json
+        : Promise.reject(json.message)
+    })
 }
