@@ -107,7 +107,10 @@ let app = new Vue({
     logOut() {
       this.accessToken = ''
       this.currentUser = null
-    }
+    },
+    debouncedSearch: _.debounce(function (event) {
+      this.search = event.target.value
+    }, 500)
   },
   mounted() {
     this.currentUser = { id: 1 }
