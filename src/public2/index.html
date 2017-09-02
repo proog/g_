@@ -64,14 +64,14 @@
     </nav>
     <div class="container-fluid">
       <div class="row" v-if="isLoginOpen">
-        <div class="col pb-3 px-2">
+        <div class="col pb-3">
           <login-form @login="loggedIn"
                       @cancel="closeLogin">
           </login-form>
         </div>
       </div>
       <div class="row" v-if="isSettingsOpen">
-        <div class="col pb-3 px-2">
+        <div class="col pb-3">
           <system-settings :genres="sortedGenres"
                            :platforms="sortedPlatforms"
                            :tags="sortedTags"
@@ -81,7 +81,7 @@
         </div>
       </div>
       <div class="row" v-if="!!newGame">
-        <div class="col col-lg-10 col-xl-8 mx-lg-auto pb-3 px-2">
+        <div class="col col-lg-10 col-xl-8 mx-lg-auto pb-3">
           <game-item :game="newGame"
                      :all-genres="sortedGenres"
                      :all-platforms="sortedPlatforms"
@@ -94,7 +94,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-12 col-lg-10 col-xl-6 mx-lg-auto pb-3 px-2"
+        <div class="col-12 col-lg-10 col-xl-6 mx-lg-auto pb-3"
              v-for="game in filteredGames">
           <game-item :key="game.id"
                      :game="game"
