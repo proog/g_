@@ -108,6 +108,8 @@ let app = new Vue({
     logOut() {
       this.accessToken = ''
       this.currentUser = null
+      this.newGame = null
+      this.isSettingsOpen = false
     },
     debouncedSearch: _.debounce(function (event) {
       this.search = event.target.value
