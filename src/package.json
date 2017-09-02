@@ -33,7 +33,7 @@
     "build": "npm run vendor:clean && npm run vendor:copy && npm run js:uglify",
     "watch": "npm run build && watch 'npm run js:uglify' public/js",
     "postinstall": "npm run build",
-    "bwatch": "babel public2src --watch --out-dir public2/js"
+    "bwatch": "babel public2src --watch --out-dir public2/js --source-maps=true"
   },
   "author": "Per Mortensen",
   "license": "ISC"
