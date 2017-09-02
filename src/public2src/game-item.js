@@ -5,6 +5,7 @@ Vue.component('game-item', {
     allGenres: Array,
     allPlatforms: Array,
     allTags: Array,
+    api: Api,
     isEditable: Boolean,
     isNew: Boolean
   },
@@ -50,35 +51,36 @@ Vue.component('game-item', {
       this.imageRemoved = false
     },
     save() {
-      if (this.isNew) {
-        // POST
-        // _.assign(this.edited, created)
-      }
-      else {
-        // PUT
-        // _.assign(this.edited, updated)
-      }
+      let createOrUpdate = this.isNew
+        ? this.api.postGame(this.edited)
+        : this.api.putGame(this.edited)
 
-      if (this.game.image && this.imageRemoved) {
-        // DELETE image, then
-        this.edited.image = null
-      }
-      else if (this.imageFile) {
-        // POST image, then
-        let url = 'http://lorempizza.com/380/240'
-        this.edited.image = url
-      }
+      createOrUpdate
+        .then(updated => {
+          _.assign(this.edited, updated)
 
-      this.isEditing = false
-      this.$emit('save', this.game, this.edited)
+          if (this.game.image && this.imageRemoved) {
+            return this.api.deleteImage(this.game)
+              .then(() => this.edited.image = null)
+          }
+          else if (this.imageFile) {
+            return this.api.postImage(this.game, this.imageFile)
+              .then(gameWithImage => this.edited.image = gameWithImage.image)
+          }
+        })
+        .then(() => {
+          this.isEditing = false
+          this.$emit('save', this.game, this.edited)
+        })
     },
     remove() {
       if (!confirm(`Are you sure you want to delete ${this.game.title}?`))
         return
 
-      // DELETE game.id, then
-      this.isEditing = false
-      this.$emit('remove', this.game)
+      this.api.deleteGame(this.game).then(() => {
+        this.isEditing = false
+        this.$emit('remove', this.game)
+      })
     },
     cancel() {
       this.isEditing = false

@@ -1,5 +1,8 @@
 Vue.component('login-form', {
   template: '#login-form-template',
+  props: {
+    api: Api
+  },
   data() {
     return {
       username: '',
@@ -10,8 +13,7 @@ Vue.component('login-form', {
   methods: {
     login() {
       this.clearError()
-
-      getAccessToken(this.username, this.password)
+      this.api.getAccessToken(this.username, this.password)
         .then(oauth => {
           let username = this.username
           this.clear()

@@ -65,7 +65,8 @@
     <div class="container-fluid">
       <div class="row" v-if="isLoginOpen">
         <div class="col pb-3">
-          <login-form @login="loggedIn"
+          <login-form :api="api"
+                      @login="loggedIn"
                       @cancel="closeLogin">
           </login-form>
         </div>
@@ -75,6 +76,7 @@
           <system-settings :genres="sortedGenres"
                            :platforms="sortedPlatforms"
                            :tags="sortedTags"
+                           :api="api"
                            @save="settingsSaved"
                            @cancel="closeSettings">
           </system-settings>
@@ -86,6 +88,7 @@
                      :all-genres="sortedGenres"
                      :all-platforms="sortedPlatforms"
                      :all-tags="sortedTags"
+                     :api="api"
                      :is-editable="canEdit"
                      :is-new="true"
                      @save="gameSaved"
@@ -101,6 +104,7 @@
                      :all-genres="sortedGenres"
                      :all-platforms="sortedPlatforms"
                      :all-tags="sortedTags"
+                     :api="api"
                      :is-editable="canEdit"
                      :is-new="false"
                      @save="gameSaved"

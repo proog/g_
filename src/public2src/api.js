@@ -1,99 +1,122 @@
-function getUsers() {
-  return get('/api/users')
-}
-
-function getGames(userId) {
-  return get(`/api/users/${userId}/games`)
-}
-
-function getGenres(userId) {
-  return get(`/api/users/${userId}/genres`)
-}
-function getPlatforms(userId) {
-  return get(`/api/users/${userId}/platforms`)
-}
-function getTags(userId) {
-  return get(`/api/users/${userId}/tags`)
-}
-
-function postGame(userId, game) {
-  return post(`/api/users/${userId}/games`, game)
-}
-function putGame(userId, game) {
-  return put(`/api/users/${userId}/games/${game.id}`, game)
-}
-function deleteGame(userId, game) {
-  return del(`/api/users/${userId}/games/${game.id}`)
-}
-
-function postGenre(userId, genre) {
-  return post(`/api/users/${userId}/genres`, genre)
-}
-function postPlatform(userId, platform) {
-  return post(`/api/users/${userId}/platforms`, platform)
-}
-function postTag(userId, tag) {
-  return post(`/api/users/${userId}/tags`, tag)
-}
-
-function putGenre(userId, genre) {
-  return put(`/api/users/${userId}/genres/${genre.id}`, genre)
-}
-function putPlatform(userId, platform) {
-  return put(`/api/users/${userId}/platforms/${platform.id}`, platform)
-}
-function putTag(userId, tag) {
-  return put(`/api/users/${userId}/tags/${tag.id}`, tag)
-}
-
-function deleteGenre(userId, genre) {
-  return del(`/api/users/${userId}/genres/${genre.id}`)
-}
-function deletePlatform(userId, platform) {
-  return del(`/api/users/${userId}/platforms/${platform.id}`)
-}
-function deleteTag(userId, tag) {
-  return del(`/api/users/${userId}/tags/${tag.id}`)
-}
-
-function getAccessToken(username, password) {
-  let form = new FormData()
-  form.append('grant_type', 'password')
-  form.append('username', username)
-  form.append('password', password)
-
-  return send('/api/token', 'POST', form)
-}
-
-function get(url, accessToken) {
-  return send(url, 'GET', null, accessToken)
-}
-function post(url, data, accessToken) {
-  return send(url, 'POST', JSON.stringify(data), accessToken)
-}
-function put(url, data, accessToken) {
-  return send(url, 'PUT', JSON.stringify(data), accessToken)
-}
-function del(url, accessToken) {
-  return send(url, 'DELETE', null, accessToken)
-}
-
-function send(url, method, body, accessToken) {
-  let options = {
-    method: method,
-    body: body,
-    headers: new Headers()
+class Api {
+  constructor() {
+    this.userId = null
+    this.accessToken = null
   }
 
-  if (accessToken)
-    options.headers.append('Authorization', `Bearer ${accessToken}`)
+  getUsers() {
+    return this.get('/api/users')
+  }
 
-  return fetch(url, options)
-    .then(response => {
-      let json = response.json()
+  getGames() {
+    return this.get(`/api/users/${this.userId}/games`)
+  }
 
-      return response.ok
-        ? json
-        : Promise.reject(json.message)
+  getGenres() {
+    return this.get(`/api/users/${this.userId}/genres`)
+  }
+  getPlatforms() {
+    return this.get(`/api/users/${this.userId}/platforms`)
+  }
+  getTags() {
+    return this.get(`/api/users/${this.userId}/tags`)
+  }
+
+  postGame(game) {
+    return this.post(`/api/users/${this.userId}/games`, game)
+  }
+  putGame(game) {
+    return this.put(`/api/users/${this.userId}/games/${game.id}`, game)
+  }
+  deleteGame(game) {
+    return this.del(`/api/users/${this.userId}/games/${game.id}`)
+  }
+
+  postImage(game, imageFile) {
+    let form = new FormData();
+    form.append('image', imageFile)
+
+    return this.send(`/api/users/${this.userId}/games/${game.id}/image`, 'POST', form)
+  }
+  deleteImage(game) {
+    return this.del(`/api/users/${this.userId}/games/${game.id}/image`)
+  }
+
+  postGenre(genre) {
+    return this.post(`/api/users/${this.userId}/genres`, genre)
+  }
+  postPlatform(platform) {
+    return this.post(`/api/users/${this.userId}/platforms`, platform)
+  }
+  postTag(tag) {
+    return this.post(`/api/users/${this.userId}/tags`, tag)
+  }
+
+  putGenre(genre) {
+    return this.put(`/api/users/${this.userId}/genres/${genre.id}`, genre)
+  }
+  putPlatform(platform) {
+    return this.put(`/api/users/${this.userId}/platforms/${platform.id}`, platform)
+  }
+  putTag(tag) {
+    return this.put(`/api/users/${this.userId}/tags/${tag.id}`, tag)
+  }
+
+  deleteGenre(genre) {
+    return this.del(`/api/users/${this.userId}/genres/${genre.id}`)
+  }
+  deletePlatform(platform) {
+    return this.del(`/api/users/${this.userId}/platforms/${platform.id}`)
+  }
+  deleteTag(tag) {
+    return this.del(`/api/users/${this.userId}/tags/${tag.id}`)
+  }
+
+  getAccessToken(username, password) {
+    let form = new FormData()
+    form.append('grant_type', 'password')
+    form.append('username', username)
+    form.append('password', password)
+
+    return this.send('/api/token', 'POST', form)
+  }
+
+  get(url) {
+    return this.send(url, 'GET', null)
+  }
+  post(url, data) {
+    return this.send(url, 'POST', JSON.stringify(data))
+  }
+  put(url, data) {
+    return this.send(url, 'PUT', JSON.stringify(data))
+  }
+  del(url) {
+    return this.send(url, 'DELETE', null)
+  }
+
+  send(url, method, body) {
+    let options = {
+      method: method,
+      body: body,
+      headers: new Headers()
+    }
+
+    if (_.isString(body))
+      options.headers.append('Content-Type', 'application/json')
+
+    if (this.accessToken)
+      options.headers.append('Authorization', `Bearer ${this.accessToken}`)
+
+    return fetch(url, options).then(response => {
+      return response.text().then(text => {
+        let parsed = text.length > 0
+          ? JSON.parse(text)
+          : undefined
+
+        return response.ok
+          ? parsed
+          : Promise.reject(parsed)
+      })
     })
+  }
 }

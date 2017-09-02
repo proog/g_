@@ -3,7 +3,8 @@ Vue.component('system-settings', {
   props: {
     genres: Array,
     platforms: Array,
-    tags: Array
+    tags: Array,
+    api: Api
   },
   data() {
     return {

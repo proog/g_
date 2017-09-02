@@ -10,7 +10,7 @@ let app = new Vue({
     tags: [],
     newGame: null,
     search: '',
-    accessToken: '',
+    api: new Api(),
     isSettingsOpen: false,
     isLoginOpen: false
   },
@@ -101,12 +101,12 @@ let app = new Vue({
       this.isLoginOpen = false
     },
     loggedIn(username, accessToken) {
-      this.accessToken = accessToken
+      this.api.accessToken = accessToken
       this.currentUser = _.find(this.users, x => x.username === username)
       this.closeLogin()
     },
     logOut() {
-      this.accessToken = ''
+      this.api.accessToken = null
       this.currentUser = null
       this.newGame = null
       this.isSettingsOpen = false
@@ -118,18 +118,19 @@ let app = new Vue({
   mounted() {
     this.currentUser = { id: 1 }
 
-    getUsers()
+    this.api.getUsers()
       .then(users => {
         this.users = users
         this.selectedUser = _.head(users)
+        this.api.userId = this.selectedUser.id
         return this.selectedUser
       })
       .then(user => {
         return Promise.all([
-          getGames(user.id).then(games => this.games = games),
-          getGenres(user.id).then(genres => this.genres = genres),
-          getPlatforms(user.id).then(platforms => this.platforms = platforms),
-          getTags(user.id).then(tags => this.tags = tags)
+          this.api.getGames().then(games => this.games = games),
+          this.api.getGenres().then(genres => this.genres = genres),
+          this.api.getPlatforms().then(platforms => this.platforms = platforms),
+          this.api.getTags().then(tags => this.tags = tags)
         ])
       })
   }
