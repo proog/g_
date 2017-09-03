@@ -101,6 +101,7 @@ let app = new Vue({
       this.isLoginOpen = false
     },
     loggedIn(username, accessToken) {
+      sessionStorage.setItem('token', accessToken)
       this.api.accessToken = accessToken
       this.currentUser = _.find(this.users, x => x.username === username)
       this.closeLogin()
@@ -116,13 +117,20 @@ let app = new Vue({
     }, 500)
   },
   mounted() {
-    this.currentUser = { id: 1 }
+    const accessToken = sessionStorage.getItem('token')
 
     this.api.getUsers()
       .then(users => {
         this.users = users
         this.selectedUser = _.head(users)
         this.api.userId = this.selectedUser.id
+
+        if (accessToken && isJwtValid(accessToken)) {
+          let payload = getJwtPayload(accessToken)
+          this.api.accessToken = accessToken
+          this.currentUser = _.find(users, x => x.id === payload['id'])
+        }
+
         return this.selectedUser
       })
       .then(user => {
@@ -175,4 +183,23 @@ function filterGames(games, genres, platforms, tags, searchQuery) {
 function pruneGameDescriptors(ids, descriptors) {
   let invalidIds = _.difference(ids, _.map(descriptors, x => x.id))
   return _.without(ids, invalidIds)
+}
+
+function isJwtValid(token) {
+  try {
+    let payload = getJwtPayload(token)
+      , now = new Date().getTime() / 1000
+    return now >= payload['nbf'] && now < payload['exp']
+  } catch (e) {
+    return false
+  }
+}
+
+function getJwtPayload(token) {
+  try {
+    let split = token.split('.')
+    return JSON.parse(atob(split[1]))
+  } catch (e) {
+    return undefined
+  }
 }

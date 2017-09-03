@@ -51,23 +51,26 @@ Vue.component('game-item', {
       this.imageRemoved = false
     },
     save() {
-      let createOrUpdate = this.isNew
-        ? this.api.postGame(this.edited)
-        : this.api.putGame(this.edited)
+      let createOrUpdate = () => {
+        return this.isNew
+          ? this.api.postGame(this.edited)
+          : this.api.putGame(this.edited)
+      }
+      let postOrDeleteImage = () => {
+        if (this.imageFile) {
+          return this.api.postImage(this.game, this.imageFile)
+            .then(gameWithImage => this.edited.image = gameWithImage.image)
+        }
 
-      createOrUpdate
-        .then(updated => {
-          _.assign(this.edited, updated)
+        if (this.game.image && this.imageRemoved) {
+          return this.api.deleteImage(this.game)
+            .then(() => this.edited.image = null)
+        }
+      }
 
-          if (this.game.image && this.imageRemoved) {
-            return this.api.deleteImage(this.game)
-              .then(() => this.edited.image = null)
-          }
-          else if (this.imageFile) {
-            return this.api.postImage(this.game, this.imageFile)
-              .then(gameWithImage => this.edited.image = gameWithImage.image)
-          }
-        })
+      createOrUpdate()
+        .then(updated => _.assign(this.edited, updated))
+        .then(postOrDeleteImage)
         .then(() => {
           this.isEditing = false
           this.$emit('save', this.game, this.edited)
