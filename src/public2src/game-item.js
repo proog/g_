@@ -12,6 +12,7 @@ Vue.component('game-item', {
   data() {
     return {
       isEditing: false,
+      isSaving: false,
       edited: null,
       imageFile: null,
       imageRemoved: false
@@ -57,27 +58,34 @@ Vue.component('game-item', {
           : this.api.putGame(this.edited)
       }
       let postOrDeleteImage = () => {
-        if (this.imageFile) {
+        if (this.imageFile)
           return this.api.postImage(this.game, this.imageFile)
             .then(gameWithImage => this.edited.image = gameWithImage.image)
-        }
 
-        if (this.game.image && this.imageRemoved) {
+        if (this.game.image && this.imageRemoved)
           return this.api.deleteImage(this.game)
             .then(() => this.edited.image = null)
-        }
       }
 
+      if (this.isSaving)
+        return
+
+      this.isSaving = true
       createOrUpdate()
         .then(updated => _.assign(this.edited, updated))
         .then(postOrDeleteImage)
         .then(() => {
+          this.isSaving = false
           this.isEditing = false
           this.$emit('save', this.game, this.edited)
         })
+        .catch(error => {
+          this.isSaving = false
+          alert(error)
+        })
     },
     remove() {
-      if (!confirm(`Are you sure you want to delete ${this.game.title}?`))
+      if (this.isSaving || !confirm(`Are you sure you want to delete ${this.game.title}?`))
         return
 
       this.api.deleteGame(this.game).then(() => {
@@ -86,6 +94,9 @@ Vue.component('game-item', {
       })
     },
     cancel() {
+      if (this.isSaving)
+        return
+
       this.isEditing = false
       this.$emit('cancel', this.game)
     },

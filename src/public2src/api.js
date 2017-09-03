@@ -115,7 +115,7 @@ class Api {
 
         return response.ok
           ? parsed
-          : Promise.reject(parsed)
+          : Promise.reject(parsed && parsed.message)
       })
     })
   }
