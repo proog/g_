@@ -18,100 +18,104 @@ namespace Games.Controllers
     [Route("api/users/{userId}")]
     public class DescriptorController : Controller
     {
-        private readonly GamesContext db;
-        private readonly IUserRepository userRepository;
+        private readonly IUserRepository users;
+        private readonly IGenreRepository genres;
+        private readonly IPlatformRepository platforms;
+        private readonly ITagRepository tags;
         private readonly IAuthenticationService auth;
 
-        public DescriptorController(GamesContext db, IUserRepository userRepository, IAuthenticationService auth)
+        public DescriptorController(IUserRepository users, IGenreRepository genres, IPlatformRepository platforms, ITagRepository tags, IAuthenticationService auth)
         {
-            this.db = db;
-            this.userRepository = userRepository;
+            this.users = users;
+            this.genres = genres;
+            this.platforms = platforms;
+            this.tags = tags;
             this.auth = auth;
         }
 
         [HttpGet("genres")]
         public List<DescriptorViewModel> GetGenres(int userId)
         {
-            return All(userId, u => u.Genres);
+            return All(userId, genres);
         }
         [HttpGet("platforms")]
         public List<DescriptorViewModel> GetPlatforms(int userId)
         {
-            return All(userId, u => u.Platforms);
+            return All(userId, platforms);
         }
         [HttpGet("tags")]
         public List<DescriptorViewModel> GetTags(int userId)
         {
-            return All(userId, u => u.Tags);
+            return All(userId, tags);
         }
 
         [HttpGet("genres/{id}")]
         public DescriptorViewModel GetGenre(int userId, int id)
         {
-            return Single(userId, id, u => u.Genres);
+            return Single(userId, id, genres);
         }
         [HttpGet("platforms/{id}")]
         public DescriptorViewModel GetPlatform(int userId, int id)
         {
-            return Single(userId, id, u => u.Platforms);
+            return Single(userId, id, platforms);
         }
         [HttpGet("tags/{id}")]
         public DescriptorViewModel GetTag(int userId, int id)
         {
-            return Single(userId, id, u => u.Tags);
+            return Single(userId, id, tags);
         }
 
         [HttpPost("genres"), Authorize]
         public DescriptorViewModel AddGenre(int userId, [FromBody] DescriptorViewModel rendition)
         {
-            return Add(userId, rendition, () => db.Genres);
+            return Add(userId, rendition, genres);
         }
         [HttpPost("platforms"), Authorize]
         public DescriptorViewModel AddPlatform(int userId, [FromBody] DescriptorViewModel rendition)
         {
-            return Add(userId, rendition, () => db.Platforms);
+            return Add(userId, rendition, platforms);
         }
         [HttpPost("tags"), Authorize]
         public DescriptorViewModel AddTag(int userId, [FromBody] DescriptorViewModel rendition)
         {
-            return Add(userId, rendition, () => db.Tags);
+            return Add(userId, rendition, tags);
         }
 
         [HttpPut("genres/{id}"), Authorize]
         public DescriptorViewModel UpdateGenre(int userId, int id, [FromBody] DescriptorViewModel rendition)
         {
-            return Update(userId, id, rendition, u => u.Genres);
+            return Update(userId, id, rendition, genres);
         }
         [HttpPut("platforms/{id}"), Authorize]
         public DescriptorViewModel UpdatePlatform(int userId, int id, [FromBody] DescriptorViewModel rendition)
         {
-            return Update(userId, id, rendition, u => u.Platforms);
+            return Update(userId, id, rendition, platforms);
         }
         [HttpPut("tags/{id}"), Authorize]
         public DescriptorViewModel UpdateTag(int userId, int id, [FromBody] DescriptorViewModel rendition)
         {
-            return Update(userId, id, rendition, u => u.Tags);
+            return Update(userId, id, rendition, tags);
         }
 
         [HttpDelete("genres/{id}"), Authorize]
         public IActionResult DeleteGenre(int userId, int id)
         {
-            return Delete(userId, id, u => u.Genres);
+            return Delete(userId, id, genres);
         }
         [HttpDelete("platforms/{id}"), Authorize]
         public IActionResult DeletePlatform(int userId, int id)
         {
-            return Delete(userId, id, u => u.Platforms);
+            return Delete(userId, id, platforms);
         }
         [HttpDelete("tags/{id}"), Authorize]
         public IActionResult DeleteTag(int userId, int id)
         {
-            return Delete(userId, id, u => u.Tags);
+            return Delete(userId, id, tags);
         }
 
-        private DescriptorViewModel Add<T>(int userId, DescriptorViewModel vm, Func<DbSet<T>> getter) where T : Descriptor, new()
+        private DescriptorViewModel Add<T>(int userId, DescriptorViewModel vm, IDescriptorRepository<T> repository) where T : Descriptor, new()
         {
-            var user = userRepository.Get(userId);
+            var user = users.Get(userId);
             auth.VerifyCurrentUser(user, HttpContext);
 
             var descriptor = new T
@@ -122,64 +126,55 @@ namespace Games.Controllers
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
-            getter().Add(descriptor);
-            db.SaveChanges();
+            repository.Add(descriptor);
 
             return ViewModelFactory.MakeDescriptorViewModel(descriptor);
         }
 
-        private DescriptorViewModel Update<T>(int userId, int id, DescriptorViewModel vm, Func<User, IEnumerable<T>> getter) where T : Descriptor
+        private DescriptorViewModel Update<T>(int userId, int id, DescriptorViewModel vm, IDescriptorRepository<T> repository) where T : Descriptor
         {
-            var user = userRepository.Get(userId);
+            var user = users.Get(userId);
             auth.VerifyCurrentUser(user, HttpContext);
 
-            var descriptor = getter(user)
-                .SingleOrDefault(it => it.Id == id);
+            var descriptor = repository.Get(user, id);
             descriptor.VerifyExists();
 
             descriptor.Name = vm.Name;
             descriptor.ShortName = vm.ShortName;
             descriptor.UpdatedAt = DateTime.UtcNow;
-            db.SaveChanges();
+            repository.Update(descriptor);
 
             return ViewModelFactory.MakeDescriptorViewModel(descriptor);
         }
 
-        private IActionResult Delete<T>(int userId, int id, Func<User, IEnumerable<T>> getter) where T : Descriptor
+        private IActionResult Delete<T>(int userId, int id, IDescriptorRepository<T> repository) where T : Descriptor
         {
-            var user = userRepository.Get(userId);
+            var user = users.Get(userId);
             auth.VerifyCurrentUser(user, HttpContext);
 
-            var descriptor = getter(user)
-                .SingleOrDefault(it => it.Id == id);
+            var descriptor = repository.Get(user, id);
             descriptor.VerifyExists();
+            repository.Delete(descriptor);
 
-            db.Remove(descriptor);
-            db.SaveChanges();
             return NoContent();
         }
 
-        private List<DescriptorViewModel> All<T>(int userId, Expression<Func<User, IEnumerable<T>>> relation) where T : Descriptor
+        private List<DescriptorViewModel> All<T>(int userId, IDescriptorRepository<T> repository) where T : Descriptor
         {
-            var user = userRepository.Get(userId);
+            var user = users.Get(userId);
             user.VerifyExists();
 
-            return db.Entry(user)
-                .Collection(relation)
-                .Query()
+            return repository.All(user)
                 .Select(ViewModelFactory.MakeDescriptorViewModel)
                 .ToList();
         }
 
-        private DescriptorViewModel Single<T>(int userId, int id, Expression<Func<User, IEnumerable<T>>> relation) where T : Descriptor
+        private DescriptorViewModel Single<T>(int userId, int id, IDescriptorRepository<T> repository) where T : Descriptor
         {
-            var user = userRepository.Get(userId);
+            var user = users.Get(userId);
             user.VerifyExists();
 
-            var descriptor = db.Entry(user)
-                .Collection(relation)
-                .Query()
-                .SingleOrDefault(it => it.Id == id);
+            var descriptor = repository.Get(user, id);
             descriptor.VerifyExists();
 
             return ViewModelFactory.MakeDescriptorViewModel(descriptor);
