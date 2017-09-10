@@ -9,6 +9,8 @@ namespace Games.Interfaces
 
         User Get(int id);
 
+        User Get(string username);
+
         void Add(User user);
 
         void Update(User user);

@@ -5,7 +5,7 @@ using Microsoft.Extensions.FileProviders;
 
 namespace Games.Services
 {
-    public class GamesContext : DbContext
+    class GamesContext : DbContext
     {
         public DbSet<Game> Games { get; set; }
 

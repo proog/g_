@@ -13,12 +13,12 @@ namespace Games.Controllers
     [Route("api")]
     public class AuthenticationController : Controller
     {
-        private readonly GamesContext db;
+        private readonly IUserRepository userRepository;
         private readonly IAuthenticationService auth;
 
-        public AuthenticationController(GamesContext db, IAuthenticationService auth)
+        public AuthenticationController(IUserRepository userRepository, IAuthenticationService auth)
         {
-            this.db = db;
+            this.userRepository = userRepository;
             this.auth = auth;
         }
 
@@ -34,11 +34,9 @@ namespace Games.Controllers
         public OAuthResponse Token([FromForm] OAuthCredentials cred)
         {
             var hash = auth.HashPassword(cred.Password);
-            var user = db.Users.SingleOrDefault(
-                u => u.Username == cred.Username && u.Password == hash
-            );
+            var user = userRepository.Get(cred.Username);
 
-            if (user == null)
+            if (user == null || user.Password != hash)
                 throw new UnauthorizedException("Invalid credentials");
 
             var jwt = auth.Authenticate(user);

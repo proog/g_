@@ -21,6 +21,11 @@ namespace Games.Repositories
             return Query().SingleOrDefault(u => u.Id == id);
         }
 
+        public User Get(string username)
+        {
+            return Query().SingleOrDefault(u => u.Username == username);
+        }
+
         public IEnumerable<User> All()
         {
             return Query().ToList();
