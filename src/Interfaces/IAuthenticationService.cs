@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Games.Models;
 using Microsoft.AspNetCore.Http;
 
-namespace Games.Services
+namespace Games.Interfaces
 {
     public interface IAuthenticationService
     {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Games.Models;
 
-namespace Games.Repositories
+namespace Games.Interfaces
 {
     public interface IGameRepository
     {
