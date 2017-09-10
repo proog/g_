@@ -91,6 +91,7 @@
                      :api="api"
                      :is-editable="canEdit"
                      :is-new="true"
+                     :is-assisted="isAssistedCreationEnabled"
                      @save="gameSaved"
                      @cancel="newGameCancelled">
           </game-item>
@@ -107,6 +108,7 @@
                      :api="api"
                      :is-editable="canEdit"
                      :is-new="false"
+                     :is-assisted="false"
                      @save="gameSaved"
                      @remove="gameRemoved">
           </game-item>

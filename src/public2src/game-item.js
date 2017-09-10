@@ -7,7 +7,8 @@ Vue.component('game-item', {
     allTags: Array,
     api: Api,
     isEditable: Boolean,
-    isNew: Boolean
+    isNew: Boolean,
+    isAssisted: Boolean
   },
   data() {
     return {
@@ -44,6 +45,13 @@ Vue.component('game-item', {
       return summary(this.allTags, this.game.tag_ids)
     }
   },
+  watch: {
+    'edited.title': function (newTitle) {
+      // when editing the title, provide autocompletion via giant bomb
+      if (this.isAssisted && newTitle.length > 2)
+        this.autocomplete(newTitle)
+    }
+  },
   methods: {
     edit() {
       this.isEditing = true
@@ -73,7 +81,7 @@ Vue.component('game-item', {
       this.isSaving = true
       createOrUpdate()
         .then(updated => _.assign(this.edited, updated))
-        .then(postOrDeleteImage)
+        .then(() => postOrDeleteImage())
         .then(() => {
           this.isSaving = false
           this.isEditing = false
@@ -114,7 +122,12 @@ Vue.component('game-item', {
 
       // clear the file input by resetting the form
       this.$refs.imageForm.reset()
-    }
+    },
+    autocomplete: _.debounce(function (title) {
+      this.api.getAssistedSearch(title).then(gbGames => {
+        console.log(gbGames)
+      })
+    }, 1000)
   },
   mounted() {
     // if adding a new game, go directly to edit mode

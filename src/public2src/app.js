@@ -12,7 +12,8 @@ let app = new Vue({
     search: '',
     api: new Api(),
     isSettingsOpen: false,
-    isLoginOpen: false
+    isLoginOpen: false,
+    isAssistedCreationEnabled: false
   },
   computed: {
     sortedGenres() {
@@ -45,8 +46,16 @@ let app = new Vue({
   methods: {
     addGame() {
       this.newGame = {
+        title: '',
+        sort_as: '',
+        year: '',
+        developer: '',
+        publisher: '',
         currently_playing: false,
         finished: 0,
+        playtime: '',
+        comment: '',
+        image: null,
         platform_ids: [],
         genre_ids: [],
         tag_ids: []
@@ -122,18 +131,19 @@ let app = new Vue({
     this.api.getUsers()
       .then(users => {
         this.users = users
-        this.selectedUser = _.head(users)
-        this.api.userId = this.selectedUser.id
 
         if (accessToken && isJwtValid(accessToken)) {
           let payload = getJwtPayload(accessToken)
           this.api.accessToken = accessToken
           this.currentUser = _.find(users, x => x.id === payload['id'])
         }
-
-        return this.selectedUser
       })
-      .then(user => {
+      .then(() => this.api.getConfig())
+      .then(config => {
+        this.selectedUser = _.find(this.users, x => x.id === config.default_user_id)
+        this.api.userId = this.selectedUser.id
+        this.isAssistedCreationEnabled = config.is_assisted_creation_enabled
+
         return Promise.all([
           this.api.getGames().then(games => this.games = games),
           this.api.getGenres().then(genres => this.genres = genres),

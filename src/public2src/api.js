@@ -72,6 +72,23 @@ class Api {
     return this.del(`/api/users/${this.userId}/tags/${tag.id}`)
   }
 
+  getConfig() {
+    return this.get('/api/config')
+  }
+  getSettings() {
+    return this.get('/api/settings')
+  }
+  putSettings(settings) {
+    return this.put('/api/settings', settings)
+  }
+
+  getAssistedSearch(title) {
+    return this.get(`/api/assisted/search/${encodeURIComponent(title)}`)
+  }
+  getAssistedGame(gbGameId) {
+    return this.get(`/api/assisted/game/${gbGameId}`)
+  }
+
   getAccessToken(username, password) {
     let form = new FormData()
     form.append('grant_type', 'password')
