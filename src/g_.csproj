@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="Views\**\*;public\**\*">
+    <None Update="Views\**\*;public\**\*;appsettings.json;appsettings.*.json">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
   </ItemGroup>
