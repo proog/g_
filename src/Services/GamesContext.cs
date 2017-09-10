@@ -19,8 +19,6 @@ namespace Games.Services
 
         public DbSet<Config> Configs { get; set; }
 
-        public bool IsConfigured => Configs.Any();
-
         public GamesContext(DbContextOptions<GamesContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

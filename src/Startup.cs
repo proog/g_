@@ -40,7 +40,7 @@ namespace Games
             Directory.CreateDirectory(imageDirectory);
         }
 
-        public void Configure(IApplicationBuilder app, GamesContext db)
+        public void Configure(IApplicationBuilder app, IConfigRepository configRepository)
         {
             var authOptions = new JwtBearerOptions
             {
@@ -65,7 +65,7 @@ namespace Games
 
             // redirect to setup until configured
             app.MapWhen(
-                ctx => ctx.Request.Path == "/" && !db.IsConfigured,
+                ctx => ctx.Request.Path == "/" && !configRepository.IsConfigured,
                 req => req.Run(
                     ctx => Task.Run(() => ctx.Response.Redirect("setup"))
                 )
@@ -89,6 +89,7 @@ namespace Games
                 .AddTransient<IGenreRepository, GenreRepository>()
                 .AddTransient<IPlatformRepository, PlatformRepository>()
                 .AddTransient<ITagRepository, TagRepository>()
+                .AddTransient<IConfigRepository, ConfigRepository>()
                 .AddSingleton<HttpClient>(CreateHttpClient())
                 .AddSingleton<IFileProvider>(new PhysicalFileProvider(dataDirectory))
                 .AddDbContext<GamesContext>(options => options.UseSqlite(connectionString))

@@ -10,12 +10,14 @@ namespace Games.Controllers
     [Route("setup")]
     public partial class SetupController : Controller
     {
-        private readonly GamesContext db;
+        private readonly IConfigRepository configRepository;
+        private readonly IUserRepository userRepository;
         private readonly IAuthenticationService auth;
 
-        public SetupController(GamesContext db, IAuthenticationService auth)
+        public SetupController(IConfigRepository configRepository, IUserRepository userRepository, IAuthenticationService auth)
         {
-            this.db = db;
+            this.configRepository = configRepository;
+            this.userRepository = userRepository;
             this.auth = auth;
         }
 
@@ -24,14 +26,14 @@ namespace Games.Controllers
         {
             return Render(new SetupViewModel
             {
-                Success = db.IsConfigured
+                Success = configRepository.IsConfigured
             });
         }
 
         [HttpPost]
         public ViewResult Do([FromForm] SetupViewModel vm)
         {
-            if (db.IsConfigured)
+            if (configRepository.IsConfigured)
             {
                 vm.Success = true;
                 return Render(vm);
@@ -51,17 +53,15 @@ namespace Games.Controllers
                 return Render(vm);
             }
 
-            db.Configs.Add(new Config
+            var defaultUser = new User
             {
-                GiantBombApiKey = vm.ApiKey?.Trim(),
-                DefaultUser = new User
-                {
-                    Username = vm.Username.Trim(),
-                    Password = auth.HashPassword(vm.Password)
-                }
-            });
+                Username = vm.Username.Trim(),
+                Password = auth.HashPassword(vm.Password)
+            };
 
-            db.SaveChanges();
+            userRepository.Add(defaultUser);
+            configRepository.Configure(defaultUser, vm.ApiKey?.Trim());
+
             vm.Success = true;
             return Render(vm);
         }

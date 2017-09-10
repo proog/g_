@@ -26,6 +26,18 @@ namespace Games.Repositories
             return Query().ToList();
         }
 
+        public void Add(User user)
+        {
+            db.Users.Add(user);
+            db.SaveChanges();
+        }
+
+        public void Update(User user)
+        {
+            db.Users.Update(user);
+            db.SaveChanges();
+        }
+
         private IQueryable<User> Query()
         {
             return db.Users

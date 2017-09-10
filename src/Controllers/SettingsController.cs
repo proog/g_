@@ -15,13 +15,13 @@ namespace Games.Controllers
     [Route("api")]
     public class SettingsController : Controller
     {
-        private readonly GamesContext db;
+        private readonly IConfigRepository configRepository;
         private readonly IUserRepository userRepository;
         private readonly IAuthenticationService auth;
 
-        public SettingsController(GamesContext db, IUserRepository userRepository, IAuthenticationService auth)
+        public SettingsController(IConfigRepository configRepository, IUserRepository userRepository, IAuthenticationService auth)
         {
-            this.db = db;
+            this.configRepository = configRepository;
             this.userRepository = userRepository;
             this.auth = auth;
         }
@@ -29,9 +29,7 @@ namespace Games.Controllers
         [HttpGet("config")]
         public ConfigViewModel GetConfig()
         {
-            var config = db.Configs
-                .Include(c => c.DefaultUser)
-                .SingleOrDefault();
+            var config = configRepository.DefaultConfig;
             config.VerifyExists();
             return ViewModelFactory.MakeConfigViewModel(config);
         }
@@ -39,7 +37,7 @@ namespace Games.Controllers
         [HttpGet("settings"), Authorize]
         public AuthorizedSettings GetSettings()
         {
-            var config = db.Configs.SingleOrDefault();
+            var config = configRepository.DefaultConfig;
             return new AuthorizedSettings
             {
                 DefaultUserId = config.DefaultUserId,
@@ -61,14 +59,14 @@ namespace Games.Controllers
             if (defaultUser == null)
                 throw new BadRequestException();
 
-            var config = db.Configs.Single();
-            config.DefaultUser = defaultUser;
-            config.GiantBombApiKey = settings.GiantBombApiKey;
+            configRepository.Configure(defaultUser, settings.GiantBombApiKey);
 
             if (!string.IsNullOrEmpty(settings.NewPassword))
+            {
                 user.Password = auth.HashPassword(settings.NewPassword);
+                userRepository.Update(user);
+            }
 
-            db.SaveChanges();
             return GetSettings();
         }
     }

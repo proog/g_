@@ -21,15 +21,17 @@ namespace Games.Controllers
     {
         private readonly string apiKey;
         private readonly HttpClient httpClient;
+        private readonly IConfigRepository configRepository;
         private readonly IAuthenticationService auth;
         private readonly JsonSerializerSettings jsonSettings;
         private const string NotFoundMessage = "No Giant Bomb API key specified. Please request an API key and add it in the settings dialog or database.";
 
-        public GiantBombController(GamesContext db, IAuthenticationService auth, HttpClient httpClient)
+        public GiantBombController(IConfigRepository configRepository, IAuthenticationService auth, HttpClient httpClient)
         {
+            this.configRepository = configRepository;
             this.auth = auth;
             this.httpClient = httpClient;
-            apiKey = db.Configs.SingleOrDefault()?.GiantBombApiKey;
+            apiKey = configRepository.DefaultConfig?.GiantBombApiKey;
             jsonSettings = new JsonSerializerSettings
             {
                 ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() },
