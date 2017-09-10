@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Games.Infrastructure;
 using Games.Interfaces;
 using Games.Repositories;
 using Games.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -21,41 +23,22 @@ namespace Games
 {
     public class Startup
     {
-        private readonly IConfigurationRoot configuration;
+        private readonly IConfiguration configuration;
         private readonly string dataDirectory;
         private readonly string imageDirectory;
         private readonly string connectionString;
 
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
-            configuration = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .Build();
-
+            this.configuration = configuration;
             dataDirectory = Path.Combine(env.ContentRootPath, configuration["dataDirectory"]);
             imageDirectory = Path.Combine(dataDirectory, "images");
             connectionString = $"Data Source={Path.Combine(dataDirectory, "games.db")}";
             Directory.CreateDirectory(imageDirectory);
         }
 
-        public void Configure(IApplicationBuilder app, IConfigRepository configRepository)
+        public void Configure(IApplicationBuilder app)
         {
-            var authOptions = new JwtBearerOptions
-            {
-                AuthenticationScheme = "Bearer",
-                AutomaticAuthenticate = true,
-                AutomaticChallenge = true,
-                TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateAudience = false,
-                    ValidateIssuer = false,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["signingKey"]))
-                }
-            };
             var fileOptions = new FileServerOptions
             {
                 RequestPath = "/images",
@@ -65,7 +48,11 @@ namespace Games
 
             // redirect to setup until configured
             app.MapWhen(
-                ctx => ctx.Request.Path == "/" && !configRepository.IsConfigured,
+                ctx =>
+                {
+                    var configRepository = ctx.RequestServices.GetService<IConfigRepository>();
+                    return ctx.Request.Path == "/" && !configRepository.IsConfigured;
+                },
                 req => req.Run(
                     ctx => Task.Run(() => ctx.Response.Redirect("setup"))
                 )
@@ -73,27 +60,15 @@ namespace Games
             app.UseDefaultFiles() // serve index.html for /
                 .UseStaticFiles() // serve public
                 .UseFileServer(fileOptions) // serve uploaded images
-                .UseJwtBearerAuthentication(authOptions)
+                .UseAuthentication()
                 .UseMvc();
             CreateDatabase(app);
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services
-                .Configure<AppSettings>(configuration)
-                .AddOptions()
-                .AddTransient<IAuthenticationService, AuthenticationService>()
-                .AddTransient<IGameRepository, GameRepository>()
-                .AddTransient<IUserRepository, UserRepository>()
-                .AddTransient<IGenreRepository, GenreRepository>()
-                .AddTransient<IPlatformRepository, PlatformRepository>()
-                .AddTransient<ITagRepository, TagRepository>()
-                .AddTransient<IConfigRepository, ConfigRepository>()
-                .AddSingleton<HttpClient>(CreateHttpClient())
-                .AddSingleton<IFileProvider>(new PhysicalFileProvider(dataDirectory))
-                .AddDbContext<GamesContext>(options => options.UseSqlite(connectionString))
-                .AddMvc(options =>
+            services.AddOptions().Configure<AppSettings>(configuration);
+            services.AddMvc(options =>
                 {
                     options.Filters.Add(new ValidateModelFilter());
                     options.Filters.Add(new HandleExceptionFilter());
@@ -108,6 +83,28 @@ namespace Games
                         NamingStrategy = new SnakeCaseNamingStrategy()
                     };
                 });
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateAudience = false,
+                        ValidateIssuer = false,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["signingKey"]))
+                    };
+                });
+            services.AddDbContext<GamesContext>(options => options.UseSqlite(connectionString))
+                .AddTransient<IAuthenticationService, AuthenticationService>()
+                .AddTransient<IGameRepository, GameRepository>()
+                .AddTransient<IUserRepository, UserRepository>()
+                .AddTransient<IGenreRepository, GenreRepository>()
+                .AddTransient<IPlatformRepository, PlatformRepository>()
+                .AddTransient<ITagRepository, TagRepository>()
+                .AddTransient<IConfigRepository, ConfigRepository>()
+                .AddSingleton<HttpClient>(CreateHttpClient())
+                .AddSingleton<IFileProvider>(new PhysicalFileProvider(dataDirectory));
         }
 
         private void CreateDatabase(IApplicationBuilder app)
