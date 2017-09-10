@@ -5,6 +5,9 @@
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <OutputType>Exe</OutputType>
     <PackageTargetFallback>$(PackageTargetFallback);netcoreapp</PackageTargetFallback>
+
+    <!-- Exclude node_modules from compilation as searching it slows msbuild to a crawl -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);**\node_modules\**;node_modules\**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
