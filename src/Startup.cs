@@ -97,6 +97,7 @@ namespace Games
                 });
             services.AddDbContext<GamesContext>(options => options.UseSqlite(connectionString))
                 .AddTransient<IAuthenticationService, AuthenticationService>()
+                .AddTransient<IGiantBombService, GiantBombService>()
                 .AddTransient<IGameRepository, GameRepository>()
                 .AddTransient<IUserRepository, UserRepository>()
                 .AddTransient<IGenreRepository, GenreRepository>()

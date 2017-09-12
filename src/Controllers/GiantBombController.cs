@@ -20,50 +20,26 @@ namespace Games.Controllers
     public class GiantBombController : Controller
     {
         private readonly string apiKey;
-        private readonly HttpClient httpClient;
-        private readonly IConfigRepository configRepository;
         private readonly IAuthenticationService auth;
-        private readonly JsonSerializerSettings jsonSettings;
+        private readonly IGiantBombService giantBomb;
         private const string NotFoundMessage = "No Giant Bomb API key specified. Please request an API key and add it in the settings dialog or database.";
 
-        public GiantBombController(IConfigRepository configRepository, IAuthenticationService auth, HttpClient httpClient)
+        public GiantBombController(IConfigRepository configRepository, IAuthenticationService auth, IGiantBombService giantBomb)
         {
-            this.configRepository = configRepository;
             this.auth = auth;
-            this.httpClient = httpClient;
+            this.giantBomb = giantBomb;
             apiKey = configRepository.DefaultConfig?.GiantBombApiKey;
-            jsonSettings = new JsonSerializerSettings
-            {
-                ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() },
-                Error = (sender, args) =>
-                {
-                    // sometimes GB returns results as an object instead of an
-                    // array on error conditions. We just squelch errors about
-                    // those since the response will be unusable anyway
-                    if (args.ErrorContext.Path == "results")
-                        args.ErrorContext.Handled = true;
-                }
-            };
         }
 
         [HttpGet("search/{title}")]
         public async Task<List<AssistedSearchResult>> Search(string title)
         {
-            apiKey.VerifyExists(NotFoundMessage);
+            if (apiKey == null)
+                throw new NotFoundException(NotFoundMessage);
 
-            var uri = GetUri("games", new Dictionary<string, string>
-            {
-                { "filter", "name:" + Uri.EscapeDataString(title) },
-                { "field_list", "name,original_release_date,id" },
-                { "limit", "20" }
-            });
-            var json = await httpClient.GetStringAsync(uri);
-            var response = JsonConvert.DeserializeObject<GBResponse<List<GBSearchResult>>>(json, jsonSettings);
+            var results = await giantBomb.Search(title, apiKey);
 
-            if (!response.IsSuccess)
-                throw new Exception(response.ErrorMessage);
-
-            return response.Results
+            return results
                 .Select(it => new AssistedSearchResult
                 {
                     Id = it.Id,
@@ -75,20 +51,11 @@ namespace Games.Controllers
         [HttpGet("game/{id}")]
         public async Task<AssistedGameResult> Get(int id)
         {
-            apiKey.VerifyExists(NotFoundMessage);
+            if (apiKey == null)
+                throw new NotFoundException(NotFoundMessage);
 
             var user = auth.GetCurrentUser(HttpContext);
-            var uri = GetUri($"game/{id}", new Dictionary<string, string>
-            {
-                { "field_list", "name,original_release_date,genres,platforms,image,developers,publishers" }
-            });
-            var json = await httpClient.GetStringAsync(uri);
-            var response = JsonConvert.DeserializeObject<GBResponse<GBGame>>(json, jsonSettings);
-
-            if (!response.IsSuccess)
-                throw new Exception(response.ErrorMessage);
-
-            var gb = response.Results;
+            var gb = await giantBomb.GetGame(id, apiKey);
             var result = new AssistedGameResult
             {
                 Title = gb.Name,
@@ -140,24 +107,6 @@ namespace Games.Controllers
             return gbName.Contains(name)
                 || gbName.Contains(shortName)
                 || name.Contains(gbName);
-        }
-
-        private Uri GetUri(string resource, IDictionary<string, string> queries)
-        {
-            return new UriBuilder
-            {
-                Scheme = "http",
-                Host = "www.giantbomb.com",
-                Path = $"api/{resource}",
-                Query = string.Join("&",
-                    queries.Concat(new[]
-                    {
-                        new KeyValuePair<string, string>("format", "json"),
-                        new KeyValuePair<string, string>("api_key", apiKey)
-                    })
-                    .Select(it => $"{it.Key}={it.Value}")
-                )
-            }.Uri;
         }
     }
 }
