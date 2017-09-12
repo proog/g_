@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Games.Interfaces;
 using Games.Services;
-using Microsoft.Extensions.Configuration;
 using Xunit;
 
 namespace Games.IntegrationTests
@@ -21,12 +20,7 @@ namespace Games.IntegrationTests
             httpClient.DefaultRequestHeaders.Add("User-Agent", new[] { Guid.NewGuid().ToString() });
 
             giantBomb = new GiantBombService(httpClient);
-
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("testsettings.json")
-                .AddJsonFile("testsettings.Production.json", optional: true)
-                .Build();
-            apiKey = configuration.GetValue<string>("giantBombApiKey");
+            apiKey = Helper.GetConfiguration()["giantBombApiKey"];
         }
 
         [Fact]
