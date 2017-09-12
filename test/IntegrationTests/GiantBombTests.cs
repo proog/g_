@@ -26,7 +26,7 @@ namespace Games.IntegrationTests
         [Fact]
         public async Task CanSearchGiantBomb()
         {
-            if (apiKey == null)
+            if (string.IsNullOrEmpty(apiKey))
             {
                 Console.WriteLine($"Skipping {nameof(CanSearchGiantBomb)}");
                 return;
@@ -40,7 +40,7 @@ namespace Games.IntegrationTests
         [Fact]
         public async Task CanFetchGiantBombGame()
         {
-            if (apiKey == null)
+            if (string.IsNullOrEmpty(apiKey))
             {
                 Console.WriteLine($"Skipping {nameof(CanFetchGiantBombGame)}");
                 return;
