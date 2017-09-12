@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Games.Controllers
 {
-    [Route("api/users/{userId}")]
+    [Route("api/users/{" + Constants.UserIdParameter + "}")]
     public class DescriptorController : Controller
     {
         private readonly IUserRepository users;
@@ -65,49 +65,49 @@ namespace Games.Controllers
             return Single(userId, id, tags);
         }
 
-        [HttpPost("genres"), Authorize]
+        [HttpPost("genres"), Authorize(Constants.SameUserPolicy)]
         public DescriptorViewModel AddGenre(int userId, [FromBody] DescriptorViewModel rendition)
         {
             return Add(userId, rendition, genres);
         }
-        [HttpPost("platforms"), Authorize]
+        [HttpPost("platforms"), Authorize(Constants.SameUserPolicy)]
         public DescriptorViewModel AddPlatform(int userId, [FromBody] DescriptorViewModel rendition)
         {
             return Add(userId, rendition, platforms);
         }
-        [HttpPost("tags"), Authorize]
+        [HttpPost("tags"), Authorize(Constants.SameUserPolicy)]
         public DescriptorViewModel AddTag(int userId, [FromBody] DescriptorViewModel rendition)
         {
             return Add(userId, rendition, tags);
         }
 
-        [HttpPut("genres/{id}"), Authorize]
+        [HttpPut("genres/{id}"), Authorize(Constants.SameUserPolicy)]
         public DescriptorViewModel UpdateGenre(int userId, int id, [FromBody] DescriptorViewModel rendition)
         {
             return Update(userId, id, rendition, genres);
         }
-        [HttpPut("platforms/{id}"), Authorize]
+        [HttpPut("platforms/{id}"), Authorize(Constants.SameUserPolicy)]
         public DescriptorViewModel UpdatePlatform(int userId, int id, [FromBody] DescriptorViewModel rendition)
         {
             return Update(userId, id, rendition, platforms);
         }
-        [HttpPut("tags/{id}"), Authorize]
+        [HttpPut("tags/{id}"), Authorize(Constants.SameUserPolicy)]
         public DescriptorViewModel UpdateTag(int userId, int id, [FromBody] DescriptorViewModel rendition)
         {
             return Update(userId, id, rendition, tags);
         }
 
-        [HttpDelete("genres/{id}"), Authorize]
+        [HttpDelete("genres/{id}"), Authorize(Constants.SameUserPolicy)]
         public IActionResult DeleteGenre(int userId, int id)
         {
             return Delete(userId, id, genres);
         }
-        [HttpDelete("platforms/{id}"), Authorize]
+        [HttpDelete("platforms/{id}"), Authorize(Constants.SameUserPolicy)]
         public IActionResult DeletePlatform(int userId, int id)
         {
             return Delete(userId, id, platforms);
         }
-        [HttpDelete("tags/{id}"), Authorize]
+        [HttpDelete("tags/{id}"), Authorize(Constants.SameUserPolicy)]
         public IActionResult DeleteTag(int userId, int id)
         {
             return Delete(userId, id, tags);
@@ -116,8 +116,6 @@ namespace Games.Controllers
         private DescriptorViewModel Add<T>(int userId, DescriptorViewModel vm, IDescriptorRepository<T> repository) where T : Descriptor, new()
         {
             var user = users.Get(userId);
-            auth.VerifyCurrentUser(user, HttpContext);
-
             var descriptor = new T
             {
                 Name = vm.Name,
@@ -134,8 +132,6 @@ namespace Games.Controllers
         private DescriptorViewModel Update<T>(int userId, int id, DescriptorViewModel vm, IDescriptorRepository<T> repository) where T : Descriptor
         {
             var user = users.Get(userId);
-            auth.VerifyCurrentUser(user, HttpContext);
-
             var descriptor = repository.Get(user, id);
             descriptor.VerifyExists();
 
@@ -150,8 +146,6 @@ namespace Games.Controllers
         private IActionResult Delete<T>(int userId, int id, IDescriptorRepository<T> repository) where T : Descriptor
         {
             var user = users.Get(userId);
-            auth.VerifyCurrentUser(user, HttpContext);
-
             var descriptor = repository.Get(user, id);
             descriptor.VerifyExists();
             repository.Delete(descriptor);

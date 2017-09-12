@@ -95,7 +95,8 @@ namespace Games
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["signingKey"]))
                     };
                 });
-            services.AddDbContext<GamesContext>(options => options.UseSqlite(connectionString))
+            services.AddRouteUserIdAuthorization()
+                .AddDbContext<GamesContext>(options => options.UseSqlite(connectionString))
                 .AddTransient<IAuthenticationService, AuthenticationService>()
                 .AddTransient<IGiantBombService, GiantBombService>()
                 .AddTransient<IGameRepository, GameRepository>()

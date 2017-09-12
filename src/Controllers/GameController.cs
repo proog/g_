@@ -15,7 +15,7 @@ using Microsoft.Extensions.FileProviders;
 
 namespace Games.Controllers
 {
-    [Route("api/users/{userId}")]
+    [Route("api/users/{" + Constants.UserIdParameter + "}")]
     public class GameController : Controller
     {
         private readonly IGameRepository gameRepository;
@@ -133,12 +133,10 @@ namespace Games.Controllers
                 .ToList();
         }
 
-        [HttpPost("games"), Authorize]
+        [HttpPost("games"), Authorize(Constants.SameUserPolicy)]
         public GameViewModel AddGame(int userId, [FromBody] GameViewModel vm)
         {
             var user = userRepository.Get(userId);
-            auth.VerifyCurrentUser(user, HttpContext);
-
             var game = new Game
             {
                 Title = vm.Title,
@@ -166,12 +164,10 @@ namespace Games.Controllers
             return ViewModelFactory.MakeGameViewModel(game);
         }
 
-        [HttpPut("games/{id}"), Authorize]
+        [HttpPut("games/{id}"), Authorize(Constants.SameUserPolicy)]
         public GameViewModel UpdateGame(int userId, int id, [FromBody] GameViewModel vm)
         {
             var user = userRepository.Get(userId);
-            auth.VerifyCurrentUser(user, HttpContext);
-
             var game = gameRepository.Get(user, id);
             game.VerifyExists();
 
@@ -197,12 +193,10 @@ namespace Games.Controllers
             return ViewModelFactory.MakeGameViewModel(game);
         }
 
-        [HttpDelete("games/{id}"), Authorize]
+        [HttpDelete("games/{id}"), Authorize(Constants.SameUserPolicy)]
         public IActionResult DeleteGame(int userId, int id)
         {
             var user = userRepository.Get(userId);
-            auth.VerifyCurrentUser(user, HttpContext);
-
             var game = gameRepository.Get(user, id);
             game.VerifyExists();
 

@@ -15,7 +15,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Games.Controllers
 {
-    [Route("api/users/{userId}/games/{id}/image"), Authorize]
+    [Route("api/users/{" + Constants.UserIdParameter + "}/games/{id}/image"), Authorize(Constants.SameUserPolicy)]
     public class ImageController : Controller
     {
         private readonly IGameRepository gameRepository;
@@ -37,8 +37,6 @@ namespace Games.Controllers
         public async Task<GameViewModel> UploadImage(int userId, int id)
         {
             var user = userRepository.Get(userId);
-            auth.VerifyCurrentUser(user, HttpContext);
-
             var game = gameRepository.Get(user, id);
             game.VerifyExists();
 
@@ -68,8 +66,6 @@ namespace Games.Controllers
         public IActionResult DeleteImage(int userId, int id)
         {
             var user = userRepository.Get(userId);
-            auth.VerifyCurrentUser(user, HttpContext);
-
             var game = gameRepository.Get(user, id);
             game.VerifyExists();
 
