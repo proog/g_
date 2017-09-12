@@ -10,7 +10,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Games.Services
 {
-    class GiantBombService : IGiantBombService
+    public class GiantBombService : IGiantBombService
     {
         private readonly HttpClient httpClient;
         private readonly JsonSerializerSettings jsonSettings;

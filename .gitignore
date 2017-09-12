@@ -3,6 +3,7 @@ src/public/g.min.js
 src/public/g.min.js.map
 data
 appsettings.*.json
+testsettings.*.json
 bin
 obj
 .vscode
