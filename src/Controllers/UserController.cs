@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers
 {
-    [Route("api")]
+    [Route("api/users")]
     public class UserController : Controller
     {
         private readonly IUserRepository userRepository;
@@ -19,7 +19,7 @@ namespace Games.Controllers
             this.userRepository = userRepository;
         }
 
-        [HttpGet("users")]
+        [HttpGet]
         public List<UserViewModel> GetUsers()
         {
             return userRepository.All()
@@ -27,7 +27,7 @@ namespace Games.Controllers
                 .ToList();
         }
 
-        [HttpGet("users/{id}")]
+        [HttpGet("{id}")]
         public UserViewModel GetUser(int id)
         {
             var user = userRepository.Get(id);
