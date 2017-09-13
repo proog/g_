@@ -49,14 +49,7 @@ namespace Games.Controllers
                 : await ReadGiantBombImage(Request);
 
             using (imageStream)
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(fileInfo.PhysicalPath));
-
-                using (var stream = new FileStream(fileInfo.PhysicalPath, FileMode.Create))
-                {
-                    imageStream.CopyTo(stream);
-                }
-            }
+                await WriteToFile(imageStream, fileInfo.PhysicalPath);
 
             game.Image = path;
             gameRepository.Update(game);
@@ -107,6 +100,14 @@ namespace Games.Controllers
                 throw new Exception("Giant Bomb returned non-success status code");
 
             return await response.Content.ReadAsStreamAsync();
+        }
+
+        private async Task WriteToFile(Stream stream, string path)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            using (var file = new FileStream(path, FileMode.Create))
+                await stream.CopyToAsync(file);
         }
     }
 }
