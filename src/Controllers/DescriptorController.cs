@@ -133,7 +133,9 @@ namespace Games.Controllers
         {
             var user = users.Get(userId);
             var descriptor = repository.Get(user, id);
-            descriptor.VerifyExists();
+
+            if (descriptor == null)
+                throw new NotFoundException();
 
             descriptor.Name = vm.Name;
             descriptor.ShortName = vm.ShortName;
@@ -147,16 +149,20 @@ namespace Games.Controllers
         {
             var user = users.Get(userId);
             var descriptor = repository.Get(user, id);
-            descriptor.VerifyExists();
-            repository.Delete(descriptor);
 
+            if (descriptor == null)
+                throw new NotFoundException();
+
+            repository.Delete(descriptor);
             return NoContent();
         }
 
         private List<DescriptorViewModel> All<T>(int userId, IDescriptorRepository<T> repository) where T : Descriptor
         {
             var user = users.Get(userId);
-            user.VerifyExists();
+
+            if (user == null)
+                throw new NotFoundException();
 
             return repository.All(user)
                 .Select(ViewModelFactory.MakeDescriptorViewModel)
@@ -166,10 +172,14 @@ namespace Games.Controllers
         private DescriptorViewModel Single<T>(int userId, int id, IDescriptorRepository<T> repository) where T : Descriptor
         {
             var user = users.Get(userId);
-            user.VerifyExists();
+
+            if (user == null)
+                throw new NotFoundException();
 
             var descriptor = repository.Get(user, id);
-            descriptor.VerifyExists();
+
+            if (descriptor == null)
+                throw new NotFoundException();
 
             return ViewModelFactory.MakeDescriptorViewModel(descriptor);
         }

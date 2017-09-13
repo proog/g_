@@ -33,7 +33,9 @@ namespace Games.Controllers
         public List<GameViewModel> GetGames(int userId)
         {
             var user = userRepository.Get(userId);
-            user.VerifyExists();
+
+            if (user == null)
+                throw new NotFoundException();
 
             var games = gameRepository.All(user);
 
@@ -49,13 +51,14 @@ namespace Games.Controllers
         public GameViewModel GetGame(int userId, int id)
         {
             var user = userRepository.Get(userId);
-            user.VerifyExists();
+
+            if (user == null)
+                throw new NotFoundException();
 
             var game = gameRepository.Get(user, id);
-            game.VerifyExists();
 
-            if (game.Hidden && !IsCurrentUser(user))
-                (null as object).VerifyExists();
+            if (game == null || game.Hidden && !IsCurrentUser(user))
+                throw new NotFoundException();
 
             return ViewModelFactory.MakeGameViewModel(game);
         }
@@ -64,7 +67,9 @@ namespace Games.Controllers
         public List<Suggestion> GetSuggestions(int userId)
         {
             var user = userRepository.Get(userId);
-            user.VerifyExists();
+
+            if (user == null)
+                throw new NotFoundException();
 
             var allGames = gameRepository.All(user);
 
@@ -169,7 +174,9 @@ namespace Games.Controllers
         {
             var user = userRepository.Get(userId);
             var game = gameRepository.Get(user, id);
-            game.VerifyExists();
+
+            if (game == null)
+                throw new NotFoundException();
 
             game.Title = vm.Title;
             game.Developer = vm.Developer;
@@ -198,7 +205,9 @@ namespace Games.Controllers
         {
             var user = userRepository.Get(userId);
             var game = gameRepository.Get(user, id);
-            game.VerifyExists();
+
+            if (game == null)
+                throw new NotFoundException();
 
             gameRepository.Delete(game);
             return NoContent();

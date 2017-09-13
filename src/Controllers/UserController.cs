@@ -31,7 +31,10 @@ namespace Games.Controllers
         public UserViewModel GetUser(int id)
         {
             var user = userRepository.Get(id);
-            user.VerifyExists();
+
+            if (user == null)
+                throw new NotFoundException();
+
             return ViewModelFactory.MakeUserViewModel(user);
         }
     }

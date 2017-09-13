@@ -38,7 +38,9 @@ namespace Games.Controllers
         {
             var user = userRepository.Get(userId);
             var game = gameRepository.Get(user, id);
-            game.VerifyExists();
+
+            if (game == null)
+                throw new NotFoundException();
 
             var path = $"images/{game.Id}/image.jpg";
             var fileInfo = data.GetFileInfo(path);
@@ -67,11 +69,12 @@ namespace Games.Controllers
         {
             var user = userRepository.Get(userId);
             var game = gameRepository.Get(user, id);
-            game.VerifyExists();
+
+            if (game == null)
+                throw new NotFoundException();
 
             game.Image = null;
             gameRepository.Update(game);
-
             return NoContent();
         }
 

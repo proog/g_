@@ -30,7 +30,10 @@ namespace Games.Controllers
         public ConfigViewModel GetConfig()
         {
             var config = configRepository.DefaultConfig;
-            config.VerifyExists();
+
+            if (config == null)
+                throw new NotFoundException();
+
             return ViewModelFactory.MakeConfigViewModel(config);
         }
 
