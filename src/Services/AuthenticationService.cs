@@ -71,17 +71,5 @@ namespace Games.Services
             var currentUser = GetCurrentUser(ctx);
             return currentUser != null && user.Id == currentUser.Id;
         }
-
-        public void VerifyCurrentUser(User user, HttpContext ctx)
-        {
-            user.VerifyExists("The user does not exist.");
-
-            if (!IsCurrentUser(user, ctx))
-            {
-                throw new UnauthorizedException(
-                    "The specified user is not the current user."
-                );
-            }
-        }
     }
 }

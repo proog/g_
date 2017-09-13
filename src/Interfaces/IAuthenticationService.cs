@@ -13,7 +13,5 @@ namespace Games.Interfaces
         string HashPassword(string plain);
 
         bool IsCurrentUser(User user, HttpContext ctx);
-
-        void VerifyCurrentUser(User user, HttpContext ctx);
     }
 }
