@@ -6,12 +6,8 @@ namespace Games.Interfaces
 {
     public interface IAuthenticationService
     {
-        User GetCurrentUser(HttpContext ctx);
-
         string Authenticate(User user);
 
         string HashPassword(string plain);
-
-        bool IsCurrentUser(User user, HttpContext ctx);
     }
 }

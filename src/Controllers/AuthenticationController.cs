@@ -25,8 +25,12 @@ namespace Games.Controllers
         [HttpGet("login"), Authorize]
         public UserViewModel GetCurrentUser()
         {
-            var user = auth.GetCurrentUser(HttpContext);
-            user.VerifyExists();
+            var idClaim = User.FindFirst(Constants.UserIdClaim);
+
+            if (idClaim == null)
+                throw new NotFoundException();
+
+            var user = userRepository.Get(int.Parse(idClaim.Value));
             return ViewModelFactory.MakeUserViewModel(user);
         }
 

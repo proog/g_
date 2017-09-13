@@ -1,56 +1,38 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Interfaces;
 using Games.Models;
-using Games.Repositories;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Games.Services
 {
-    class AuthenticationService : IAuthenticationService
+    public class AuthenticationService : IAuthenticationService
     {
         private readonly string signingKey;
-        private const string claimType = "id";
-        private const string claimValueType = ClaimValueTypes.Integer;
-        private const string authenticationType = "Password";
-        private readonly IUserRepository userRepository;
 
-        public AuthenticationService(IUserRepository userRepository, IOptions<AppSettings> appSettings)
+        public AuthenticationService(IOptions<AppSettings> appSettings)
         {
-            this.userRepository = userRepository;
             this.signingKey = appSettings.Value.SigningKey;
-        }
-
-        public User GetCurrentUser(HttpContext ctx)
-        {
-            var idClaim = ctx.User.Claims.FirstOrDefault(
-                c => c.Type == claimType && c.ValueType == claimValueType
-            );
-            return idClaim != null
-                ? userRepository.Get(int.Parse(idClaim.Value))
-                : null;
         }
 
         public string Authenticate(User user)
         {
-            var handler = new JwtSecurityTokenHandler();
-            var identity = new ClaimsIdentity(
-                new[] { new Claim(claimType, user.Id.ToString(), claimValueType) }
-            );
+            var claims = new[]
+            {
+                new Claim(Constants.UserIdClaim, user.Id.ToString(), ClaimValueTypes.Integer)
+            };
             var signingCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
                 SecurityAlgorithms.HmacSha256Signature
             );
+            var handler = new JwtSecurityTokenHandler();
             var token = handler.CreateJwtSecurityToken(
-                subject: identity,
+                subject: new ClaimsIdentity(claims),
                 signingCredentials: signingCredentials,
                 expires: DateTime.Now.AddHours(6)
             );
@@ -64,12 +46,6 @@ namespace Games.Services
             return BitConverter.ToString(hashBytes)
                 .Replace("-", "")
                 .ToLower();
-        }
-
-        public bool IsCurrentUser(User user, HttpContext ctx)
-        {
-            var currentUser = GetCurrentUser(ctx);
-            return currentUser != null && user.Id == currentUser.Id;
         }
     }
 }

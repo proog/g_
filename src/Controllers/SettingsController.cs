@@ -48,7 +48,8 @@ namespace Games.Controllers
         [HttpPut("settings"), Authorize]
         public AuthorizedSettings UpdateSettings([FromBody] AuthorizedSettingsInput settings)
         {
-            var user = auth.GetCurrentUser(HttpContext);
+            var idClaim = User.FindFirst(Constants.UserIdClaim);
+            var user = userRepository.Get(int.Parse(idClaim.Value));
             var hash = auth.HashPassword(settings.OldPassword);
 
             if (hash != user.Password)

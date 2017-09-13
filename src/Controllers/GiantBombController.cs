@@ -20,13 +20,13 @@ namespace Games.Controllers
     public class GiantBombController : Controller
     {
         private readonly string apiKey;
-        private readonly IAuthenticationService auth;
+        private readonly IUserRepository userRepository;
         private readonly IGiantBombService giantBomb;
         private const string NotFoundMessage = "No Giant Bomb API key specified. Please request an API key and add it in the settings dialog or database.";
 
-        public GiantBombController(IConfigRepository configRepository, IAuthenticationService auth, IGiantBombService giantBomb)
+        public GiantBombController(IConfigRepository configRepository, IUserRepository userRepository, IGiantBombService giantBomb)
         {
-            this.auth = auth;
+            this.userRepository = userRepository;
             this.giantBomb = giantBomb;
             apiKey = configRepository.DefaultConfig?.GiantBombApiKey;
         }
@@ -54,7 +54,9 @@ namespace Games.Controllers
             if (apiKey == null)
                 throw new NotFoundException(NotFoundMessage);
 
-            var user = auth.GetCurrentUser(HttpContext);
+            var idClaim = User.FindFirst(Constants.UserIdClaim);
+            var user = userRepository.Get(int.Parse(idClaim.Value));
+
             var gb = await giantBomb.GetGame(id, apiKey);
             var result = new AssistedGameResult
             {

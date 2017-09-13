@@ -5,5 +5,7 @@ namespace Games
         public const string SameUserPolicy = "SameUser";
 
         public const string UserIdParameter = "userId";
+
+        public const string UserIdClaim = "id";
     }
 }

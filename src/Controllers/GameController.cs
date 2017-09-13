@@ -37,7 +37,7 @@ namespace Games.Controllers
 
             var games = gameRepository.All(user);
 
-            if (!auth.IsCurrentUser(user, HttpContext))
+            if (!IsCurrentUser(user))
                 games = games.Where(game => !game.Hidden);
 
             return games
@@ -54,7 +54,7 @@ namespace Games.Controllers
             var game = gameRepository.Get(user, id);
             game.VerifyExists();
 
-            if (game.Hidden && !auth.IsCurrentUser(user, HttpContext))
+            if (game.Hidden && !IsCurrentUser(user))
                 (null as object).VerifyExists();
 
             return ViewModelFactory.MakeGameViewModel(game);
@@ -68,7 +68,7 @@ namespace Games.Controllers
 
             var allGames = gameRepository.All(user);
 
-            if (!auth.IsCurrentUser(user, HttpContext))
+            if (!IsCurrentUser(user))
                 allGames = allGames.Where(game => !game.Hidden);
 
             var applicableGames = allGames
@@ -202,6 +202,12 @@ namespace Games.Controllers
 
             gameRepository.Delete(game);
             return NoContent();
+        }
+
+        private bool IsCurrentUser(User user)
+        {
+            var idClaim = User.FindFirst(Constants.UserIdClaim);
+            return idClaim != null && int.Parse(idClaim.Value) == user.Id;
         }
     }
 }
