@@ -23,7 +23,7 @@ namespace Games.Infrastructure
         {
             var filterContext = context.Resource as AuthorizationFilterContext;
             var routeUserId = filterContext?.RouteData?.Values[Constants.UserIdParameter] as string;
-            return context.User.HasClaim("id", routeUserId);
+            return context.User.HasClaim(Constants.UserIdClaim, routeUserId);
         }
     }
 }

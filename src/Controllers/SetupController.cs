@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Games.Controllers
 {
     [Route("setup")]
-    public partial class SetupController : Controller
+    public class SetupController : Controller
     {
         private readonly IConfigRepository configRepository;
         private readonly IUserRepository userRepository;

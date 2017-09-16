@@ -17,7 +17,7 @@ namespace Games.Services
 
         public AuthenticationService(IOptions<AppSettings> appSettings)
         {
-            this.signingKey = appSettings.Value.SigningKey;
+            signingKey = appSettings.Value.SigningKey;
         }
 
         public string Authenticate(User user)

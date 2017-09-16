@@ -45,8 +45,8 @@ namespace Games.Controllers
             var path = $"images/{game.Id}/image.jpg";
             var fileInfo = data.GetFileInfo(path);
             var imageStream = Request.HasFormContentType
-                ? await ReadFormImage(Request)
-                : await ReadGiantBombImage(Request);
+                ? await ReadFormImage()
+                : await ReadGiantBombImage();
 
             using (imageStream)
                 await WriteToFile(imageStream, fileInfo.PhysicalPath);
@@ -71,9 +71,9 @@ namespace Games.Controllers
             return NoContent();
         }
 
-        private async Task<Stream> ReadFormImage(HttpRequest request)
+        private async Task<Stream> ReadFormImage()
         {
-            var form = await request.ReadFormAsync();
+            var form = await Request.ReadFormAsync();
             var file = form.Files["image"];
 
             if (file == null)
@@ -82,7 +82,7 @@ namespace Games.Controllers
             return file.OpenReadStream();
         }
 
-        private async Task<Stream> ReadGiantBombImage(HttpRequest request)
+        private async Task<Stream> ReadGiantBombImage()
         {
             string url;
             using (var reader = new StreamReader(Request.Body))

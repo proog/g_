@@ -13,7 +13,7 @@ namespace Games.Repositories
         private readonly GamesContext db;
         private readonly DbSet<T> dbSet;
 
-        public DescriptorRepository(GamesContext db, DbSet<T> dbSet)
+        protected DescriptorRepository(GamesContext db, DbSet<T> dbSet)
         {
             this.db = db;
             this.dbSet = dbSet;
