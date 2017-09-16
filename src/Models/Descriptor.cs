@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-
 namespace Games.Models
 {
     public abstract class Descriptor : DbModel

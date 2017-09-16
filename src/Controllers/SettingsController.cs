@@ -1,14 +1,8 @@
-using System.Linq;
-using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Interfaces;
-using Games.Models;
 using Games.Models.ViewModels;
-using Games.Repositories;
-using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Games.Controllers
 {

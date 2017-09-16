@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Games.Models.ViewModels
 {
     public class ApiError

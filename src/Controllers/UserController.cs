@@ -2,9 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Games.Infrastructure;
 using Games.Interfaces;
-using Games.Models;
 using Games.Models.ViewModels;
-using Games.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers

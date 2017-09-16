@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-
 namespace Games.Models.ViewModels
 {
     public class DescriptorViewModel

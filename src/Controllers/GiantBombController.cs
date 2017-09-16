@@ -1,18 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Interfaces;
 using Games.Models;
 using Games.Models.GiantBomb;
 using Games.Models.ViewModels;
-using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace Games.Controllers
 {

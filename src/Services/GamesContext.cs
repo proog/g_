@@ -1,7 +1,5 @@
-using System.Linq;
 using Games.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 
 namespace Games.Services
 {

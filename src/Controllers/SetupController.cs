@@ -2,7 +2,6 @@ using System.Linq;
 using Games.Interfaces;
 using Games.Models;
 using Games.Models.ViewModels;
-using Games.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers

@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Games.Models.ViewModels
 {
     public class ConfigViewModel
