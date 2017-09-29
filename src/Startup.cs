@@ -9,6 +9,7 @@ using Games.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,6 +38,10 @@ namespace Games
 
         public void Configure(IApplicationBuilder app)
         {
+            var headerOptions = new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            };
             var fileOptions = new FileServerOptions
             {
                 RequestPath = "/images",
@@ -55,7 +60,8 @@ namespace Games
                     ctx => Task.Run(() => ctx.Response.Redirect("setup"))
                 )
             );
-            app.UseDefaultFiles() // serve index.html for /
+            app.UseForwardedHeaders(headerOptions) // trust reverse proxy
+                .UseDefaultFiles() // serve index.html for /
                 .UseStaticFiles() // serve public
                 .UseFileServer(fileOptions) // serve uploaded images
                 .UseAuthentication()
