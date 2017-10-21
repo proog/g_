@@ -16,7 +16,9 @@ Vue.component('game-item', {
       isSaving: false,
       edited: null,
       imageFile: null,
-      imageRemoved: false
+      imageUrl: null,
+      imageRemoved: false,
+      completions: null
     }
   },
   computed: {
@@ -71,11 +73,15 @@ Vue.component('game-item', {
       }
       let postOrDeleteImage = () => {
         if (this.imageFile)
-          return this.api.postImage(this.game, this.imageFile)
+          return this.api.postImage(this.edited, this.imageFile)
             .then(gameWithImage => this.edited.image = gameWithImage.image)
 
-        if (this.game.image && this.imageRemoved)
-          return this.api.deleteImage(this.game)
+        if (this.imageUrl)
+          return this.api.postImageUrl(this.edited, this.imageUrl)
+            .then(gameWithImage => this.edited.image = gameWithImage.image)
+
+        if (this.edited.image && this.imageRemoved)
+          return this.api.deleteImage(this.edited)
             .then(() => this.edited.image = null)
       }
 
@@ -123,15 +129,34 @@ Vue.component('game-item', {
 
       this.imageRemoved = true
       this.imageFile = null
+      this.imageUrl = null
 
       // clear the file input by resetting the form
       this.$refs.imageForm.reset()
     },
     autocomplete: _.debounce(function (title) {
       this.api.getAssistedSearch(title).then(gbGames => {
-        console.log(gbGames)
+        this.completions = gbGames
+        $(this.$refs.titleInput).dropdown('toggle')
       })
-    }, 1000)
+    }, 1000),
+    selectCompletion: function (completion) {
+      this.completions = null
+
+      this.api.getAssistedGame(completion.id).then(gbGame => {
+        this.edited.title = gbGame.title
+        this.edited.developer = gbGame.developer
+        this.edited.publisher = gbGame.publisher
+        this.edited.year = gbGame.year
+        this.edited.genre_ids = gbGame.genre_ids
+        this.edited.platform_ids = gbGame.platform_ids
+
+        this.imageUrl = gbGame.image_url
+        this.imageRemoved = false
+        this.imageFile = null
+        this.$refs.imageForm.reset()
+      })
+    }
   },
   mounted() {
     // if adding a new game, go directly to edit mode

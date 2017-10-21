@@ -38,6 +38,13 @@ class Api {
 
     return this.send(`/api/users/${this.userId}/games/${game.id}/image`, 'POST', form)
   }
+  postImageUrl(game, imageUrl) {
+    let payload = {
+      image_url: imageUrl
+    }
+
+    return this.post(`/api/users/${this.userId}/games/${game.id}/image`, payload)
+  }
   deleteImage(game) {
     return this.del(`/api/users/${this.userId}/games/${game.id}/image`)
   }
