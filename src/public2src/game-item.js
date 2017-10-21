@@ -46,7 +46,11 @@ Vue.component('game-item', {
     }
   },
   watch: {
-    'edited.title': function (newTitle) {
+    'edited.title': function (newTitle, oldTitle) {
+      // for new games, update sort_as if it's following the title
+      if (this.isNew && this.edited.sort_as === oldTitle)
+        this.edited.sort_as = newTitle
+
       // when editing the title, provide autocompletion via giant bomb
       if (this.isAssisted && newTitle.length > 2)
         this.autocomplete(newTitle)
