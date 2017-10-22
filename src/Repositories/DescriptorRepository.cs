@@ -45,6 +45,7 @@ namespace Games.Repositories
         public void Delete(T descriptor)
         {
             dbSet.Remove(descriptor);
+            db.SaveChanges();
         }
     }
 
