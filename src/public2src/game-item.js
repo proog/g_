@@ -74,11 +74,11 @@ Vue.component('game-item', {
       let postOrDeleteImage = () => {
         if (this.imageFile)
           return this.api.postImage(this.edited, this.imageFile)
-            .then(gameWithImage => this.edited.image = gameWithImage.image)
+            .then(withImage => this.edited.image = uniqueUrl(withImage.image))
 
         if (this.imageUrl)
           return this.api.postImageUrl(this.edited, this.imageUrl)
-            .then(gameWithImage => this.edited.image = gameWithImage.image)
+            .then(withImage => this.edited.image = uniqueUrl(withImage.image))
 
         if (this.edited.image && this.imageRemoved)
           return this.api.deleteImage(this.edited)
@@ -120,6 +120,7 @@ Vue.component('game-item', {
     },
     updateImage(fileEvent) {
       this.imageRemoved = false
+      this.imageUrl = null
       this.imageFile = _.head(fileEvent.target.files)
     },
     removeImage() {
@@ -170,4 +171,9 @@ function summary(descriptors, ids) {
     .filter(x => _.includes(ids, x.id))
     .map(x => x.name)
     .join(', ')
+}
+
+function uniqueUrl(url) {
+  // generate a unique url to get around caching when updating images
+  return `${url}?_t=${_.uniqueId()}`
 }
