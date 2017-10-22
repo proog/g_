@@ -131,8 +131,8 @@ Vue.component('game-item', {
       this.imageFile = null
       this.imageUrl = null
 
-      // clear the file input by resetting the form
-      this.$refs.imageForm.reset()
+      // clear the file input by setting its value to null
+      this.$refs.imageInput.value = null
     },
     autocomplete: _.debounce(function (title) {
       this.api.getAssistedSearch(title).then(gbGames => {
@@ -154,7 +154,7 @@ Vue.component('game-item', {
         this.imageUrl = gbGame.image_url
         this.imageRemoved = false
         this.imageFile = null
-        this.$refs.imageForm.reset()
+        this.$refs.imageInput.value = null
       })
     }
   },
