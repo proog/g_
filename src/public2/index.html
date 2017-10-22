@@ -136,9 +136,7 @@
                        :disabled="isSaving"
                        @change="updateImage"
                        ref="imageInput">
-                <span class="custom-file-control">
-                  {{ imageFile && imageFile.name }}
-                </span>
+                <span class="custom-file-control">{{ imageFile && imageFile.name }}</span>
               </label>
             </div>
             <div class="form-group" v-if="imageUrl">
