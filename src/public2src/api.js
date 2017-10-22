@@ -33,7 +33,7 @@ class Api {
   }
 
   postImage(game, imageFile) {
-    let form = new FormData();
+    let form = new FormData()
     form.append('image', imageFile)
 
     return this.send(`/api/users/${this.userId}/games/${game.id}/image`, 'POST', form)

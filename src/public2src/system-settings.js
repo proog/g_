@@ -50,15 +50,26 @@ Vue.component('system-settings', {
 
       // map to delete, post and put
       let promises = _.flatten([
-        /*_.map(addedGenres, x => postGenre(9999999, x)),
-        _.map(addedPlatforms, x => postPlatform(9999999, x)),
-        _.map(addedTags, x => postTag(9999999, x)),*/
+        _.map(addedGenres, x => this.api.postGenre(x)),
+        _.map(addedPlatforms, x => this.api.postPlatform(x)),
+        _.map(addedTags, x => this.api.postTag(x)),
+        _.map(updatedGenres, x => this.api.putGenre(x)),
+        _.map(updatedPlatforms, x => this.api.putPlatform(x)),
+        _.map(updatedTags, x => this.api.putTag(x)),
+        _.map(removedGenres, x => this.api.deleteGenre(x)),
+        _.map(removedPlatforms, x => this.api.deletePlatform(x)),
+        _.map(removedTags, x => this.api.deleteTag(x))
       ])
 
-      Promise.all(promises).then(() => {
-        // replace with refreshed arrays
-        this.$emit('save', this.editedGenres, this.editedPlatforms, this.editedTags)
-      })
+      Promise.all(promises)
+        .then(() => Promise.all([
+          this.api.getGenres(),
+          this.api.getPlatforms(),
+          this.api.getTags()
+        ]))
+        .then(refreshed => {
+          this.$emit('save', refreshed[0], refreshed[1], refreshed[2])
+        })
     },
     cancel() {
       this.$emit('cancel')

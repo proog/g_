@@ -94,6 +94,7 @@ let app = new Vue({
       this.platforms = platforms
       this.tags = tags
 
+      // remove any relations to deleted descriptors
       for (let game of this.games) {
         game.genre_ids = pruneGameDescriptors(game.genre_ids, genres)
         game.platform_ids = pruneGameDescriptors(game.platform_ids, platforms)
