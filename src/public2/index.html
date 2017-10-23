@@ -162,6 +162,7 @@
                          required
                          v-model="edited.title"
                          v-focus
+                         @input="titleChanged"
                          ref="titleInput"
                          data-toggle="dropdown">
                   <div class="dropdown-menu">

@@ -52,10 +52,6 @@ Vue.component('game-item', {
       // for new games, update sort_as if it's following the title
       if (this.isNew && this.edited.sort_as === oldTitle)
         this.edited.sort_as = newTitle
-
-      // when editing the title, provide autocompletion via giant bomb
-      if (this.isAssisted && newTitle.length > 2)
-        this.autocomplete(newTitle)
     }
   },
   methods: {
@@ -135,14 +131,19 @@ Vue.component('game-item', {
       // clear the file input by setting its value to null
       this.$refs.imageInput.value = null
     },
+    titleChanged() {
+      // when editing the title, provide autocompletion via giant bomb
+      if (this.isAssisted && this.edited.title.length > 2)
+        this.autocomplete(this.edited.title)
+    },
     autocomplete: _.debounce(function (title) {
       this.api.getAssistedSearch(title).then(gbGames => {
         this.completions = gbGames
         $(this.$refs.titleInput).dropdown('toggle')
       })
     }, 1000),
-    selectCompletion: function (completion) {
-      this.completions = null
+    selectCompletion(completion) {
+      $(this.$refs.titleInput).dropdown('toggle')
 
       this.api.getAssistedGame(completion.id).then(gbGame => {
         this.edited.title = gbGame.title
