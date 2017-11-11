@@ -29,14 +29,12 @@ namespace Games
         private readonly IConfiguration configuration;
         private readonly string dataDirectory;
         private readonly string imageDirectory;
-        private readonly string connectionString;
 
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             this.configuration = configuration;
             dataDirectory = Path.Combine(env.ContentRootPath, configuration["dataDirectory"]);
             imageDirectory = Path.Combine(dataDirectory, "images");
-            connectionString = $"Data Source={Path.Combine(dataDirectory, "games.db")}";
             Directory.CreateDirectory(imageDirectory);
         }
 
@@ -85,7 +83,7 @@ namespace Games
 
             services.AddRouteUserIdAuthorization();
 
-            services.AddDbContext<GamesContext>(options => options.UseSqlite(connectionString))
+            services.AddDbContext<GamesContext>(ConfigureDatabase)
                 .AddTransient<IAuthenticationService, AuthenticationService>()
                 .AddTransient<IGiantBombService, GiantBombService>()
                 .AddTransient<IGameRepository, GameRepository>()
@@ -140,6 +138,17 @@ namespace Games
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["signingKey"]))
             };
+        }
+
+        private void ConfigureDatabase(DbContextOptionsBuilder options)
+        {
+            var useMySql = configuration["database"]?.ToLower() == "mysql";
+            var connectionString = configuration["connectionString"];
+
+            if (useMySql)
+                options.UseMySQL(connectionString);
+            else
+                options.UseSqlite(connectionString);
         }
 
         private HttpClient CreateHttpClient()
