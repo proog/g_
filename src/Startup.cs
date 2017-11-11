@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -72,35 +73,16 @@ namespace Games
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddOptions().Configure<AppSettings>(configuration);
-            services.AddMvc(options =>
-                {
-                    options.Filters.Add(new ValidateModelFilter());
-                    options.Filters.Add(new HandleExceptionFilter());
-                })
-                .AddJsonOptions(options =>
-                {
-                    var settings = options.SerializerSettings;
-                    settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                    settings.Converters.Add(new UnixDateTimeConverter());
-                    settings.ContractResolver = new DefaultContractResolver
-                    {
-                        NamingStrategy = new SnakeCaseNamingStrategy()
-                    };
-                });
+
+            services.AddMvc(ConfigureMvc)
+                .AddJsonOptions(ConfigureJson);
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateAudience = false,
-                        ValidateIssuer = false,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["signingKey"]))
-                    };
-                });
-            services.AddRouteUserIdAuthorization()
-                .AddDbContext<GamesContext>(options => options.UseSqlite(connectionString))
+                .AddJwtBearer(ConfigureJwtBearer);
+
+            services.AddRouteUserIdAuthorization();
+
+            services.AddDbContext<GamesContext>(options => options.UseSqlite(connectionString))
                 .AddTransient<IAuthenticationService, AuthenticationService>()
                 .AddTransient<IGiantBombService, GiantBombService>()
                 .AddTransient<IGameRepository, GameRepository>()
@@ -123,6 +105,35 @@ namespace Games
                 var db = scope.ServiceProvider.GetService<GamesContext>();
                 db.Database.EnsureCreated();
             }
+        }
+
+        private void ConfigureMvc(MvcOptions options)
+        {
+            options.Filters.Add(new ValidateModelFilter());
+            options.Filters.Add(new HandleExceptionFilter());
+        }
+
+        private void ConfigureJson(MvcJsonOptions options)
+        {
+            var settings = options.SerializerSettings;
+            settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            settings.Converters.Add(new UnixDateTimeConverter());
+            settings.ContractResolver = new DefaultContractResolver
+            {
+                NamingStrategy = new SnakeCaseNamingStrategy()
+            };
+        }
+
+        private void ConfigureJwtBearer(JwtBearerOptions options)
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["signingKey"]))
+            };
         }
 
         private HttpClient CreateHttpClient()
