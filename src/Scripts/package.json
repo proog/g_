@@ -1,0 +1,17 @@
+{
+  "name": "g_",
+  "version": "2.0.0",
+  "description": "A game collection web app",
+  "main": "",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1"
+  },
+  "scripts": {
+    "build": "babel ./*.js --out-file ../wwwroot/app.js --source-maps",
+    "watch": "babel ./*.js --out-file ../wwwroot/app.js --source-maps --watch",
+    "postinstall": "npm run build"
+  },
+  "author": "Per Mortensen",
+  "license": "ISC"
+}

@@ -1,7 +1,5 @@
-src/public/vendor
-src/public/g.min.js
-src/public/g.min.js.map
-src/public2/js
+src/wwwroot/app.js
+src/wwwroot/app.js.map
 data
 appsettings.*.json
 testsettings.*.json
