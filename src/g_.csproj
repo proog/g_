@@ -20,4 +20,8 @@
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
   </ItemGroup>
 
+  <Target Name="NpmBuild" BeforeTargets="Build">
+    <Exec Command="cd Scripts &amp;&amp; npm run build" />
+  </Target>
+
 </Project>

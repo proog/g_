@@ -9,8 +9,7 @@
   },
   "scripts": {
     "build": "babel ./*.js --out-file ../wwwroot/app.js --source-maps",
-    "watch": "babel ./*.js --out-file ../wwwroot/app.js --source-maps --watch",
-    "postinstall": "npm run build"
+    "watch": "babel ./*.js --out-file ../wwwroot/app.js --source-maps --watch"
   },
   "author": "Per Mortensen",
   "license": "ISC"
