@@ -5,11 +5,12 @@
   "main": "",
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1"
+    "babel-preset-env": "^1.6.1",
+    "uglify-js": "^3.2.1"
   },
   "scripts": {
-    "build": "babel ./*.js --out-file ../wwwroot/app.js --source-maps",
-    "watch": "babel ./*.js --out-file ../wwwroot/app.js --source-maps --watch"
+    "build": "babel ./*.js --source-maps inline | uglifyjs --compress --mangle --output ../wwwroot/app.min.js --source-map 'content=inline,root=Scripts,url=app.min.js.map'",
+    "watch": "babel ./*.js --out-file ../wwwroot/app.min.js --source-maps --watch"
   },
   "author": "Per Mortensen",
   "license": "ISC"

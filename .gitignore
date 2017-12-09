@@ -1,5 +1,5 @@
-src/wwwroot/app.js
-src/wwwroot/app.js.map
+src/wwwroot/app.min.js
+src/wwwroot/app.min.js.map
 data
 appsettings.*.json
 testsettings.*.json
