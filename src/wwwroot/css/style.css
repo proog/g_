@@ -1,0 +1,10 @@
+.container-fluid {
+  margin-top: 70px;
+}
+.cover {
+  height: 250px;
+  text-align: center;
+}
+.cover img {
+  max-height: 100%;
+}
