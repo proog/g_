@@ -74,10 +74,11 @@
           </div>
           <div class="col-4 form-group">
             <div class="form-check">
-              <label class="form-check-label">
-                <input type="checkbox"
-                        class="form-check-input"
-                        v-model="edited.currently_playing">
+              <input type="checkbox"
+                      class="form-check-input"
+                      v-model="edited.currently_playing"
+                      :id="idPlaying">
+              <label class="form-check-label" :for="idPlaying">
                 Playing
               </label>
             </div>
@@ -100,12 +101,13 @@
         <div class="form-row">
           <div class="col form-group">
             <div class="form-check">
-              <label class="form-check-label">
-                <input type="checkbox"
-                        class="form-check-input"
-                        v-model="edited.finished"
-                        :true-value="1"
-                        :false-value="0">
+              <input type="checkbox"
+                      class="form-check-input"
+                      :id="idFinished"
+                      v-model="edited.finished"
+                      :true-value="1"
+                      :false-value="0">
+              <label class="form-check-label" :for="idFinished">
                 Finished
               </label>
             </div>
@@ -253,6 +255,12 @@ export default {
     },
     tags() {
       return summary(this.allTags, this.game.tag_ids)
+    },
+    idPlaying() {
+      return _.uniqueId('_id') // unique id for checkbox and label
+    },
+    idFinished() {
+      return _.uniqueId('_id')
     }
   },
   watch: {

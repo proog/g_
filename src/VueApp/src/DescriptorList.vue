@@ -1,12 +1,13 @@
 <template>
 <div>
-  <div class="form-check" v-for="item in items" :key="item.id">
-    <label class="form-check-label">
-      <input type="checkbox"
-              class="form-check-input"
-              v-model="cloned"
-              :value="item.id"
-              @change="update">
+  <div class="form-check" v-for="(item, index) in items" :key="item.id">
+    <input type="checkbox"
+            class="form-check-input"
+            v-model="cloned"
+            :id="ids[index]"
+            :value="item.id"
+            @change="update">
+    <label class="form-check-label" :for="ids[index]">
       {{ item.name }}
     </label>
   </div>
@@ -28,6 +29,12 @@ export default {
     value (newValue) {
       // update cloned list when parent component has updated the original
       this.cloned = _.clone(newValue)
+    }
+  },
+  computed: {
+    ids() {
+      // create an array of ids to tie inputs and labels together
+      return this.items.map(x => _.uniqueId('_id'))
     }
   },
   methods: {
