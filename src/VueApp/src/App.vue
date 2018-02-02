@@ -1,97 +1,97 @@
 <template>
-  <div id="app">
-    <nav class="navbar fixed-top navbar-light bg-light">
-      <span class="navbar-text" v-if="selectedUser">
-        {{ selectedUser.username }}'s games
-      </span>
-      <form class="form-inline">
-        <button type="button"
-                class="btn btn-success mr-2"
-                :disabled="!!newGame"
-                @click="addGame"
-                v-if="canEdit">
-          New
-        </button>
-        <button type="button"
-                class="btn btn-outline-primary mr-2"
-                :disabled="!!isSettingsOpen"
-                @click="openSettings"
-                v-if="canEdit">
-          Settings
-        </button>
-        <button type="button"
-                class="btn btn-outline-primary mr-2"
-                @click="logOut"
-                v-if="isLoggedIn">
-          Log out
-        </button>
-        <button type="button"
-                class="btn btn-outline-primary mr-2"
-                @click="openLogin"
-                v-else>
-          Log in
-        </button>
-        <input type="search"
-                class="form-control"
-                placeholder="Search"
-                :value="search"
-                @input="debouncedSearch">
-      </form>
-    </nav>
-    <div class="container-fluid">
-      <div class="row" v-if="isLoginOpen">
-        <div class="col pb-3">
-          <login-form :api="api"
-                      @login="loggedIn"
-                      @cancel="closeLogin">
-          </login-form>
-        </div>
+<div id="app">
+  <nav class="navbar fixed-top navbar-light bg-light">
+    <span class="navbar-text" v-if="selectedUser">
+      {{ selectedUser.username }}'s games
+    </span>
+    <form class="form-inline">
+      <button type="button"
+              class="btn btn-success mr-2"
+              :disabled="!!newGame"
+              @click="addGame"
+              v-if="canEdit">
+        New
+      </button>
+      <button type="button"
+              class="btn btn-outline-primary mr-2"
+              :disabled="!!isSettingsOpen"
+              @click="openSettings"
+              v-if="canEdit">
+        Settings
+      </button>
+      <button type="button"
+              class="btn btn-outline-primary mr-2"
+              @click="logOut"
+              v-if="isLoggedIn">
+        Log out
+      </button>
+      <button type="button"
+              class="btn btn-outline-primary mr-2"
+              @click="openLogin"
+              v-else>
+        Log in
+      </button>
+      <input type="search"
+              class="form-control"
+              placeholder="Search"
+              :value="search"
+              @input="debouncedSearch">
+    </form>
+  </nav>
+  <div class="container-fluid">
+    <div class="row" v-if="isLoginOpen">
+      <div class="col pb-3">
+        <login-form :api="api"
+                    @login="loggedIn"
+                    @cancel="closeLogin">
+        </login-form>
       </div>
-      <div class="row" v-if="isSettingsOpen">
-        <div class="col pb-3">
-          <system-settings :genres="sortedGenres"
-                           :platforms="sortedPlatforms"
-                           :tags="sortedTags"
-                           :api="api"
-                           @save="settingsSaved"
-                           @cancel="closeSettings">
-          </system-settings>
-        </div>
+    </div>
+    <div class="row" v-if="isSettingsOpen">
+      <div class="col pb-3">
+        <system-settings :genres="sortedGenres"
+                          :platforms="sortedPlatforms"
+                          :tags="sortedTags"
+                          :api="api"
+                          @save="settingsSaved"
+                          @cancel="closeSettings">
+        </system-settings>
       </div>
-      <div class="row" v-if="!!newGame">
-        <div class="col col-lg-10 col-xl-8 mx-lg-auto pb-3">
-          <game-item :game="newGame"
-                     :all-genres="sortedGenres"
-                     :all-platforms="sortedPlatforms"
-                     :all-tags="sortedTags"
-                     :api="api"
-                     :is-editable="canEdit"
-                     :is-new="true"
-                     :is-assisted="isAssistedCreationEnabled"
-                     @save="gameSaved"
-                     @cancel="newGameCancelled">
-          </game-item>
-        </div>
+    </div>
+    <div class="row" v-if="!!newGame">
+      <div class="col col-lg-10 col-xl-8 mx-lg-auto pb-3">
+        <game-item :game="newGame"
+                    :all-genres="sortedGenres"
+                    :all-platforms="sortedPlatforms"
+                    :all-tags="sortedTags"
+                    :api="api"
+                    :is-editable="canEdit"
+                    :is-new="true"
+                    :is-assisted="isAssistedCreationEnabled"
+                    @save="gameSaved"
+                    @cancel="newGameCancelled">
+        </game-item>
       </div>
-      <div class="row">
-        <div class="col-12 col-lg-10 col-xl-6 mx-lg-auto pb-3"
-             v-for="game in filteredGames"
-             :key="game.id">
-          <game-item :game="game"
-                     :all-genres="sortedGenres"
-                     :all-platforms="sortedPlatforms"
-                     :all-tags="sortedTags"
-                     :api="api"
-                     :is-editable="canEdit"
-                     :is-new="false"
-                     :is-assisted="false"
-                     @save="gameSaved"
-                     @remove="gameRemoved">
-          </game-item>
-        </div>
+    </div>
+    <div class="row">
+      <div class="col-12 col-lg-10 col-xl-6 mx-lg-auto pb-3"
+            v-for="game in filteredGames"
+            :key="game.id">
+        <game-item :game="game"
+                    :all-genres="sortedGenres"
+                    :all-platforms="sortedPlatforms"
+                    :all-tags="sortedTags"
+                    :api="api"
+                    :is-editable="canEdit"
+                    :is-new="false"
+                    :is-assisted="false"
+                    @save="gameSaved"
+                    @remove="gameRemoved">
+        </game-item>
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script>
