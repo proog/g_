@@ -1,9 +1,0 @@
-{
-    "typeAcquisition": {
-        "enable": true,
-        "include": ["lodash", "vue"]
-    },
-    "compilerOptions": {
-        "target": "es6"
-    }
-}

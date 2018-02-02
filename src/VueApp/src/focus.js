@@ -1,5 +1,5 @@
-Vue.directive('focus', {
+export default {
   inserted(el) {
     el.focus()
   }
-})
+}

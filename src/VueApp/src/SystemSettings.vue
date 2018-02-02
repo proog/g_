@@ -1,5 +1,47 @@
-Vue.component('system-settings', {
-  template: '#system-settings-template',
+<template>
+<form class="card" @submit.prevent="save" @keyup.esc="cancel">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-12 col-lg-4">
+        <h4>Genres</h4>
+        <descriptors-editor :items="editedGenres"
+                            @add="addGenre"
+                            @remove="removeGenre">
+        </descriptors-editor>
+      </div>
+      <div class="col-12 col-lg-4">
+        <h4>Platforms</h4>
+        <descriptors-editor :items="editedPlatforms"
+                            @add="addPlatform"
+                            @remove="removePlatform">
+        </descriptors-editor>
+      </div>
+      <div class="col-12 col-lg-4">
+        <h4>Tags</h4>
+        <descriptors-editor :items="editedTags"
+                            @add="addTag"
+                            @remove="removeTag">
+        </descriptors-editor>
+      </div>
+    </div>
+    <div>
+      <button type="submit" class="btn btn-success">
+        Save
+      </button>
+      <button type="button" class="btn btn-outline-secondary" @click="cancel">
+        Cancel
+      </button>
+    </div>
+  </div>
+</form>
+</template>
+
+<script>
+import _ from 'lodash'
+import Api from './api'
+import DescriptorsEditor from './DescriptorsEditor.vue'
+
+export default {
   props: {
     genres: Array,
     platforms: Array,
@@ -74,8 +116,11 @@ Vue.component('system-settings', {
     cancel() {
       this.$emit('cancel')
     }
+  },
+  components: {
+    'descriptors-editor': DescriptorsEditor
   }
-})
+}
 
 function getAdded(originalDescriptors, editedDescriptors) {
   // it's added if it doesn't have an id
@@ -104,3 +149,4 @@ function getRemoved(originalDescriptors, editedDescriptors) {
     original => _.every(editedDescriptors, edited => edited.id !== original.id)
   )
 }
+</script>

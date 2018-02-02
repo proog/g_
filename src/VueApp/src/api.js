@@ -1,4 +1,6 @@
-class Api {
+import _ from 'lodash'
+
+export default class Api {
   constructor() {
     this.userId = null
     this.accessToken = null
