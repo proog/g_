@@ -222,6 +222,7 @@ export default {
       this.closeLogin()
     },
     logOut() {
+      sessionStorage.removeItem('token')
       this.api.accessToken = null
       this.currentUser = null
       this.newGame = null
