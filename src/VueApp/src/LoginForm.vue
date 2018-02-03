@@ -6,6 +6,7 @@
               class="form-control"
               required
               placeholder="Username"
+              v-focus
               v-model="username"
               :class="{ 'is-invalid': !!error }"
               @input="clearError">
@@ -28,6 +29,7 @@
 
 <script>
 import Api from './api'
+import Focus from './focus'
 
 export default {
   props: {
@@ -63,6 +65,9 @@ export default {
     clearError() {
       this.error = false
     }
+  },
+  directives: {
+    'focus': Focus
   }
 }
 </script>

@@ -34,6 +34,7 @@
       <input type="search"
               class="form-control"
               placeholder="Search"
+              v-focus
               :value="search"
               @input="debouncedSearch">
     </form>
@@ -99,6 +100,7 @@ import _ from 'lodash'
 import Vue from 'vue'
 import Api from './api'
 import { filterGames, getJwtPayload, isJwtValid } from './util'
+import Focus from './focus'
 import GameItem from './GameItem.vue'
 import LoginForm from './LoginForm.vue'
 import SystemSettings from './SystemSettings.vue'
@@ -264,6 +266,9 @@ export default {
     'game-item': GameItem,
     'login-form': LoginForm,
     'system-settings': SystemSettings
+  },
+  directives: {
+    'focus': Focus
   }
 }
 
