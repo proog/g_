@@ -1,5 +1,5 @@
 <template>
-<div id="app">
+<div>
   <nav class="navbar fixed-top navbar-light bg-light">
     <span class="navbar-text" v-if="selectedUser">
       {{ selectedUser.username }}'s games
@@ -106,6 +106,9 @@ import LoginForm from './LoginForm.vue'
 import SystemSettings from './SystemSettings.vue'
 
 export default {
+  props: {
+    userId: Number
+  },
   data() {
     return {
       users: [],
@@ -151,7 +154,57 @@ export default {
         && this.currentUser.id === this.selectedUser.id
     }
   },
+  watch: {
+    userId() {
+      // called when the route user id changes
+      this.loadData()
+    }
+  },
+  created() {
+    // initial render
+    this.loadData()
+  },
   methods: {
+    loadData() {
+      this.api.getUsers()
+        .then(users => {
+          this.users = users
+
+          const accessToken = sessionStorage.getItem('token')
+
+          if (accessToken && isJwtValid(accessToken)) {
+            const payload = getJwtPayload(accessToken)
+            this.api.accessToken = accessToken
+            this.currentUser = _.find(users, x => x.id === payload['id'])
+          }
+        })
+        .then(() => this.api.getConfig())
+        .then(config => {
+          // find user from route
+          const user = _.find(this.users, x => x.id === this.userId)
+
+          // redirect to default user if none specified or not found
+          if (!user) {
+            this.$router.push({
+              name: 'user',
+              params: { userId: config.default_user_id }
+            })
+
+            return this.userId ? Promise.reject('User not found') : Promise.resolve()
+          }
+
+          this.selectedUser = user
+          this.api.userId = this.selectedUser.id
+          this.isAssistedCreationEnabled = config.is_assisted_creation_enabled
+
+          return Promise.all([
+            this.api.getGames().then(games => this.games = games),
+            this.api.getGenres().then(genres => this.genres = genres),
+            this.api.getPlatforms().then(platforms => this.platforms = platforms),
+            this.api.getTags().then(tags => this.tags = tags)
+          ])
+        })
+    },
     addGame() {
       this.newGame = {
         title: '',
@@ -234,33 +287,6 @@ export default {
     debouncedSearch: _.debounce(function (event) {
       this.search = event.target.value
     }, 500)
-  },
-  mounted() {
-    const accessToken = sessionStorage.getItem('token')
-
-    this.api.getUsers()
-      .then(users => {
-        this.users = users
-
-        if (accessToken && isJwtValid(accessToken)) {
-          let payload = getJwtPayload(accessToken)
-          this.api.accessToken = accessToken
-          this.currentUser = _.find(users, x => x.id === payload['id'])
-        }
-      })
-      .then(() => this.api.getConfig())
-      .then(config => {
-        this.selectedUser = _.find(this.users, x => x.id === config.default_user_id)
-        this.api.userId = this.selectedUser.id
-        this.isAssistedCreationEnabled = config.is_assisted_creation_enabled
-
-        return Promise.all([
-          this.api.getGames().then(games => this.games = games),
-          this.api.getGenres().then(genres => this.genres = genres),
-          this.api.getPlatforms().then(platforms => this.platforms = platforms),
-          this.api.getTags().then(tags => this.tags = tags)
-        ])
-      })
   },
   components: {
     'game-item': GameItem,
