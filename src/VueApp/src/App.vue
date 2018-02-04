@@ -1,10 +1,21 @@
 <template>
 <div>
-  <nav class="navbar fixed-top navbar-light bg-light">
-    <span class="navbar-text" v-if="selectedUser">
-      {{ selectedUser.username }}'s games
-    </span>
-    <form class="form-inline">
+  <nav class="navbar fixed-top navbar-expand navbar-light bg-light">
+    <ul class="navbar-nav">
+      <li class="nav-item dropdown" v-if="selectedUser">
+        <a class="nav-link dropdown-toggle" data-toggle="dropdown">
+          {{ selectedUser.username }}'s games
+        </a>
+        <div class="dropdown-menu">
+          <router-link v-for="user in users" :key="user.id"
+                        :to="{ name: 'user', params: { userId: user.id }}"
+                        class="dropdown-item">
+            {{ user.username }}
+          </router-link>
+        </div>
+      </li>
+    </ul>
+    <form class="form-inline ml-auto">
       <button type="button"
               class="btn btn-success mr-2"
               :disabled="!!newGame"
