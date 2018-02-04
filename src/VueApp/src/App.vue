@@ -7,7 +7,7 @@
       </span>
       <ul class="navbar-nav" v-else>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" data-toggle="dropdown">
+          <a class="nav-link dropdown-toggle pointer" data-toggle="dropdown">
             {{ selectedUser.username }}'s games
           </a>
           <div class="dropdown-menu">
@@ -323,5 +323,9 @@ function pruneGameDescriptors(ids, descriptors) {
 <style>
 .container-fluid {
   margin-top: 70px;
+}
+
+.pointer {
+  cursor: pointer;
 }
 </style>
