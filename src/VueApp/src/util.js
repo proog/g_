@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 export function filterGames(games, genres, platforms, tags, searchQuery) {
   let search = _.toLower(searchQuery)
     , filtered = search !== '' ? _.filter(games, filterPredicate) : games

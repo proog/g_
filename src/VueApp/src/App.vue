@@ -92,7 +92,7 @@
     </div>
     <div class="row">
       <div class="col-12 col-lg-10 col-xl-6 mx-lg-auto pb-3"
-            v-for="game in filteredGames"
+            v-for="game in limitedGames"
             :key="game.id">
         <game-item :game="game"
                     :all-genres="sortedGenres"
@@ -105,6 +105,13 @@
                     @save="gameSaved"
                     @remove="gameRemoved">
         </game-item>
+      </div>
+    </div>
+    <div class="row" v-if="canShowMore">
+      <div class="col-12 pt-5 pb-3 text-center">
+        <button type="button" class="btn btn-success btn-lg px-5" @click="showMore">
+          Show more
+        </button>
       </div>
     </div>
   </div>
@@ -139,7 +146,9 @@ export default {
       api: new Api(),
       isSettingsOpen: false,
       isLoginOpen: false,
-      isAssistedCreationEnabled: false
+      isAssistedCreationEnabled: false,
+      limit: 20,
+      limitIncrement: 20
     }
   },
   computed: {
@@ -153,13 +162,13 @@ export default {
       return _.orderBy(this.tags, x => _.toLower(x.name))
     },
     filteredGames() {
-      return filterGames(
-        this.games,
-        this.genres,
-        this.platforms,
-        this.tags,
-        this.search
-      )
+      return filterGames(this.games, this.genres, this.platforms, this.tags, this.search)
+    },
+    limitedGames() {
+      return _.take(this.filteredGames, this.limit)
+    },
+    canShowMore() {
+      return this.filteredGames.length > this.limitedGames.length
     },
     isLoggedIn() {
       return !!this.currentUser
@@ -302,7 +311,11 @@ export default {
     },
     debouncedSearch: _.debounce(function (event) {
       this.search = event.target.value
-    }, 500)
+      this.limit = this.limitIncrement
+    }, 500),
+    showMore() {
+      this.limit += this.limitIncrement
+    }
   },
   components: {
     'game-item': GameItem,
