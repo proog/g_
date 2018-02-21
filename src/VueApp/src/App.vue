@@ -210,7 +210,7 @@ export default {
 
           // redirect to default user if none specified or not found
           if (!user) {
-            this.$router.push({
+            this.$router.replace({
               name: 'user',
               params: { userId: config.default_user_id }
             })
