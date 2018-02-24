@@ -184,15 +184,9 @@ export default {
       imageFile: null,
       imageUrl: null,
       imageRemoved: false,
-      completions: null
-    }
-  },
-  computed: {
-    idPlaying() {
-      return _.uniqueId('_id') // unique id for checkbox and label
-    },
-    idFinished() {
-      return _.uniqueId('_id')
+      completions: null,
+      idPlaying: _.uniqueId('_id'), // unique id for checkbox and label
+      idFinished: _.uniqueId('_id')
     }
   },
   watch: {
