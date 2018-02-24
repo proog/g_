@@ -35,26 +35,11 @@
     <div class="col-8">
       <div class="form-row">
         <div class="col-8 form-group">
-          <div class="dropdown">
-            <input type="text"
-                    class="form-control"
-                    placeholder="Title"
-                    required
-                    v-model="edited.title"
-                    v-focus
-                    @input="titleChanged"
-                    ref="titleInput"
-                    data-toggle="dropdown">
-            <div class="dropdown-menu">
-              <button type="button"
-                      class="dropdown-item"
-                      v-for="completion in completions"
-                      :key="completion.id"
-                      @click="selectCompletion(completion)">
-                {{ completion.title }}
-              </button>
-            </div>
-          </div>
+          <title-editor :api="api"
+                        :is-assisted="isAssisted"
+                        v-model="edited.title"
+                        @select="applyAssistance">
+          </title-editor>
         </div>
         <div class="col-4 form-group">
           <input type="number"
@@ -163,9 +148,9 @@
 <script>
 import _ from 'lodash'
 import Api from './api'
-import Focus from './focus'
 import DescriptorList from './DescriptorList.vue'
 import DeleteButton from './GameDeleteButton.vue'
+import TitleEditor from './GameTitleEditor.vue'
 
 export default {
   props: {
@@ -184,7 +169,8 @@ export default {
       imageFile: null,
       imageUrl: null,
       imageRemoved: false,
-      completions: null,
+      completions: [],
+      isSuggestionsOpen: false,
       idPlaying: _.uniqueId('_id'), // unique id for checkbox and label
       idFinished: _.uniqueId('_id')
     }
@@ -259,41 +245,24 @@ export default {
       // clear the file input by setting its value to null
       this.$refs.imageInput.value = null
     },
-    titleChanged() {
-      // when editing the title, provide autocompletion via giant bomb
-      if (this.isAssisted && this.edited.title.length > 2)
-        this.autocomplete(this.edited.title)
-    },
-    autocomplete: _.debounce(function (title) {
-      this.api.getAssistedSearch(title).then(gbGames => {
-        this.completions = gbGames
-        $(this.$refs.titleInput).dropdown('toggle')
-      })
-    }, 1000),
-    selectCompletion(completion) {
-      $(this.$refs.titleInput).dropdown('toggle')
+    applyAssistance(gbGame) {
+      this.edited.title = gbGame.title
+      this.edited.developer = gbGame.developer
+      this.edited.publisher = gbGame.publisher
+      this.edited.year = gbGame.year
+      this.edited.genre_ids = gbGame.genre_ids
+      this.edited.platform_ids = gbGame.platform_ids
 
-      this.api.getAssistedGame(completion.id).then(gbGame => {
-        this.edited.title = gbGame.title
-        this.edited.developer = gbGame.developer
-        this.edited.publisher = gbGame.publisher
-        this.edited.year = gbGame.year
-        this.edited.genre_ids = gbGame.genre_ids
-        this.edited.platform_ids = gbGame.platform_ids
-
-        this.imageUrl = gbGame.image_url
-        this.imageRemoved = false
-        this.imageFile = null
-        this.$refs.imageInput.value = null
-      })
+      this.imageUrl = gbGame.image_url
+      this.imageRemoved = false
+      this.imageFile = null
+      this.$refs.imageInput.value = null
     }
   },
   components: {
     'descriptor-list': DescriptorList,
-    'delete-button': DeleteButton
-  },
-  directives: {
-    'focus': Focus
+    'delete-button': DeleteButton,
+    'title-editor': TitleEditor
   }
 }
 
