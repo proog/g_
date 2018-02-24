@@ -107,9 +107,14 @@
         </game-item>
       </div>
     </div>
-    <div class="row" v-if="canShowMore">
-      <div class="col-12 pt-5 pb-3 text-center">
-        <button type="button" class="btn btn-success btn-lg px-5" @click="showMore">
+    <div class="row">
+      <div class="col-12 pb-3 text-center">
+        <p>
+          Showing {{ limitedGames.length }}
+          <span v-if="canShowMore">of {{ filteredGames.length }}</span>
+          games
+        </p>
+        <button type="button" class="btn btn-success btn-lg px-5" v-if="canShowMore" @click="showMore">
           Show more
         </button>
       </div>
@@ -147,8 +152,7 @@ export default {
       isSettingsOpen: false,
       isLoginOpen: false,
       isAssistedCreationEnabled: false,
-      limit: 20,
-      limitIncrement: 20
+      limit: 20
     }
   },
   computed: {
@@ -311,10 +315,10 @@ export default {
     },
     debouncedSearch: _.debounce(function (event) {
       this.search = event.target.value
-      this.limit = this.limitIncrement
+      this.limit = 20
     }, 500),
     showMore() {
-      this.limit += this.limitIncrement
+      this.limit *= 2
     }
   },
   components: {
