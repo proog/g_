@@ -316,7 +316,7 @@ export default {
     debouncedSearch: _.debounce(function (event) {
       this.search = event.target.value
       this.limit = 20
-    }, 500),
+    }, 200),
     showMore() {
       this.limit *= 2
     }
