@@ -1,25 +1,14 @@
 <template>
 <div>
   <nav class="navbar fixed-top navbar-expand navbar-light bg-light">
-    <template v-if="selectedUser">
-      <span class="navbar-text" v-if="users.length === 1">
-        {{ selectedUser.username }}'s games
-      </span>
-      <ul class="navbar-nav" v-else>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle pointer" data-toggle="dropdown">
-            {{ selectedUser.username }}'s games
-          </a>
-          <div class="dropdown-menu">
-            <router-link v-for="user in users" :key="user.id"
-                          :to="{ name: 'user', params: { userId: user.id }}"
-                          class="dropdown-item">
-              {{ user.username }}
-            </router-link>
-          </div>
-        </li>
-      </ul>
-    </template>
+    <form class="form-inline">
+      <input type="search"
+              class="form-control mr-2"
+              placeholder="Search"
+              v-focus
+              :value="search"
+              @input="debouncedSearch">
+    </form>
     <form class="form-inline ml-auto">
       <button type="button"
               class="btn btn-success mr-2"
@@ -35,25 +24,28 @@
               v-if="canEdit">
         Settings
       </button>
-      <button type="button"
-              class="btn btn-outline-primary mr-2"
-              @click="logOut"
-              v-if="isLoggedIn">
-        Log out
-      </button>
-      <button type="button"
-              class="btn btn-outline-primary mr-2"
-              @click="openLogin"
-              v-else>
-        Log in
-      </button>
-      <input type="search"
-              class="form-control"
-              placeholder="Search"
-              v-focus
-              :value="search"
-              @input="debouncedSearch">
     </form>
+    <ul class="navbar-nav" v-if="selectedUser">
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle pointer" data-toggle="dropdown">
+          {{ selectedUser.username }}'s games
+        </a>
+        <div class="dropdown-menu">
+          <router-link v-for="user in users" :key="user.id"
+                        :to="{ name: 'user', params: { userId: user.id }}"
+                        class="dropdown-item">
+            {{ user.username }}
+          </router-link>
+          <div class="dropdown-divider"></div>
+          <button type="button" class="dropdown-item" @click="logOut" v-if="isLoggedIn">
+            Log out
+          </button>
+          <button type="button" class="dropdown-item" @click="openLogin" v-else>
+            Log in
+          </button>
+        </div>
+      </li>
+    </ul>
   </nav>
   <div class="container-fluid">
     <div class="row" v-if="isLoginOpen">
