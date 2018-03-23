@@ -18,17 +18,19 @@ namespace Games.Controllers
         private readonly string apiKey;
         private readonly IUserRepository userRepository;
         private readonly IGiantBombService giantBomb;
+        private readonly IViewModelFactory vmFactory;
         private const string NotFoundMessage = "No Giant Bomb API key specified. Please request an API key and add it in the settings dialog or database.";
 
-        public GiantBombController(IConfigRepository configRepository, IUserRepository userRepository, IGiantBombService giantBomb)
+        public GiantBombController(IConfigRepository configRepository, IUserRepository userRepository, IGiantBombService giantBomb, IViewModelFactory vmFactory)
         {
             this.userRepository = userRepository;
             this.giantBomb = giantBomb;
+            this.vmFactory = vmFactory;
             apiKey = configRepository.DefaultConfig?.GiantBombApiKey;
         }
 
-        [HttpGet("search/{title}")]
-        public async Task<List<AssistedSearchResult>> Search(string title)
+        [HttpGet("search", Name = Route.AssistedSearch)]
+        public async Task<List<AssistedSearchResult>> Search([FromQuery] string title)
         {
             if (apiKey == null)
                 throw new NotFoundException(NotFoundMessage);
@@ -36,15 +38,11 @@ namespace Games.Controllers
             var results = await giantBomb.Search(title, apiKey);
 
             return results
-                .Select(it => new AssistedSearchResult
-                {
-                    Id = it.Id,
-                    Title = it.Name
-                })
+                .Select(vmFactory.MakeAssistedSearchResult)
                 .ToList();
         }
 
-        [HttpGet("game/{id}")]
+        [HttpGet("game/{id}", Name = Route.AssistedGame)]
         public async Task<AssistedGameResult> Get(int id)
         {
             if (apiKey == null)

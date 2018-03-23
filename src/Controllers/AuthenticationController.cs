@@ -11,11 +11,13 @@ namespace Games.Controllers
     {
         private readonly IUserRepository userRepository;
         private readonly IAuthenticationService auth;
+        private readonly IViewModelFactory vmFactory;
 
-        public AuthenticationController(IUserRepository userRepository, IAuthenticationService auth)
+        public AuthenticationController(IUserRepository userRepository, IAuthenticationService auth, IViewModelFactory vmFactory)
         {
             this.userRepository = userRepository;
             this.auth = auth;
+            this.vmFactory = vmFactory;
         }
 
         [HttpGet("login"), Authorize]
@@ -27,7 +29,7 @@ namespace Games.Controllers
                 throw new NotFoundException();
 
             var user = userRepository.Get(int.Parse(idClaim.Value));
-            return ViewModelFactory.MakeUserViewModel(user);
+            return vmFactory.MakeUserViewModel(user);
         }
 
         [HttpPost("token")]

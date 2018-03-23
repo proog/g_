@@ -18,43 +18,45 @@ namespace Games.Controllers
         private readonly IPlatformRepository platforms;
         private readonly ITagRepository tags;
         private readonly IAuthenticationService auth;
+        private readonly IViewModelFactory vmFactory;
 
-        public DescriptorController(IUserRepository users, IGenreRepository genres, IPlatformRepository platforms, ITagRepository tags, IAuthenticationService auth)
+        public DescriptorController(IUserRepository users, IGenreRepository genres, IPlatformRepository platforms, ITagRepository tags, IAuthenticationService auth, IViewModelFactory vmFactory)
         {
             this.users = users;
             this.genres = genres;
             this.platforms = platforms;
             this.tags = tags;
             this.auth = auth;
+            this.vmFactory = vmFactory;
         }
 
-        [HttpGet("genres")]
+        [HttpGet("genres", Name = Route.Genres)]
         public List<DescriptorViewModel> GetGenres(int userId)
         {
             return All(userId, genres);
         }
-        [HttpGet("platforms")]
+        [HttpGet("platforms", Name = Route.Platforms)]
         public List<DescriptorViewModel> GetPlatforms(int userId)
         {
             return All(userId, platforms);
         }
-        [HttpGet("tags")]
+        [HttpGet("tags", Name = Route.Tags)]
         public List<DescriptorViewModel> GetTags(int userId)
         {
             return All(userId, tags);
         }
 
-        [HttpGet("genres/{id}")]
+        [HttpGet("genres/{id}", Name = Route.Genre)]
         public DescriptorViewModel GetGenre(int userId, int id)
         {
             return Single(userId, id, genres);
         }
-        [HttpGet("platforms/{id}")]
+        [HttpGet("platforms/{id}", Name = Route.Platform)]
         public DescriptorViewModel GetPlatform(int userId, int id)
         {
             return Single(userId, id, platforms);
         }
-        [HttpGet("tags/{id}")]
+        [HttpGet("tags/{id}", Name = Route.Tag)]
         public DescriptorViewModel GetTag(int userId, int id)
         {
             return Single(userId, id, tags);
@@ -121,7 +123,7 @@ namespace Games.Controllers
             };
             repository.Add(descriptor);
 
-            return ViewModelFactory.MakeDescriptorViewModel(descriptor);
+            return vmFactory.MakeDescriptorViewModel(descriptor);
         }
 
         private DescriptorViewModel Update<T>(int userId, int id, DescriptorViewModel vm, IDescriptorRepository<T> repository) where T : Descriptor
@@ -137,7 +139,7 @@ namespace Games.Controllers
             descriptor.UpdatedAt = DateTime.UtcNow;
             repository.Update(descriptor);
 
-            return ViewModelFactory.MakeDescriptorViewModel(descriptor);
+            return vmFactory.MakeDescriptorViewModel(descriptor);
         }
 
         private IActionResult Delete<T>(int userId, int id, IDescriptorRepository<T> repository) where T : Descriptor
@@ -160,7 +162,7 @@ namespace Games.Controllers
                 throw new NotFoundException();
 
             return repository.All(user)
-                .Select(ViewModelFactory.MakeDescriptorViewModel)
+                .Select(vmFactory.MakeDescriptorViewModel)
                 .ToList();
         }
 
@@ -176,7 +178,7 @@ namespace Games.Controllers
             if (descriptor == null)
                 throw new NotFoundException();
 
-            return ViewModelFactory.MakeDescriptorViewModel(descriptor);
+            return vmFactory.MakeDescriptorViewModel(descriptor);
         }
     }
 }

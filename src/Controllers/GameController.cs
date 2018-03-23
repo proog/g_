@@ -16,15 +16,17 @@ namespace Games.Controllers
         private readonly IGameRepository gameRepository;
         private readonly IUserRepository userRepository;
         private readonly IAuthenticationService auth;
+        private readonly IViewModelFactory vmFactory;
 
-        public GameController(IGameRepository games, IUserRepository users, IAuthenticationService auth)
+        public GameController(IGameRepository games, IUserRepository users, IAuthenticationService auth, IViewModelFactory vmFactory)
         {
             this.gameRepository = games;
             this.userRepository = users;
             this.auth = auth;
+            this.vmFactory = vmFactory;
         }
 
-        [HttpGet("games")]
+        [HttpGet("games", Name = Route.Games)]
         public List<GameViewModel> GetGames(int userId)
         {
             var user = userRepository.Get(userId);
@@ -38,11 +40,11 @@ namespace Games.Controllers
                 games = games.Where(game => !game.Hidden);
 
             return games
-                .Select(ViewModelFactory.MakeGameViewModel)
+                .Select(vmFactory.MakeGameViewModel)
                 .ToList();
         }
 
-        [HttpGet("games/{id}")]
+        [HttpGet("games/{id}", Name = Route.Game)]
         public GameViewModel GetGame(int userId, int id)
         {
             var user = userRepository.Get(userId);
@@ -55,10 +57,10 @@ namespace Games.Controllers
             if (game == null || game.Hidden && !IsCurrentUser(user))
                 throw new NotFoundException();
 
-            return ViewModelFactory.MakeGameViewModel(game);
+            return vmFactory.MakeGameViewModel(game);
         }
 
-        [HttpGet("suggestions")]
+        [HttpGet("suggestions", Name = Route.Suggestions)]
         public List<Suggestion> GetSuggestions(int userId)
         {
             var user = userRepository.Get(userId);
@@ -156,12 +158,12 @@ namespace Games.Controllers
             };
 
             game.User = user;
-            game.GameGenres = ViewModelFactory.MakeGameGenres(game, vm.GenreIds, user.Genres);
-            game.GamePlatforms = ViewModelFactory.MakeGamePlatforms(game, vm.PlatformIds, user.Platforms);
-            game.GameTags = ViewModelFactory.MakeGameTags(game, vm.TagIds, user.Tags);
+            game.GameGenres = vmFactory.MakeGameGenres(game, vm.GenreIds, user.Genres);
+            game.GamePlatforms = vmFactory.MakeGamePlatforms(game, vm.PlatformIds, user.Platforms);
+            game.GameTags = vmFactory.MakeGameTags(game, vm.TagIds, user.Tags);
 
             gameRepository.Add(game);
-            return ViewModelFactory.MakeGameViewModel(game);
+            return vmFactory.MakeGameViewModel(game);
         }
 
         [HttpPut("games/{id}"), Authorize(Constants.SameUserPolicy)]
@@ -187,12 +189,12 @@ namespace Games.Controllers
             game.Hidden = vm.Hidden;
             game.WishlistPosition = vm.WishlistPosition;
 
-            game.GameGenres = ViewModelFactory.MakeGameGenres(game, vm.GenreIds, user.Genres);
-            game.GamePlatforms = ViewModelFactory.MakeGamePlatforms(game, vm.PlatformIds, user.Platforms);
-            game.GameTags = ViewModelFactory.MakeGameTags(game, vm.TagIds, user.Tags);
+            game.GameGenres = vmFactory.MakeGameGenres(game, vm.GenreIds, user.Genres);
+            game.GamePlatforms = vmFactory.MakeGamePlatforms(game, vm.PlatformIds, user.Platforms);
+            game.GameTags = vmFactory.MakeGameTags(game, vm.TagIds, user.Tags);
 
             gameRepository.Update(game);
-            return ViewModelFactory.MakeGameViewModel(game);
+            return vmFactory.MakeGameViewModel(game);
         }
 
         [HttpDelete("games/{id}"), Authorize(Constants.SameUserPolicy)]

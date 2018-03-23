@@ -11,21 +11,23 @@ namespace Games.Controllers
     public class UserController : Controller
     {
         private readonly IUserRepository userRepository;
+        private readonly IViewModelFactory vmFactory;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IUserRepository userRepository, IViewModelFactory vmFactory)
         {
             this.userRepository = userRepository;
+            this.vmFactory = vmFactory;
         }
 
-        [HttpGet]
+        [HttpGet(Name = Route.Users)]
         public List<UserViewModel> GetUsers()
         {
             return userRepository.All()
-                .Select(ViewModelFactory.MakeUserViewModel)
+                .Select(vmFactory.MakeUserViewModel)
                 .ToList();
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = Route.User)]
         public UserViewModel GetUser(int id)
         {
             var user = userRepository.Get(id);
@@ -33,7 +35,7 @@ namespace Games.Controllers
             if (user == null)
                 throw new NotFoundException();
 
-            return ViewModelFactory.MakeUserViewModel(user);
+            return vmFactory.MakeUserViewModel(user);
         }
     }
 }

@@ -12,12 +12,14 @@ namespace Games.Controllers
         private readonly IConfigRepository configRepository;
         private readonly IUserRepository userRepository;
         private readonly IAuthenticationService auth;
+        private readonly IViewModelFactory vmFactory;
 
-        public SettingsController(IConfigRepository configRepository, IUserRepository userRepository, IAuthenticationService auth)
+        public SettingsController(IConfigRepository configRepository, IUserRepository userRepository, IAuthenticationService auth, IViewModelFactory vmFactory)
         {
             this.configRepository = configRepository;
             this.userRepository = userRepository;
             this.auth = auth;
+            this.vmFactory = vmFactory;
         }
 
         [HttpGet("config")]
@@ -28,10 +30,10 @@ namespace Games.Controllers
             if (config == null)
                 throw new NotFoundException();
 
-            return ViewModelFactory.MakeConfigViewModel(config);
+            return vmFactory.MakeConfigViewModel(config);
         }
 
-        [HttpGet("settings"), Authorize]
+        [HttpGet("settings", Name = Route.Settings), Authorize]
         public AuthorizedSettings GetSettings()
         {
             var config = configRepository.DefaultConfig;

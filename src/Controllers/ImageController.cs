@@ -12,22 +12,24 @@ using Newtonsoft.Json.Linq;
 
 namespace Games.Controllers
 {
-    [Route("api/users/{" + Constants.UserIdParameter + "}/games/{id}/image"), Authorize(Constants.SameUserPolicy)]
+    [Route("api/users/{" + Constants.UserIdParameter + "}/games/{id}/image", Name = Route.Image), Authorize(Constants.SameUserPolicy)]
     public class ImageController : Controller
     {
         private readonly IGameRepository gameRepository;
         private readonly IUserRepository userRepository;
         private readonly HttpClient httpClient;
+        private readonly IViewModelFactory vmFactory;
         private readonly IAuthenticationService auth;
         private readonly IFileProvider data;
 
-        public ImageController(IGameRepository gameRepository, IUserRepository userRepository, IAuthenticationService auth, IFileProvider data, HttpClient httpClient)
+        public ImageController(IGameRepository gameRepository, IUserRepository userRepository, IAuthenticationService auth, IFileProvider data, HttpClient httpClient, IViewModelFactory vmFactory)
         {
             this.gameRepository = gameRepository;
             this.userRepository = userRepository;
             this.auth = auth;
             this.data = data;
             this.httpClient = httpClient;
+            this.vmFactory = vmFactory;
         }
 
         [HttpPost]
@@ -51,7 +53,7 @@ namespace Games.Controllers
             game.Image = path;
             gameRepository.Update(game);
 
-            return ViewModelFactory.MakeGameViewModel(game);
+            return vmFactory.MakeGameViewModel(game);
         }
 
         [HttpDelete]

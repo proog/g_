@@ -1,6 +1,6 @@
 namespace Games.Models.ViewModels
 {
-    public class UserViewModel
+    public class UserViewModel : Linked
     {
         public int Id { get; set; }
 

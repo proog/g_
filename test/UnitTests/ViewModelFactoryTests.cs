@@ -25,7 +25,8 @@ namespace Games.UnitTests
                 }
             };
 
-            var result = ViewModelFactory.MakeGameGenres(game, ids, all);
+            var factory = new ViewModelFactory(null);
+            var result = factory.MakeGameGenres(game, ids, all);
             Assert.Equal(2, result.Count);
             Assert.Contains(game.GameGenres.First(), result);
         }
@@ -47,7 +48,8 @@ namespace Games.UnitTests
                 }
             };
 
-            var result = ViewModelFactory.MakeGamePlatforms(game, ids, all);
+            var factory = new ViewModelFactory(null);
+            var result = factory.MakeGamePlatforms(game, ids, all);
             Assert.Equal(2, result.Count);
             Assert.Contains(game.GamePlatforms.First(), result);
         }
@@ -69,7 +71,8 @@ namespace Games.UnitTests
                 }
             };
 
-            var result = ViewModelFactory.MakeGameTags(game, ids, all);
+            var factory = new ViewModelFactory(null);
+            var result = factory.MakeGameTags(game, ids, all);
             Assert.Equal(2, result.Count);
             Assert.Contains(game.GameTags.First(), result);
         }

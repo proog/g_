@@ -1,6 +1,6 @@
 namespace Games.Models.ViewModels
 {
-    public class AssistedSearchResult
+    public class AssistedSearchResult : Linked
     {
         public int Id { get; set; }
 

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -11,6 +12,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -91,6 +94,9 @@ namespace Games
                 .AddTransient<IPlatformRepository, PlatformRepository>()
                 .AddTransient<ITagRepository, TagRepository>()
                 .AddTransient<IConfigRepository, ConfigRepository>()
+                .AddTransient<IViewModelFactory, ViewModelFactory>()
+                .AddScoped<IUrlHelper>(CreateUrlHelper)
+                .AddSingleton<IActionContextAccessor, ActionContextAccessor>()
                 .AddSingleton<HttpClient>(CreateHttpClient())
                 .AddSingleton<IFileProvider>(new PhysicalFileProvider(dataDirectory));
         }
@@ -143,6 +149,13 @@ namespace Games
                 "User-Agent", new[] { "permortensen.com g_sharp 0.1" }
             );
             return client;
+        }
+
+        private IUrlHelper CreateUrlHelper(IServiceProvider serviceProvider)
+        {
+            var actionContext = serviceProvider.GetRequiredService<IActionContextAccessor>().ActionContext;
+            var factory = serviceProvider.GetRequiredService<IUrlHelperFactory>();
+            return factory.GetUrlHelper(actionContext);
         }
     }
 }

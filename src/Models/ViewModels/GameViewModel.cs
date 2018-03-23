@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Games.Models.ViewModels
 {
-    public class GameViewModel
+    public class GameViewModel : Linked
     {
         public int Id { get; set; }
 
