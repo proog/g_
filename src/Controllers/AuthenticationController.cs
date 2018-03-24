@@ -20,19 +20,7 @@ namespace Games.Controllers
             this.vmFactory = vmFactory;
         }
 
-        [HttpGet("login"), Authorize]
-        public UserViewModel GetCurrentUser()
-        {
-            var idClaim = User.FindFirst(Constants.UserIdClaim);
-
-            if (idClaim == null)
-                throw new NotFoundException();
-
-            var user = userRepository.Get(int.Parse(idClaim.Value));
-            return vmFactory.MakeUserViewModel(user);
-        }
-
-        [HttpPost("token")]
+        [HttpPost("token", Name = Route.Token)]
         public OAuthResponse Token([FromForm] OAuthCredentials cred)
         {
             var hash = auth.HashPassword(cred.Password);

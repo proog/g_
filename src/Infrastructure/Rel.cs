@@ -12,6 +12,7 @@ namespace Games.Infrastructure
         public const string Settings = "settings";
         public const string Suggestions = "suggestions";
         public const string Tags = "tags";
+        public const string OAuth = "oauth";
         public const string Users = "users";
     }
 }

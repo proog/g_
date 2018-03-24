@@ -190,7 +190,7 @@ export default {
   },
   methods: {
     loadData() {
-      this.api.getRoot()
+      this.api.get('/api')
         .then(root => {
           this.api.root = root
 

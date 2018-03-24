@@ -24,7 +24,8 @@ namespace Games.Services
             var links = new List<Link>
             {
                 new Link(Rel.Users, url.Link(Route.Users, null)),
-                new Link(Rel.Settings, url.Link(Route.Settings, null))
+                new Link(Rel.Settings, url.Link(Route.Settings, null)),
+                new Link(Rel.OAuth, url.Link(Route.Token, null))
             };
 
             if (!string.IsNullOrEmpty(config.GiantBombApiKey))

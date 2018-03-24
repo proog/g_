@@ -6,28 +6,18 @@ export default class Api {
     this.root = null
   }
 
-  getRoot() {
-    return this.get('/api')
-  }
-
-  getAccessToken(username, password) {
-    let form = new FormData()
-    form.append('grant_type', 'password')
-    form.append('username', username)
-    form.append('password', password)
-
-    return this.send('/api/token', 'POST', form)
-  }
-
   get(url) {
     return this.send(url, 'GET', null)
   }
+
   post(url, data) {
     return this.send(url, 'POST', JSON.stringify(data))
   }
+
   put(url, data) {
     return this.send(url, 'PUT', JSON.stringify(data))
   }
+
   del(url) {
     return this.send(url, 'DELETE', null)
   }

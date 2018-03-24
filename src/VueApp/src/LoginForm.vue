@@ -30,6 +30,7 @@
 <script>
 import Api from './api'
 import Focus from './focus'
+import { getLink } from './util'
 
 export default {
   props: {
@@ -44,10 +45,17 @@ export default {
   },
   methods: {
     login() {
+      const link = getLink(this.api.root, 'oauth')
+      const data = {
+        'grant_type': 'password',
+        'username': this.username,
+        'password': this.password
+      }
+
       this.clearError()
-      this.api.getAccessToken(this.username, this.password)
+      this.api.postForm(link.href, data)
         .then(oauth => {
-          let username = this.username
+          const username = this.username
           this.clear()
           this.$emit('login', username, oauth.access_token)
         })
