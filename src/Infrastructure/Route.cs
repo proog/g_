@@ -7,7 +7,6 @@ namespace Games.Infrastructure
         public const string User = "user";
         public const string Users = "users";
 
-        public const string Config = "config";
         public const string Settings = "settings";
         public const string AssistedSearch = "assisted-search";
         public const string AssistedGame = "assisted-game";

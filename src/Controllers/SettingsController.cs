@@ -22,17 +22,6 @@ namespace Games.Controllers
             this.vmFactory = vmFactory;
         }
 
-        [HttpGet("config")]
-        public ConfigViewModel GetConfig()
-        {
-            var config = configRepository.DefaultConfig;
-
-            if (config == null)
-                throw new NotFoundException();
-
-            return vmFactory.MakeConfigViewModel(config);
-        }
-
         [HttpGet("settings", Name = Route.Settings), Authorize]
         public AuthorizedSettings GetSettings()
         {

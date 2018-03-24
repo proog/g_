@@ -3,7 +3,6 @@ namespace Games.Infrastructure
     public static class Rel
     {
         public const string AssistedSearch = "assisted-search";
-        public const string Config = "config";
         public const string Game = "game";
         public const string Games = "games";
         public const string Genres = "genres";
