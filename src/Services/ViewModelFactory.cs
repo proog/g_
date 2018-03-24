@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Games.Infrastructure;
 using Games.Interfaces;
 using Games.Models;
 using Games.Models.GiantBomb;
 using Games.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Games.Infrastructure
+namespace Games.Services
 {
     public class ViewModelFactory : IViewModelFactory
     {

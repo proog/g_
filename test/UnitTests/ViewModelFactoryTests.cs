@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Games.Infrastructure;
+using Games.Services;
 using Games.Models;
 using Xunit;
 
