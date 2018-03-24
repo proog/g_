@@ -191,7 +191,9 @@ export default {
   methods: {
     loadData() {
       this.api.getRoot()
-        .then(() => {
+        .then(root => {
+          this.api.root = root
+
           const link = getLink(this.api.root, 'users')
           return this.api.get(link.href)
         })
@@ -221,7 +223,6 @@ export default {
           }
 
           this.selectedUser = user
-          this.api.userId = this.selectedUser.id
           this.isAssistedCreationEnabled = !!getLink(this.api.root, 'assisted-search')
 
           const games = getLink(this.selectedUser, 'games')

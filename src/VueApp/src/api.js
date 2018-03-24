@@ -7,10 +7,7 @@ export default class Api {
   }
 
   getRoot() {
-    return this.get('/api').then(root => {
-      this.root = root
-      return root
-    })
+    return this.get('/api')
   }
 
   getAccessToken(username, password) {
