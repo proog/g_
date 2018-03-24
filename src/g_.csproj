@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+
+    <!-- Exclude node_modules from default items as it slows omnisharp to a crawl -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);VueApp\node_modules\**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
