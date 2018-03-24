@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers
 {
-    [Route("api")]
+    [Route("api/settings", Name = Route.Settings), Authorize]
     public class SettingsController : Controller
     {
         private readonly IConfigRepository configRepository;
@@ -22,7 +22,7 @@ namespace Games.Controllers
             this.vmFactory = vmFactory;
         }
 
-        [HttpGet("settings", Name = Route.Settings), Authorize]
+        [HttpGet]
         public AuthorizedSettings GetSettings()
         {
             var config = configRepository.DefaultConfig;
@@ -33,7 +33,7 @@ namespace Games.Controllers
             };
         }
 
-        [HttpPut("settings"), Authorize]
+        [HttpPut]
         public AuthorizedSettings UpdateSettings([FromBody] AuthorizedSettingsInput settings)
         {
             var idClaim = User.FindFirst(Constants.UserIdClaim);
