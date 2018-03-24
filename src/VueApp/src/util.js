@@ -54,3 +54,10 @@ export function getJwtPayload(token) {
     return undefined
   }
 }
+
+export function getLink(links, rel) {
+  if (!_.isArray(links))
+    links = links._links
+
+  return _.find(links, x => x.rel === rel)
+}

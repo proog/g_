@@ -39,6 +39,7 @@
 <script>
 import _ from 'lodash'
 import Api from './api'
+import { getLink } from './util'
 import DescriptorsEditor from './DescriptorsEditor.vue'
 
 export default {
@@ -46,6 +47,7 @@ export default {
     genres: Array,
     platforms: Array,
     tags: Array,
+    user: Object,
     api: Api
   },
   data() {
@@ -90,24 +92,38 @@ export default {
         , removedPlatforms = getRemoved(this.platforms, this.editedPlatforms)
         , removedTags = getRemoved(this.tags, this.editedTags)
 
-      // map to delete, post and put
-      let promises = _.flatten([
-        _.map(addedGenres, x => this.api.postGenre(x)),
-        _.map(addedPlatforms, x => this.api.postPlatform(x)),
-        _.map(addedTags, x => this.api.postTag(x)),
-        _.map(updatedGenres, x => this.api.putGenre(x)),
-        _.map(updatedPlatforms, x => this.api.putPlatform(x)),
-        _.map(updatedTags, x => this.api.putTag(x)),
-        _.map(removedGenres, x => this.api.deleteGenre(x)),
-        _.map(removedPlatforms, x => this.api.deletePlatform(x)),
-        _.map(removedTags, x => this.api.deleteTag(x))
+      const genresLink = getLink(this.user, 'genres')
+      const platformsLink = getLink(this.user, 'platforms')
+      const tagsLink = getLink(this.user, 'tags')
+
+      const update = descriptor => {
+        const link = getLink(descriptor, 'self')
+        return this.api.put(link.href, descriptor)
+      }
+
+      const remove = descriptor => {
+        const link = getLink(descriptor, 'self')
+        return this.api.del(link.href, descriptor)
+      }
+
+      // map to delete, post and update
+      const promises = _.flatten([
+        _.map(addedGenres, x => this.api.post(genresLink.href, x)),
+        _.map(addedPlatforms, x => this.api.post(platformsLink.href, x)),
+        _.map(addedTags, x => this.api.post(tagsLink.href, x)),
+        _.map(updatedGenres, update),
+        _.map(updatedPlatforms, update),
+        _.map(updatedTags, update),
+        _.map(removedGenres, remove),
+        _.map(removedPlatforms, remove),
+        _.map(removedTags, remove)
       ])
 
       Promise.all(promises)
         .then(() => Promise.all([
-          this.api.getGenres(),
-          this.api.getPlatforms(),
-          this.api.getTags()
+          this.api.get(genresLink.href),
+          this.api.get(platformsLink.href),
+          this.api.get(tagsLink.href)
         ]))
         .then(refreshed => {
           this.$emit('save', refreshed[0], refreshed[1], refreshed[2])

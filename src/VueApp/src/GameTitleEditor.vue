@@ -33,6 +33,7 @@
 import _ from 'lodash'
 import Api from './api'
 import Focus from './focus'
+import { getLink } from './util';
 
 export default {
   props: {
@@ -54,12 +55,17 @@ export default {
         this.completions = []
     },
     autocomplete: _.debounce(function (title) {
-      this.api.getAssistedSearch(title).then(gbGames => {
+      const link = getLink(this.api.root, 'assisted-search')
+      const url = `${link.href}?title=${encodeURIComponent(title)}`
+
+      this.api.get(url).then(gbGames => {
         this.completions = gbGames
       })
     }, 1000),
     selectCompletion(completion) {
-      this.api.getAssistedGame(completion.id).then(gbGame => {
+      const link = getLink(completion, 'game')
+
+      this.api.get(link.href).then(gbGame => {
         this.$refs.input.focus()
         this.$emit('select', gbGame)
       })

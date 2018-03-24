@@ -1,6 +1,7 @@
 <template>
 <div class="card h-100">
   <game-editor v-if="isEditing"
+                :user="user"
                 :game="game"
                 :all-genres="allGenres"
                 :all-platforms="allPlatforms"
@@ -27,11 +28,13 @@
 <script>
 import _ from 'lodash'
 import Api from './api'
+import { getLink } from './util'
 import GameDisplay from './GameDisplay.vue'
 import GameEditor from './GameEditor.vue'
 
 export default {
   props: {
+    user: Object,
     game: Object,
     allGenres: Array,
     allPlatforms: Array,
@@ -49,7 +52,9 @@ export default {
       this.isEditing = true
     },
     remove() {
-      this.api.deleteGame(this.game).then(() => {
+      const link = getLink(this.game, 'self')
+
+      this.api.del(link.href).then(() => {
         this.isEditing = false
         this.$emit('remove', this.game)
       })

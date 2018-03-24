@@ -148,12 +148,14 @@
 <script>
 import _ from 'lodash'
 import Api from './api'
+import { getLink } from './util'
 import DescriptorList from './DescriptorList.vue'
 import DeleteButton from './GameDeleteButton.vue'
 import TitleEditor from './GameTitleEditor.vue'
 
 export default {
   props: {
+    user: Object,
     game: Object,
     allGenres: Array,
     allPlatforms: Array,
@@ -184,22 +186,28 @@ export default {
   },
   methods: {
     save() {
-      let createOrUpdate = () => {
-        return this.isNew
-          ? this.api.postGame(this.edited)
-          : this.api.putGame(this.edited)
+      const createOrUpdate = () => {
+        if (this.isNew) {
+          const link = getLink(this.user, 'games')
+          return this.api.post(link.href, this.edited)
+        }
+
+        const link = getLink(this.game, 'self')
+        return this.api.put(link.href, this.edited)
       }
-      let postOrDeleteImage = () => {
+      const createOrDeleteImage = () => {
+        const link = getLink(this.edited, 'image')
+
         if (this.imageFile)
-          return this.api.postImage(this.edited, this.imageFile)
+          return this.api.postForm(link.href, { 'image': this.imageFile })
             .then(withImage => this.edited.image = uniqueUrl(withImage.image))
 
         if (this.imageUrl)
-          return this.api.postImageUrl(this.edited, this.imageUrl)
+          return this.api.post(link.href, { 'image_url': this.imageUrl })
             .then(withImage => this.edited.image = uniqueUrl(withImage.image))
 
         if (this.edited.image && this.imageRemoved)
-          return this.api.deleteImage(this.edited)
+          return this.api.del(link.href)
             .then(() => this.edited.image = null)
       }
 
@@ -209,7 +217,7 @@ export default {
       this.isSaving = true
       createOrUpdate()
         .then(updated => _.assign(this.edited, updated))
-        .then(() => postOrDeleteImage())
+        .then(() => createOrDeleteImage())
         .then(() => {
           this.isSaving = false
           this.$emit('save', this.edited)

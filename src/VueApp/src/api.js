@@ -2,100 +2,15 @@ import _ from 'lodash'
 
 export default class Api {
   constructor() {
-    this.userId = null
     this.accessToken = null
+    this.root = null
   }
 
-  getUsers() {
-    return this.get('/api/users')
-  }
-
-  getGames() {
-    return this.get(`/api/users/${this.userId}/games`)
-  }
-
-  getGenres() {
-    return this.get(`/api/users/${this.userId}/genres`)
-  }
-  getPlatforms() {
-    return this.get(`/api/users/${this.userId}/platforms`)
-  }
-  getTags() {
-    return this.get(`/api/users/${this.userId}/tags`)
-  }
-
-  postGame(game) {
-    return this.post(`/api/users/${this.userId}/games`, game)
-  }
-  putGame(game) {
-    return this.put(`/api/users/${this.userId}/games/${game.id}`, game)
-  }
-  deleteGame(game) {
-    return this.del(`/api/users/${this.userId}/games/${game.id}`)
-  }
-
-  postImage(game, imageFile) {
-    let form = new FormData()
-    form.append('image', imageFile)
-
-    return this.send(`/api/users/${this.userId}/games/${game.id}/image`, 'POST', form)
-  }
-  postImageUrl(game, imageUrl) {
-    let payload = {
-      image_url: imageUrl
-    }
-
-    return this.post(`/api/users/${this.userId}/games/${game.id}/image`, payload)
-  }
-  deleteImage(game) {
-    return this.del(`/api/users/${this.userId}/games/${game.id}/image`)
-  }
-
-  postGenre(genre) {
-    return this.post(`/api/users/${this.userId}/genres`, genre)
-  }
-  postPlatform(platform) {
-    return this.post(`/api/users/${this.userId}/platforms`, platform)
-  }
-  postTag(tag) {
-    return this.post(`/api/users/${this.userId}/tags`, tag)
-  }
-
-  putGenre(genre) {
-    return this.put(`/api/users/${this.userId}/genres/${genre.id}`, genre)
-  }
-  putPlatform(platform) {
-    return this.put(`/api/users/${this.userId}/platforms/${platform.id}`, platform)
-  }
-  putTag(tag) {
-    return this.put(`/api/users/${this.userId}/tags/${tag.id}`, tag)
-  }
-
-  deleteGenre(genre) {
-    return this.del(`/api/users/${this.userId}/genres/${genre.id}`)
-  }
-  deletePlatform(platform) {
-    return this.del(`/api/users/${this.userId}/platforms/${platform.id}`)
-  }
-  deleteTag(tag) {
-    return this.del(`/api/users/${this.userId}/tags/${tag.id}`)
-  }
-
-  getConfig() {
-    return this.get('/api/config')
-  }
-  getSettings() {
-    return this.get('/api/settings')
-  }
-  putSettings(settings) {
-    return this.put('/api/settings', settings)
-  }
-
-  getAssistedSearch(title) {
-    return this.get(`/api/assisted/search/${encodeURIComponent(title)}`)
-  }
-  getAssistedGame(gbGameId) {
-    return this.get(`/api/assisted/game/${gbGameId}`)
+  getRoot() {
+    return this.get('/api').then(root => {
+      this.root = root
+      return root
+    })
   }
 
   getAccessToken(username, password) {
@@ -118,6 +33,15 @@ export default class Api {
   }
   del(url) {
     return this.send(url, 'DELETE', null)
+  }
+
+  postForm(url, values) {
+    let form = new FormData()
+
+    for (let key in values)
+      form.append(key, values[key])
+
+    return this.send(url, 'POST', form)
   }
 
   send(url, method, body) {

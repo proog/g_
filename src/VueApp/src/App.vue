@@ -61,6 +61,7 @@
         <system-settings :genres="sortedGenres"
                           :platforms="sortedPlatforms"
                           :tags="sortedTags"
+                          :user="currentUser"
                           :api="api"
                           @save="settingsSaved"
                           @cancel="closeSettings">
@@ -73,6 +74,7 @@
                     :all-genres="sortedGenres"
                     :all-platforms="sortedPlatforms"
                     :all-tags="sortedTags"
+                    :user="currentUser"
                     :api="api"
                     :is-editable="canEdit"
                     :is-new="true"
@@ -90,6 +92,7 @@
                     :all-genres="sortedGenres"
                     :all-platforms="sortedPlatforms"
                     :all-tags="sortedTags"
+                    :user="currentUser"
                     :api="api"
                     :is-editable="canEdit"
                     :is-new="false"
@@ -119,7 +122,7 @@
 import _ from 'lodash'
 import Vue from 'vue'
 import Api from './api'
-import { filterGames, getJwtPayload, isJwtValid } from './util'
+import { filterGames, getJwtPayload, isJwtValid, getLink } from './util'
 import Focus from './focus'
 import GameItem from './GameItem.vue'
 import LoginForm from './LoginForm.vue'
@@ -187,7 +190,11 @@ export default {
   },
   methods: {
     loadData() {
-      this.api.getUsers()
+      this.api.getRoot()
+        .then(() => {
+          const link = getLink(this.api.root, 'users')
+          return this.api.get(link.href)
+        })
         .then(users => {
           this.users = users
 
@@ -199,8 +206,7 @@ export default {
             this.currentUser = _.find(users, x => x.id === payload['id'])
           }
         })
-        .then(() => this.api.getConfig())
-        .then(config => {
+        .then(() => {
           // find user from route
           const user = _.find(this.users, x => x.id === this.userId)
 
@@ -208,7 +214,7 @@ export default {
           if (!user) {
             this.$router.replace({
               name: 'user',
-              params: { userId: config.default_user_id }
+              params: { userId: this.api.root.default_user_id }
             })
 
             return this.userId ? Promise.reject('User not found') : Promise.resolve()
@@ -216,13 +222,18 @@ export default {
 
           this.selectedUser = user
           this.api.userId = this.selectedUser.id
-          this.isAssistedCreationEnabled = config.is_assisted_creation_enabled
+          this.isAssistedCreationEnabled = !!getLink(this.api.root, 'assisted-search')
+
+          const games = getLink(this.selectedUser, 'games')
+          const genres = getLink(this.selectedUser, 'genres')
+          const platforms = getLink(this.selectedUser, 'platforms')
+          const tags = getLink(this.selectedUser, 'tags')
 
           return Promise.all([
-            this.api.getGames().then(games => this.games = games),
-            this.api.getGenres().then(genres => this.genres = genres),
-            this.api.getPlatforms().then(platforms => this.platforms = platforms),
-            this.api.getTags().then(tags => this.tags = tags)
+            this.api.get(games.href).then(games => this.games = games),
+            this.api.get(genres.href).then(genres => this.genres = genres),
+            this.api.get(platforms.href).then(platforms => this.platforms = platforms),
+            this.api.get(tags.href).then(tags => this.tags = tags)
           ])
         })
     },
