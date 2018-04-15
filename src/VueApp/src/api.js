@@ -34,9 +34,12 @@ export default class Api {
   send(url, method, body) {
     let options = {
       method: method,
-      body: body,
       headers: new Headers()
     }
+
+    // because of an Edge bug, body must not be set for GET requests (https://stackoverflow.com/a/42397093/2182896)
+    if (body)
+      options.body = body
 
     if (_.isString(body))
       options.headers.append('Content-Type', 'application/json')
