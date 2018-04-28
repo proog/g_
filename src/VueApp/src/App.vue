@@ -1,7 +1,7 @@
 <template>
 <div>
   <nav class="navbar fixed-top navbar-expand navbar-light bg-light">
-    <form class="form-inline">
+    <form class="form-inline" @submit.prevent>
       <input type="search"
               class="form-control mr-2"
               placeholder="Search"
