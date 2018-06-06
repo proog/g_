@@ -83,7 +83,7 @@ namespace Games
 
             services.AddRouteUserIdAuthorization();
 
-            services.AddDbContext<GamesContext>(ConfigureDatabase)
+            services.AddDbContextPool<GamesContext>(ConfigureDatabase)
                 .AddTransient<IAuthenticationService, AuthenticationService>()
                 .AddTransient<IGiantBombService, GiantBombService>()
                 .AddTransient<IGameRepository, GameRepository>()
@@ -146,7 +146,7 @@ namespace Games
             var connectionString = configuration["connectionString"];
 
             if (useMySql)
-                options.UseMySQL(connectionString);
+                options.UseMySql(connectionString);
             else
                 options.UseSqlite(connectionString);
         }
