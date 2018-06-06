@@ -32,7 +32,7 @@ namespace Games.IntegrationTests
             }
 
             var result = (await giantBomb.Search("Steel Panthers III", apiKey)).ToList();
-            Assert.Equal(1, result.Count);
+            Assert.Single(result);
             Assert.Equal(73, result.Single().Id);
         }
 
@@ -49,10 +49,10 @@ namespace Games.IntegrationTests
             Assert.NotNull(result);
             Assert.Equal("Steel Panthers III: Brigade Command (1939-1999)", result.Name);
             Assert.Equal("1997-10-31 00:00:00", result.OriginalReleaseDate);
-            Assert.Equal(1, result.Developers.Count);
-            Assert.Equal(1, result.Publishers.Count);
-            Assert.Equal(1, result.Genres.Count);
-            Assert.Equal(1, result.Platforms.Count);
+            Assert.Single(result.Developers);
+            Assert.Single(result.Publishers);
+            Assert.Single(result.Genres);
+            Assert.Single(result.Platforms);
         }
     }
 }

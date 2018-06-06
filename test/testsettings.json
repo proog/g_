@@ -2,6 +2,8 @@
     "giantBombApiKey": null,
     "signingKey": "b4ad2cd5-3440-4dc8-a3f6-23ea59889b18",
     "dataDirectory": "data",
+    "database": "sqlite",
+    "connectionString": "Data Source=data/games.db",
     "Logging": {
         "LogLevel": {
             "Default": "None"
