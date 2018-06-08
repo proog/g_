@@ -11,6 +11,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Xunit;
@@ -32,7 +33,11 @@ namespace Games.IntegrationTests
 
             var hostBuilder = WebHost.CreateDefaultBuilder()
                 .UseConfiguration(configuration)
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .ConfigureLogging(logging =>
+                {
+                    logging.SetMinimumLevel(LogLevel.None); // disable logging for tests
+                });
             var testServer = new TestServer(hostBuilder);
             client = testServer.CreateClient();
 
