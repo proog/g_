@@ -130,6 +130,8 @@ namespace Games.Services
 
         public List<GameGenre> MakeGameGenres(Game game, List<int> ids, List<Genre> allGenres)
         {
+            ids = ids ?? new List<int>();
+
             return allGenres
                 .Where(it => ids.Contains(it.Id))
                 .Select(it =>
@@ -140,6 +142,8 @@ namespace Games.Services
 
         public List<GamePlatform> MakeGamePlatforms(Game game, List<int> ids, List<Platform> allPlatforms)
         {
+            ids = ids ?? new List<int>();
+
             return allPlatforms
                 .Where(it => ids.Contains(it.Id))
                 .Select(it =>
@@ -150,6 +154,8 @@ namespace Games.Services
 
         public List<GameTag> MakeGameTags(Game game, List<int> ids, List<Tag> allTags)
         {
+            ids = ids ?? new List<int>();
+
             return allTags
                 .Where(it => ids.Contains(it.Id))
                 .Select(it =>

@@ -76,5 +76,25 @@ namespace Games.UnitTests
             Assert.Equal(2, result.Count);
             Assert.Contains(game.GameTags.First(), result);
         }
+
+        [Fact]
+        public void HandlesNullRelationIdLists()
+        {
+            var all = new List<Tag>
+            {
+                new Tag { Id = 1 }
+            };
+            var game = new Game
+            {
+                GameTags = new List<GameTag>
+                {
+                    new GameTag { TagId = 1 }
+                }
+            };
+
+            var factory = new ViewModelFactory(null);
+            var result = factory.MakeGameTags(game, null, all);
+            Assert.Empty(result);
+        }
     }
 }
