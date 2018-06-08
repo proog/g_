@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers
 {
-    [Route("api/settings", Name = Route.Settings), Authorize]
-    public class SettingsController : Controller
+    [ApiController]
+    [Authorize]
+    [Route("api/settings", Name = Route.Settings)]
+    public class SettingsController : ControllerBase
     {
         private readonly IConfigRepository configRepository;
         private readonly IUserRepository userRepository;
@@ -34,19 +36,19 @@ namespace Games.Controllers
         }
 
         [HttpPut]
-        public AuthorizedSettings UpdateSettings([FromBody] AuthorizedSettingsInput settings)
+        public ActionResult<AuthorizedSettings> UpdateSettings([FromBody] AuthorizedSettingsInput settings)
         {
             var idClaim = User.FindFirst(Constants.UserIdClaim);
             var user = userRepository.Get(int.Parse(idClaim.Value));
             var hash = auth.HashPassword(settings.OldPassword);
 
             if (hash != user.Password)
-                throw new UnauthorizedException();
+                return Unauthorized();
 
             var defaultUser = userRepository.Get(settings.DefaultUserId);
 
             if (defaultUser == null)
-                throw new BadRequestException();
+                return BadRequest();
 
             configRepository.Configure(defaultUser, settings.GiantBombApiKey);
 

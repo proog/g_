@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers
 {
+    [ApiController]
     [Route("api")]
-    public class AuthenticationController : Controller
+    public class AuthenticationController : ControllerBase
     {
         private readonly IUserRepository userRepository;
         private readonly IAuthenticationService auth;
@@ -21,13 +22,13 @@ namespace Games.Controllers
         }
 
         [HttpPost("token", Name = Route.Token)]
-        public OAuthResponse Token([FromForm] OAuthCredentials cred)
+        public ActionResult<OAuthResponse> Token([FromForm] OAuthCredentials cred)
         {
             var hash = auth.HashPassword(cred.Password);
             var user = userRepository.Get(cred.Username);
 
             if (user == null || user.Password != hash)
-                throw new UnauthorizedException("Invalid credentials");
+                return Unauthorized();
 
             var jwt = auth.Authenticate(user);
 

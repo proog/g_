@@ -10,8 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers
 {
+    [ApiController]
     [Route("api/users/{" + Constants.UserIdParameter + "}")]
-    public class DescriptorController : Controller
+    public class DescriptorController : ControllerBase
     {
         private readonly IUserRepository users;
         private readonly IGenreRepository genres;
@@ -31,86 +32,86 @@ namespace Games.Controllers
         }
 
         [HttpGet("genres", Name = Route.Genres)]
-        public List<DescriptorViewModel> GetGenres(int userId)
+        public ActionResult<List<DescriptorViewModel>> GetGenres(int userId)
         {
             return All(userId, genres);
         }
         [HttpGet("platforms", Name = Route.Platforms)]
-        public List<DescriptorViewModel> GetPlatforms(int userId)
+        public ActionResult<List<DescriptorViewModel>> GetPlatforms(int userId)
         {
             return All(userId, platforms);
         }
         [HttpGet("tags", Name = Route.Tags)]
-        public List<DescriptorViewModel> GetTags(int userId)
+        public ActionResult<List<DescriptorViewModel>> GetTags(int userId)
         {
             return All(userId, tags);
         }
 
         [HttpGet("genres/{id}", Name = Route.Genre)]
-        public DescriptorViewModel GetGenre(int userId, int id)
+        public ActionResult<DescriptorViewModel> GetGenre(int userId, int id)
         {
             return Single(userId, id, genres);
         }
         [HttpGet("platforms/{id}", Name = Route.Platform)]
-        public DescriptorViewModel GetPlatform(int userId, int id)
+        public ActionResult<DescriptorViewModel> GetPlatform(int userId, int id)
         {
             return Single(userId, id, platforms);
         }
         [HttpGet("tags/{id}", Name = Route.Tag)]
-        public DescriptorViewModel GetTag(int userId, int id)
+        public ActionResult<DescriptorViewModel> GetTag(int userId, int id)
         {
             return Single(userId, id, tags);
         }
 
         [HttpPost("genres"), Authorize(Constants.SameUserPolicy)]
-        public DescriptorViewModel AddGenre(int userId, [FromBody] DescriptorViewModel rendition)
+        public ActionResult<DescriptorViewModel> AddGenre(int userId, [FromBody] DescriptorViewModel rendition)
         {
             return Add(userId, rendition, genres);
         }
         [HttpPost("platforms"), Authorize(Constants.SameUserPolicy)]
-        public DescriptorViewModel AddPlatform(int userId, [FromBody] DescriptorViewModel rendition)
+        public ActionResult<DescriptorViewModel> AddPlatform(int userId, [FromBody] DescriptorViewModel rendition)
         {
             return Add(userId, rendition, platforms);
         }
         [HttpPost("tags"), Authorize(Constants.SameUserPolicy)]
-        public DescriptorViewModel AddTag(int userId, [FromBody] DescriptorViewModel rendition)
+        public ActionResult<DescriptorViewModel> AddTag(int userId, [FromBody] DescriptorViewModel rendition)
         {
             return Add(userId, rendition, tags);
         }
 
         [HttpPut("genres/{id}"), Authorize(Constants.SameUserPolicy)]
-        public DescriptorViewModel UpdateGenre(int userId, int id, [FromBody] DescriptorViewModel rendition)
+        public ActionResult<DescriptorViewModel> UpdateGenre(int userId, int id, [FromBody] DescriptorViewModel rendition)
         {
             return Update(userId, id, rendition, genres);
         }
         [HttpPut("platforms/{id}"), Authorize(Constants.SameUserPolicy)]
-        public DescriptorViewModel UpdatePlatform(int userId, int id, [FromBody] DescriptorViewModel rendition)
+        public ActionResult<DescriptorViewModel> UpdatePlatform(int userId, int id, [FromBody] DescriptorViewModel rendition)
         {
             return Update(userId, id, rendition, platforms);
         }
         [HttpPut("tags/{id}"), Authorize(Constants.SameUserPolicy)]
-        public DescriptorViewModel UpdateTag(int userId, int id, [FromBody] DescriptorViewModel rendition)
+        public ActionResult<DescriptorViewModel> UpdateTag(int userId, int id, [FromBody] DescriptorViewModel rendition)
         {
             return Update(userId, id, rendition, tags);
         }
 
         [HttpDelete("genres/{id}"), Authorize(Constants.SameUserPolicy)]
-        public IActionResult DeleteGenre(int userId, int id)
+        public ActionResult DeleteGenre(int userId, int id)
         {
             return Delete(userId, id, genres);
         }
         [HttpDelete("platforms/{id}"), Authorize(Constants.SameUserPolicy)]
-        public IActionResult DeletePlatform(int userId, int id)
+        public ActionResult DeletePlatform(int userId, int id)
         {
             return Delete(userId, id, platforms);
         }
         [HttpDelete("tags/{id}"), Authorize(Constants.SameUserPolicy)]
-        public IActionResult DeleteTag(int userId, int id)
+        public ActionResult DeleteTag(int userId, int id)
         {
             return Delete(userId, id, tags);
         }
 
-        private DescriptorViewModel Add<T>(int userId, DescriptorViewModel vm, IDescriptorRepository<T> repository) where T : Descriptor, new()
+        private ActionResult<DescriptorViewModel> Add<T>(int userId, DescriptorViewModel vm, IDescriptorRepository<T> repository) where T : Descriptor, new()
         {
             var user = users.Get(userId);
             var descriptor = new T
@@ -126,13 +127,13 @@ namespace Games.Controllers
             return vmFactory.MakeDescriptorViewModel(descriptor);
         }
 
-        private DescriptorViewModel Update<T>(int userId, int id, DescriptorViewModel vm, IDescriptorRepository<T> repository) where T : Descriptor
+        private ActionResult<DescriptorViewModel> Update<T>(int userId, int id, DescriptorViewModel vm, IDescriptorRepository<T> repository) where T : Descriptor
         {
             var user = users.Get(userId);
             var descriptor = repository.Get(user, id);
 
             if (descriptor == null)
-                throw new NotFoundException();
+                return NotFound();
 
             descriptor.Name = vm.Name;
             descriptor.ShortName = vm.ShortName;
@@ -142,41 +143,41 @@ namespace Games.Controllers
             return vmFactory.MakeDescriptorViewModel(descriptor);
         }
 
-        private IActionResult Delete<T>(int userId, int id, IDescriptorRepository<T> repository) where T : Descriptor
+        private ActionResult Delete<T>(int userId, int id, IDescriptorRepository<T> repository) where T : Descriptor
         {
             var user = users.Get(userId);
             var descriptor = repository.Get(user, id);
 
             if (descriptor == null)
-                throw new NotFoundException();
+                return NotFound();
 
             repository.Delete(descriptor);
             return NoContent();
         }
 
-        private List<DescriptorViewModel> All<T>(int userId, IDescriptorRepository<T> repository) where T : Descriptor
+        private ActionResult<List<DescriptorViewModel>> All<T>(int userId, IDescriptorRepository<T> repository) where T : Descriptor
         {
             var user = users.Get(userId);
 
             if (user == null)
-                throw new NotFoundException();
+                return NotFound();
 
             return repository.All(user)
                 .Select(vmFactory.MakeDescriptorViewModel)
                 .ToList();
         }
 
-        private DescriptorViewModel Single<T>(int userId, int id, IDescriptorRepository<T> repository) where T : Descriptor
+        private ActionResult<DescriptorViewModel> Single<T>(int userId, int id, IDescriptorRepository<T> repository) where T : Descriptor
         {
             var user = users.Get(userId);
 
             if (user == null)
-                throw new NotFoundException();
+                return NotFound();
 
             var descriptor = repository.Get(user, id);
 
             if (descriptor == null)
-                throw new NotFoundException();
+                return NotFound();
 
             return vmFactory.MakeDescriptorViewModel(descriptor);
         }

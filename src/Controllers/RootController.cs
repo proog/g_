@@ -5,8 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers
 {
+    [ApiController]
     [Route("api", Name = Route.Root)]
-    public class RootController : Controller
+    public class RootController : ControllerBase
     {
         private readonly IConfigRepository configRepository;
         private readonly IViewModelFactory vmFactory;
@@ -18,12 +19,12 @@ namespace Games.Controllers
         }
 
         [HttpGet]
-        public Root GetRoot()
+        public ActionResult<Root> GetRoot()
         {
             var config = configRepository.DefaultConfig;
 
             if (config == null)
-                throw new NotFoundException();
+                return NotFound();
 
             return vmFactory.MakeRoot(config);
         }

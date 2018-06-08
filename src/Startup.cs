@@ -75,7 +75,7 @@ namespace Games
         {
             services.AddOptions().Configure<AppSettings>(configuration);
 
-            services.AddMvc(ConfigureMvc)
+            services.AddMvc()
                 .AddJsonOptions(ConfigureJson);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -109,12 +109,6 @@ namespace Games
                 var db = scope.ServiceProvider.GetService<GamesContext>();
                 db.Database.EnsureCreated();
             }
-        }
-
-        private void ConfigureMvc(MvcOptions options)
-        {
-            options.Filters.Add(new ValidateModelFilter());
-            options.Filters.Add(new HandleExceptionFilter());
         }
 
         private void ConfigureJson(MvcJsonOptions options)

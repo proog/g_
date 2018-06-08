@@ -12,14 +12,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers
 {
-    [Route("api/assisted"), Authorize]
-    public class GiantBombController : Controller
+    [ApiController]
+    [Authorize]
+    [Route("api/assisted")]
+    public class GiantBombController : ControllerBase
     {
         private readonly string apiKey;
         private readonly IUserRepository userRepository;
         private readonly IGiantBombService giantBomb;
         private readonly IViewModelFactory vmFactory;
-        private const string NotFoundMessage = "No Giant Bomb API key specified. Please request an API key and add it in the settings dialog or database.";
+        private readonly ApiError NoApiKeyError = new ApiError("No Giant Bomb API key specified. Please request an API key and add it in the settings dialog or database.");
 
         public GiantBombController(IConfigRepository configRepository, IUserRepository userRepository, IGiantBombService giantBomb, IViewModelFactory vmFactory)
         {
@@ -30,10 +32,10 @@ namespace Games.Controllers
         }
 
         [HttpGet("search", Name = Route.AssistedSearch)]
-        public async Task<List<AssistedSearchResult>> Search([FromQuery] string title)
+        public async Task<ActionResult<List<AssistedSearchResult>>> Search([FromQuery] string title)
         {
-            if (apiKey == null)
-                throw new NotFoundException(NotFoundMessage);
+            if (string.IsNullOrEmpty(apiKey))
+                return NotFound(NoApiKeyError);
 
             var results = await giantBomb.Search(title, apiKey);
 
@@ -43,10 +45,10 @@ namespace Games.Controllers
         }
 
         [HttpGet("game/{id}", Name = Route.AssistedGame)]
-        public async Task<AssistedGameResult> Get(int id)
+        public async Task<ActionResult<AssistedGameResult>> Get(int id)
         {
-            if (apiKey == null)
-                throw new NotFoundException(NotFoundMessage);
+            if (string.IsNullOrEmpty(apiKey))
+                return NotFound(NoApiKeyError);
 
             var idClaim = User.FindFirst(Constants.UserIdClaim);
             var user = userRepository.Get(int.Parse(idClaim.Value));
@@ -65,8 +67,7 @@ namespace Games.Controllers
 
             if (!string.IsNullOrEmpty(gb.OriginalReleaseDate))
             {
-                var dt = default(DateTime);
-                if (DateTime.TryParse(gb.OriginalReleaseDate, out dt))
+                if (DateTime.TryParse(gb.OriginalReleaseDate, out DateTime dt))
                     result.Year = dt.Year;
             }
 

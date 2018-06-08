@@ -12,8 +12,10 @@ using Newtonsoft.Json.Linq;
 
 namespace Games.Controllers
 {
-    [Route("api/users/{" + Constants.UserIdParameter + "}/games/{id}/image", Name = Route.Image), Authorize(Constants.SameUserPolicy)]
-    public class ImageController : Controller
+    [ApiController]
+    [Authorize(Constants.SameUserPolicy)]
+    [Route("api/users/{" + Constants.UserIdParameter + "}/games/{id}/image", Name = Route.Image)]
+    public class ImageController : ControllerBase
     {
         private readonly IGameRepository gameRepository;
         private readonly IUserRepository userRepository;
@@ -33,22 +35,29 @@ namespace Games.Controllers
         }
 
         [HttpPost]
-        public async Task<GameViewModel> UploadImage(int userId, int id)
+        public async Task<ActionResult<GameViewModel>> UploadImage(int userId, int id)
         {
             var user = userRepository.Get(userId);
             var game = gameRepository.Get(user, id);
 
             if (game == null)
-                throw new NotFoundException();
+                return NotFound();
 
             var path = $"images/{game.Id}/image.jpg";
             var fileInfo = data.GetFileInfo(path);
-            var imageStream = Request.HasFormContentType
+
+            try {
+                var imageStream = Request.HasFormContentType
                 ? await ReadFormImage()
                 : await ReadGiantBombImage();
 
-            using (imageStream)
-                await WriteToFile(imageStream, fileInfo.PhysicalPath);
+                using (imageStream)
+                    await WriteToFile(imageStream, fileInfo.PhysicalPath);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(new ApiError(e.Message));
+            }
 
             game.Image = path;
             gameRepository.Update(game);
@@ -57,13 +66,13 @@ namespace Games.Controllers
         }
 
         [HttpDelete]
-        public IActionResult DeleteImage(int userId, int id)
+        public ActionResult DeleteImage(int userId, int id)
         {
             var user = userRepository.Get(userId);
             var game = gameRepository.Get(user, id);
 
             if (game == null)
-                throw new NotFoundException();
+                return NotFound();
 
             game.Image = null;
             gameRepository.Update(game);
@@ -76,7 +85,7 @@ namespace Games.Controllers
             var file = form.Files["image"];
 
             if (file == null)
-                throw new BadRequestException("No image supplied");
+                throw new ArgumentException("No image supplied");
 
             return file.OpenReadStream();
         }
@@ -91,7 +100,7 @@ namespace Games.Controllers
             }
 
             if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
-                throw new BadRequestException("Not a valid url");
+                throw new ArgumentException("Not a valid url");
 
             var response = await httpClient.GetAsync(url);
 

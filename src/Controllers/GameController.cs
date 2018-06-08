@@ -10,8 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers
 {
+    [ApiController]
     [Route("api/users/{" + Constants.UserIdParameter + "}")]
-    public class GameController : Controller
+    public class GameController : ControllerBase
     {
         private readonly IGameRepository gameRepository;
         private readonly IUserRepository userRepository;
@@ -27,12 +28,12 @@ namespace Games.Controllers
         }
 
         [HttpGet("games", Name = Route.Games)]
-        public List<GameViewModel> GetGames(int userId)
+        public ActionResult<List<GameViewModel>> GetGames(int userId)
         {
             var user = userRepository.Get(userId);
 
             if (user == null)
-                throw new NotFoundException();
+                return NotFound();
 
             var games = gameRepository.All(user);
 
@@ -45,28 +46,28 @@ namespace Games.Controllers
         }
 
         [HttpGet("games/{id}", Name = Route.Game)]
-        public GameViewModel GetGame(int userId, int id)
+        public ActionResult<GameViewModel> GetGame(int userId, int id)
         {
             var user = userRepository.Get(userId);
 
             if (user == null)
-                throw new NotFoundException();
+                return NotFound();
 
             var game = gameRepository.Get(user, id);
 
             if (game == null || game.Hidden && !IsCurrentUser(user))
-                throw new NotFoundException();
+                return NotFound();
 
             return vmFactory.MakeGameViewModel(game);
         }
 
         [HttpGet("suggestions", Name = Route.Suggestions)]
-        public List<Suggestion> GetSuggestions(int userId)
+        public ActionResult<List<Suggestion>> GetSuggestions(int userId)
         {
             var user = userRepository.Get(userId);
 
             if (user == null)
-                throw new NotFoundException();
+                return NotFound();
 
             var allGames = gameRepository.All(user);
 
@@ -135,8 +136,9 @@ namespace Games.Controllers
                 .ToList();
         }
 
-        [HttpPost("games"), Authorize(Constants.SameUserPolicy)]
-        public GameViewModel AddGame(int userId, [FromBody] GameViewModel vm)
+        [Authorize(Constants.SameUserPolicy)]
+        [HttpPost("games")]
+        public ActionResult<GameViewModel> AddGame(int userId, [FromBody] GameViewModel vm)
         {
             var user = userRepository.Get(userId);
             var game = new Game
@@ -166,14 +168,15 @@ namespace Games.Controllers
             return vmFactory.MakeGameViewModel(game);
         }
 
-        [HttpPut("games/{id}"), Authorize(Constants.SameUserPolicy)]
-        public GameViewModel UpdateGame(int userId, int id, [FromBody] GameViewModel vm)
+        [Authorize(Constants.SameUserPolicy)]
+        [HttpPut("games/{id}")]
+        public ActionResult<GameViewModel> UpdateGame(int userId, int id, [FromBody] GameViewModel vm)
         {
             var user = userRepository.Get(userId);
             var game = gameRepository.Get(user, id);
 
             if (game == null)
-                throw new NotFoundException();
+                return NotFound();
 
             game.Title = vm.Title;
             game.Developer = vm.Developer;
@@ -197,14 +200,15 @@ namespace Games.Controllers
             return vmFactory.MakeGameViewModel(game);
         }
 
-        [HttpDelete("games/{id}"), Authorize(Constants.SameUserPolicy)]
-        public IActionResult DeleteGame(int userId, int id)
+        [Authorize(Constants.SameUserPolicy)]
+        [HttpDelete("games/{id}")]
+        public ActionResult DeleteGame(int userId, int id)
         {
             var user = userRepository.Get(userId);
             var game = gameRepository.Get(user, id);
 
             if (game == null)
-                throw new NotFoundException();
+                return NotFound();
 
             gameRepository.Delete(game);
             return NoContent();

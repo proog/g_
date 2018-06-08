@@ -7,8 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers
 {
+    [ApiController]
     [Route("api/users")]
-    public class UserController : Controller
+    public class UserController : ControllerBase
     {
         private readonly IUserRepository userRepository;
         private readonly IViewModelFactory vmFactory;
@@ -28,12 +29,12 @@ namespace Games.Controllers
         }
 
         [HttpGet("{id}", Name = Route.User)]
-        public UserViewModel GetUser(int id)
+        public ActionResult<UserViewModel> GetUser(int id)
         {
             var user = userRepository.Get(id);
 
             if (user == null)
-                throw new NotFoundException();
+                return NotFound();
 
             return vmFactory.MakeUserViewModel(user);
         }

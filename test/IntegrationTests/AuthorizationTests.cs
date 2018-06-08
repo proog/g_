@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace Games.IntegrationTests
@@ -51,7 +52,7 @@ namespace Games.IntegrationTests
                 }
             };
             var response = await client.SendAsync(request);
-            Assert.Equal(415, (int)response.StatusCode);
+            Assert.Equal(400, (int)response.StatusCode);
         }
 
         [Fact]
