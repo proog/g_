@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Games.Repositories
 {
-    class UserRepository : IUserRepository
+    public class UserRepository : IUserRepository
     {
         private readonly GamesContext db;
 

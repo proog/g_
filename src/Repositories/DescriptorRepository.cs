@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Games.Repositories
 {
-    abstract class DescriptorRepository<T> : IDescriptorRepository<T> where T : Descriptor
+    public abstract class DescriptorRepository<T> : IDescriptorRepository<T> where T : Descriptor
     {
         private readonly GamesContext db;
         private readonly DbSet<T> dbSet;

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Games.Repositories
 {
-    class ConfigRepository : IConfigRepository
+    public class ConfigRepository : IConfigRepository
     {
         private readonly GamesContext db;
 

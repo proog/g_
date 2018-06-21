@@ -10,7 +10,7 @@ using Microsoft.Extensions.FileProviders;
 
 namespace Games.Repositories
 {
-    class GameRepository : IGameRepository
+    public class GameRepository : IGameRepository
     {
         private readonly GamesContext db;
         private readonly IFileProvider files;
@@ -73,7 +73,7 @@ namespace Games.Repositories
         {
             var imageDir = files.GetFileInfo($"images/{game.Id}");
 
-            if (imageDir.Exists)
+            if (Directory.Exists(imageDir.PhysicalPath))
                 Directory.Delete(imageDir.PhysicalPath, true);
         }
     }
