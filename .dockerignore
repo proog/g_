@@ -1,0 +1,11 @@
+.git/
+.vscode/
+data/
+test/
+src/wwwroot/app.js
+src/wwwroot/app.js.map
+**/bin/
+**/obj/
+**/node_modules/
+**/out/
+**/appsettings.*.json
