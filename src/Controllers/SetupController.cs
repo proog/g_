@@ -11,12 +11,14 @@ namespace Games.Controllers
     {
         private readonly IConfigRepository configRepository;
         private readonly IUserRepository userRepository;
+        private readonly IEventRepository eventRepository;
         private readonly IAuthenticationService auth;
 
-        public SetupController(IConfigRepository configRepository, IUserRepository userRepository, IAuthenticationService auth)
+        public SetupController(IConfigRepository configRepository, IUserRepository userRepository, IEventRepository eventRepository, IAuthenticationService auth)
         {
             this.configRepository = configRepository;
             this.userRepository = userRepository;
+            this.eventRepository = eventRepository;
             this.auth = auth;
         }
 
@@ -60,6 +62,9 @@ namespace Games.Controllers
 
             userRepository.Add(defaultUser);
             configRepository.Configure(defaultUser, vm.ApiKey?.Trim());
+
+            var eventPayload = new { defaultUserId = defaultUser.Id, defaultUsername = defaultUser.Username };
+            eventRepository.Add(new Event("SetupCompleted", eventPayload, null));
 
             vm.Success = true;
             return Render(vm);

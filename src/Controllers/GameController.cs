@@ -16,13 +16,15 @@ namespace Games.Controllers
     {
         private readonly IGameRepository gameRepository;
         private readonly IUserRepository userRepository;
+        private readonly IEventRepository eventRepository;
         private readonly IAuthenticationService auth;
         private readonly IViewModelFactory vmFactory;
 
-        public GameController(IGameRepository games, IUserRepository users, IAuthenticationService auth, IViewModelFactory vmFactory)
+        public GameController(IGameRepository gameRepository, IUserRepository userRepository, IEventRepository eventRepository, IAuthenticationService auth, IViewModelFactory vmFactory)
         {
-            this.gameRepository = games;
-            this.userRepository = users;
+            this.gameRepository = gameRepository;
+            this.userRepository = userRepository;
+            this.eventRepository = eventRepository;
             this.auth = auth;
             this.vmFactory = vmFactory;
         }
@@ -165,6 +167,7 @@ namespace Games.Controllers
             game.GameTags = vmFactory.MakeGameTags(game, vm.TagIds, user.Tags);
 
             gameRepository.Add(game);
+            eventRepository.Add(new Event("GameAdded", CreateEventPayload(game), user));
             return vmFactory.MakeGameViewModel(game);
         }
 
@@ -197,6 +200,8 @@ namespace Games.Controllers
             game.GameTags = vmFactory.MakeGameTags(game, vm.TagIds, user.Tags);
 
             gameRepository.Update(game);
+            eventRepository.Add(new Event("GameUpdated", CreateEventPayload(game), user));
+
             return vmFactory.MakeGameViewModel(game);
         }
 
@@ -211,6 +216,7 @@ namespace Games.Controllers
                 return NotFound();
 
             gameRepository.Delete(game);
+            eventRepository.Add(new Event("GameDeleted", CreateEventPayload(game), user));
             return NoContent();
         }
 
@@ -219,5 +225,24 @@ namespace Games.Controllers
             var idClaim = User.FindFirst(Constants.UserIdClaim);
             return idClaim != null && int.Parse(idClaim.Value) == user.Id;
         }
+
+        private static object CreateEventPayload(Game game) => new
+        {
+            game.Id,
+            game.Title,
+            game.Developer,
+            game.Publisher,
+            game.Year,
+            game.Image,
+            game.Finished,
+            game.Comment,
+            game.SortAs,
+            game.Playtime,
+            game.Rating,
+            game.CurrentlyPlaying,
+            game.QueuePosition,
+            game.Hidden,
+            game.WishlistPosition,
+        };
     }
 }

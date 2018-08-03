@@ -17,6 +17,8 @@ namespace Games.Services
 
         public DbSet<Config> Configs { get; set; }
 
+        public DbSet<Event> Events { get; set; }
+
         public GamesContext(DbContextOptions<GamesContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

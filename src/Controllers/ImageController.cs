@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Interfaces;
+using Games.Models;
 using Games.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,15 +20,17 @@ namespace Games.Controllers
     {
         private readonly IGameRepository gameRepository;
         private readonly IUserRepository userRepository;
+        private readonly IEventRepository eventRepository;
         private readonly HttpClient httpClient;
         private readonly IViewModelFactory vmFactory;
         private readonly IAuthenticationService auth;
         private readonly IFileProvider data;
 
-        public ImageController(IGameRepository gameRepository, IUserRepository userRepository, IAuthenticationService auth, IFileProvider data, HttpClient httpClient, IViewModelFactory vmFactory)
+        public ImageController(IGameRepository gameRepository, IUserRepository userRepository, IEventRepository eventRepository, IAuthenticationService auth, IFileProvider data, HttpClient httpClient, IViewModelFactory vmFactory)
         {
             this.gameRepository = gameRepository;
             this.userRepository = userRepository;
+            this.eventRepository = eventRepository;
             this.auth = auth;
             this.data = data;
             this.httpClient = httpClient;
@@ -61,6 +64,7 @@ namespace Games.Controllers
 
             game.Image = path;
             gameRepository.Update(game);
+            eventRepository.Add(new Event("ImageUpdated", new { game.Id, game.Image }, user));
 
             return vmFactory.MakeGameViewModel(game);
         }
@@ -76,6 +80,8 @@ namespace Games.Controllers
 
             game.Image = null;
             gameRepository.Update(game);
+            eventRepository.Add(new Event("ImageDeleted", new { game.Id }, user));
+
             return NoContent();
         }
 

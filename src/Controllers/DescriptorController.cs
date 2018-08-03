@@ -18,15 +18,17 @@ namespace Games.Controllers
         private readonly IGenreRepository genres;
         private readonly IPlatformRepository platforms;
         private readonly ITagRepository tags;
+        private readonly IEventRepository events;
         private readonly IAuthenticationService auth;
         private readonly IViewModelFactory vmFactory;
 
-        public DescriptorController(IUserRepository users, IGenreRepository genres, IPlatformRepository platforms, ITagRepository tags, IAuthenticationService auth, IViewModelFactory vmFactory)
+        public DescriptorController(IUserRepository users, IGenreRepository genres, IPlatformRepository platforms, ITagRepository tags, IEventRepository events, IAuthenticationService auth, IViewModelFactory vmFactory)
         {
             this.users = users;
             this.genres = genres;
             this.platforms = platforms;
             this.tags = tags;
+            this.events = events;
             this.auth = auth;
             this.vmFactory = vmFactory;
         }
@@ -122,7 +124,9 @@ namespace Games.Controllers
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
+
             repository.Add(descriptor);
+            events.Add(new Event("DescriptorAdded", new { descriptor.Id, descriptor.Name, descriptor.ShortName }, user));
 
             return vmFactory.MakeDescriptorViewModel(descriptor);
         }
@@ -138,7 +142,9 @@ namespace Games.Controllers
             descriptor.Name = vm.Name;
             descriptor.ShortName = vm.ShortName;
             descriptor.UpdatedAt = DateTime.UtcNow;
+
             repository.Update(descriptor);
+            events.Add(new Event("DescriptorUpdated", new { descriptor.Id, descriptor.Name, descriptor.ShortName }, user));
 
             return vmFactory.MakeDescriptorViewModel(descriptor);
         }
@@ -152,6 +158,8 @@ namespace Games.Controllers
                 return NotFound();
 
             repository.Delete(descriptor);
+            events.Add(new Event("DescriptorDeleted", new { descriptor.Id, descriptor.Name, descriptor.ShortName }, user));
+
             return NoContent();
         }
 

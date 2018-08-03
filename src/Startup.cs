@@ -92,6 +92,7 @@ namespace Games
                 .AddTransient<IPlatformRepository, PlatformRepository>()
                 .AddTransient<ITagRepository, TagRepository>()
                 .AddTransient<IConfigRepository, ConfigRepository>()
+                .AddTransient<IEventRepository, EventRepository>()
                 .AddTransient<IViewModelFactory, ViewModelFactory>()
                 .AddScoped<IUrlHelper>(CreateUrlHelper)
                 .AddSingleton<IActionContextAccessor, ActionContextAccessor>()
