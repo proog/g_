@@ -24,4 +24,5 @@ WORKDIR /app
 COPY --from=dotnetbuild /src/out ./
 COPY --from=vuebuild /src/wwwroot/app.js* ./wwwroot/
 
+EXPOSE 5000
 ENTRYPOINT ["dotnet", "g_.dll"]
