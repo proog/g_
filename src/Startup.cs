@@ -44,6 +44,11 @@ namespace Games
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             };
+
+            // allow reverse proxy on other addresses than localhost
+            headerOptions.KnownNetworks.Clear();
+            headerOptions.KnownProxies.Clear();
+
             var fileOptions = new FileServerOptions
             {
                 RequestPath = "/images",
