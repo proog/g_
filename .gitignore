@@ -1,11 +1,11 @@
-src/wwwroot/app.js
-src/wwwroot/app.js.map
+wwwroot
 data
 appsettings.*.json
 testsettings.*.json
 bin
 obj
 .vscode
+.cache
 node_modules
 *.userprefs
 *.csproj.user

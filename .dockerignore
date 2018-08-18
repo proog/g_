@@ -2,8 +2,7 @@
 .vscode/
 data/
 test/
-src/wwwroot/app.js
-src/wwwroot/app.js.map
+src/wwwroot/
 **/bin/
 **/obj/
 **/node_modules/

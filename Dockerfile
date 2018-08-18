@@ -22,7 +22,7 @@ FROM microsoft/dotnet:2.1-aspnetcore-runtime-alpine AS run
 WORKDIR /app
 
 COPY --from=dotnetbuild /src/out ./
-COPY --from=vuebuild /src/wwwroot/app.js* ./wwwroot/
+COPY --from=vuebuild /src/wwwroot ./wwwroot
 
 EXPOSE 5000
 ENTRYPOINT ["dotnet", "g_.dll"]
