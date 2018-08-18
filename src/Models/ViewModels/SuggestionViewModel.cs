@@ -1,6 +1,6 @@
 namespace Games.Models.ViewModels
 {
-    public class Suggestion
+    public class SuggestionViewModel : Linked
     {
         public int GameId { get; set; }
 

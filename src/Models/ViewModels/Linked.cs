@@ -6,6 +6,6 @@ namespace Games.Models.ViewModels
     public abstract class Linked
     {
         [JsonProperty("_links")]
-        public List<Link> Links { get; set; }
+        public List<Link> Links { get; set; } = new List<Link>();
     }
 }

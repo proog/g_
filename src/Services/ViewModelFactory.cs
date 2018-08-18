@@ -128,6 +128,19 @@ namespace Games.Services
             };
         }
 
+        public SuggestionViewModel MakeSuggestionViewModel(Suggestion suggestion)
+        {
+            return new SuggestionViewModel
+            {
+                GameId = suggestion.Game.Id,
+                Score = suggestion.Score,
+                Links = new List<Link>
+                {
+                    new Link(Rel.Game, url.Link(Route.Game, new { id = suggestion.Game.Id }))
+                }
+            };
+        }
+
         public List<GameGenre> MakeGameGenres(Game game, List<int> ids, List<Genre> allGenres)
         {
             ids = ids ?? new List<int>();

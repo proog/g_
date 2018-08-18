@@ -91,6 +91,7 @@ namespace Games
             services.AddDbContextPool<GamesContext>(ConfigureDatabase)
                 .AddTransient<IAuthenticationService, AuthenticationService>()
                 .AddTransient<IGiantBombService, GiantBombService>()
+                .AddTransient<ISuggestionService, SuggestionService>()
                 .AddTransient<IGameRepository, GameRepository>()
                 .AddTransient<IUserRepository, UserRepository>()
                 .AddTransient<IGenreRepository, GenreRepository>()
