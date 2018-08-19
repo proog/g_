@@ -19,6 +19,8 @@ namespace Games.Interfaces
 
         AssistedSearchResult MakeAssistedSearchResult(GBSearchResult result);
 
+        AssistedGameResult MakeAssistedGameResult(GBGame gb, List<Genre> allGenres, List<Platform> allPlatforms);
+
         SuggestionViewModel MakeSuggestionViewModel(Suggestion suggestion);
 
         List<GameGenre> MakeGameGenres(Game game, List<int> ids, List<Genre> allGenres);

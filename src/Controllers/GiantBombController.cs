@@ -52,58 +52,9 @@ namespace Games.Controllers
 
             var idClaim = User.FindFirst(Constants.UserIdClaim);
             var user = userRepository.Get(int.Parse(idClaim.Value));
-
             var gb = await giantBomb.GetGame(id, apiKey);
-            var result = new AssistedGameResult
-            {
-                Title = gb.Name,
-                Developer = gb.Developers?.Select(it => it.Name).FirstOrDefault(),
-                Publisher = gb.Publishers?.Select(it => it.Name).FirstOrDefault(),
-                ImageUrl = gb.Image.AnyUrl,
-                Year = null,
-                GenreIds = new List<int>(),
-                PlatformIds = new List<int>()
-            };
 
-            if (!string.IsNullOrEmpty(gb.OriginalReleaseDate))
-            {
-                if (DateTime.TryParse(gb.OriginalReleaseDate, out DateTime dt))
-                    result.Year = dt.Year;
-            }
-
-            if (gb.Genres != null)
-            {
-                result.GenreIds = user.Genres
-                    .Where(it => gb.Genres.Any(gbGenre => MatchesDescriptor(gbGenre, it)))
-                    .Select(it => it.Id)
-                    .ToList();
-            }
-
-            if (gb.Platforms != null)
-            {
-                result.PlatformIds = user.Platforms
-                    .Where(it => gb.Platforms.Any(gbPlatform => MatchesDescriptor(gbPlatform, it)))
-                    .Select(it => it.Id)
-                    .ToList();
-            }
-
-            // if we found only one platform match, use that. Otherwise, use nothing,
-            // because odds are it should only be added for one platform anyway
-            if (result.PlatformIds.Count > 1)
-                result.PlatformIds.Clear();
-
-            return result;
-        }
-
-        private bool MatchesDescriptor(GBDescriptor gb, Descriptor d)
-        {
-            var gbName = gb.Name.Replace(" ", "").ToLower();
-            var name = d.Name.Replace(" ", "").ToLower();
-            var shortName = d.ShortName.Replace(" ", "").ToLower();
-
-            return gbName.Contains(name)
-                || gbName.Contains(shortName)
-                || name.Contains(gbName);
+            return vmFactory.MakeAssistedGameResult(gb, user.Genres, user.Platforms);
         }
     }
 }
