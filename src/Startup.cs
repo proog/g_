@@ -134,10 +134,13 @@ namespace Games
         private void ConfigureDatabase(DbContextOptionsBuilder options)
         {
             var useMySql = configuration["database"]?.ToLower() == "mysql";
+            var usePostgres = configuration["database"]?.ToLower() == "postgres";
             var connectionString = configuration["connectionString"];
 
             if (useMySql)
                 options.UseMySql(connectionString);
+            else if (usePostgres)
+                options.UseNpgsql(connectionString);
             else
                 options.UseSqlite(connectionString);
         }
