@@ -10,6 +10,7 @@ namespace Games.Infrastructure
         public const string Platforms = "platforms";
         public const string Self = "self";
         public const string Settings = "settings";
+        public const string Setup = "setup";
         public const string Suggestions = "suggestions";
         public const string Tags = "tags";
         public const string OAuth = "oauth";

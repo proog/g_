@@ -4,17 +4,13 @@ namespace Games.Models.ViewModels
 {
     public class SetupViewModel
     {
-        public bool Success { get; set; }
-
-        public string UserError { get; set; }
-
-        public string OtherError { get; set; }
-
+        [Required, StringLength(10, MinimumLength = 1)]
         public string Username { get; set; }
 
-        [DataType(DataType.Password)]
+        [Required, StringLength(64, MinimumLength = 8)]
         public string Password { get; set; }
 
+        [StringLength(40, MinimumLength = 40)]
         public string ApiKey { get; set; }
     }
 }

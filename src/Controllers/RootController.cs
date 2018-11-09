@@ -22,10 +22,6 @@ namespace Games.Controllers
         public ActionResult<Root> GetRoot()
         {
             var config = configRepository.DefaultConfig;
-
-            if (config == null)
-                return NotFound();
-
             return vmFactory.MakeRoot(config);
         }
     }

@@ -49,13 +49,11 @@ export default class Api {
 
     return fetch(url, options).then(response => {
       return response.text().then(text => {
-        let parsed = text.length > 0
-          ? JSON.parse(text)
-          : undefined
+        const parsed = text && JSON.parse(text)
 
         return response.ok
           ? parsed
-          : Promise.reject(parsed && parsed.message)
+          : Promise.reject(_(parsed).values().flatten().join(' '))
       })
     })
   }

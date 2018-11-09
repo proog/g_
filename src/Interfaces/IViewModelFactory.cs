@@ -13,8 +13,6 @@ namespace Games.Interfaces
 
         UserViewModel MakeUserViewModel(User user);
 
-        ConfigViewModel MakeConfigViewModel(Config config);
-
         DescriptorViewModel MakeDescriptorViewModel(Descriptor descriptor);
 
         AssistedSearchResult MakeAssistedSearchResult(GBSearchResult result);

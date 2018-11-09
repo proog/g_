@@ -56,17 +56,6 @@ namespace Games
                 FileProvider = new PhysicalFileProvider(imageDirectory)
             };
 
-            // redirect to setup until configured
-            app.MapWhen(
-                ctx =>
-                {
-                    var configRepository = ctx.RequestServices.GetService<IConfigRepository>();
-                    return ctx.Request.Path == "/" && !configRepository.IsConfigured;
-                },
-                req => req.Run(
-                    ctx => Task.Run(() => ctx.Response.Redirect("setup"))
-                )
-            );
             app.UseForwardedHeaders(headerOptions) // trust reverse proxy
                 .UseDefaultFiles() // serve index.html for /
                 .UseStaticFiles() // serve public

@@ -195,6 +195,12 @@ export default {
           this.api.root = root
 
           const link = getLink(this.api.root, 'users')
+
+          if (!link) {
+            this.$router.replace({ name: 'setup' })
+            return Promise.reject('No users link')
+          }
+
           return this.api.get(link.href)
         })
         .then(users => {

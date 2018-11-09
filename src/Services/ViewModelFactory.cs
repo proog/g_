@@ -21,19 +21,25 @@ namespace Games.Services
 
         public Root MakeRoot(Config config)
         {
-            var links = new List<Link>
-            {
-                new Link(Rel.Users, url.Link(Route.Users, null)),
-                new Link(Rel.Settings, url.Link(Route.Settings, null)),
-                new Link(Rel.OAuth, url.Link(Route.Token, null))
-            };
+            var links = new List<Link>();
 
-            if (!string.IsNullOrEmpty(config.GiantBombApiKey))
-                links.Add(new Link(Rel.AssistedSearch, url.Link(Route.AssistedSearch, null)));
+            if (config != null)
+            {
+                links.Add(new Link(Rel.Users, url.Link(Route.Users, null)));
+                links.Add(new Link(Rel.Settings, url.Link(Route.Settings, null)));
+                links.Add(new Link(Rel.OAuth, url.Link(Route.Token, null)));
+
+                if (!string.IsNullOrEmpty(config.GiantBombApiKey))
+                    links.Add(new Link(Rel.AssistedSearch, url.Link(Route.AssistedSearch, null)));
+            }
+            else
+            {
+                links.Add(new Link(Rel.Setup, url.Link(Route.Setup, null)));
+            }
 
             return new Root
             {
-                DefaultUserId = config.DefaultUserId,
+                DefaultUserId = config?.DefaultUserId,
                 Links = links
             };
         }
@@ -85,15 +91,6 @@ namespace Games.Services
                     new Link(Rel.Tags, url.Link(Route.Tags, new { userId = user.Id })),
                     new Link(Rel.Suggestions, url.Link(Route.Suggestions, new { userId = user.Id }))
                 }
-            };
-        }
-
-        public ConfigViewModel MakeConfigViewModel(Config config)
-        {
-            return new ConfigViewModel
-            {
-                DefaultUserId = config.DefaultUserId,
-                IsAssistedCreationEnabled = !string.IsNullOrEmpty(config.GiantBombApiKey)
             };
         }
 

@@ -9,6 +9,7 @@ namespace Games.Infrastructure
 
         public const string Token = "token";
         public const string Settings = "settings";
+        public const string Setup = "setup";
         public const string AssistedSearch = "assisted-search";
         public const string AssistedGame = "assisted-game";
 

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import App from './App.vue'
+import Setup from './Setup.vue'
 
 const router = new VueRouter({
   routes: [
@@ -8,6 +9,11 @@ const router = new VueRouter({
       path: '/',
       component: App,
       name: 'root'
+    },
+    {
+      path: '/setup',
+      component: Setup,
+      name: 'setup'
     },
     {
       path: '/:userId',
