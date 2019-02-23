@@ -23,6 +23,7 @@ namespace Games.IntegrationTests
         private readonly HttpClient client;
         private readonly User user;
         private readonly string jwt;
+        private readonly StringContent emptyContent = new StringContent(string.Empty, Encoding.UTF8, "application/json");
 
         public AuthorizationTests()
         {
@@ -50,7 +51,7 @@ namespace Games.IntegrationTests
         {
             var request = new HttpRequestMessage(HttpMethod.Post, $"/api/users/{user.Id}/games")
             {
-                Content = new StringContent(""),
+                Content = emptyContent,
                 Headers =
                 {
                     Authorization = new AuthenticationHeaderValue("Bearer", jwt)
@@ -65,7 +66,7 @@ namespace Games.IntegrationTests
         {
             var request = new HttpRequestMessage(HttpMethod.Post, $"/api/users/{user.Id}/games")
             {
-                Content = new StringContent(""),
+                Content = emptyContent,
                 Headers =
                 {
                     Authorization = new AuthenticationHeaderValue("Bearer", jwt + "a")
@@ -80,7 +81,7 @@ namespace Games.IntegrationTests
         {
             var request = new HttpRequestMessage(HttpMethod.Post, $"/api/users/{user.Id + 1}/games")
             {
-                Content = new StringContent(""),
+                Content = emptyContent,
                 Headers =
                 {
                     Authorization = new AuthenticationHeaderValue("Bearer", jwt)

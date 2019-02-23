@@ -15,6 +15,8 @@ namespace Games.IntegrationTests
         {
             var configuration = Helper.GetConfiguration();
             var dataDirectory = Path.Combine(Directory.GetCurrentDirectory(), configuration["dataDirectory"]);
+            Directory.CreateDirectory(dataDirectory);
+
             var fileProvider = new PhysicalFileProvider(dataDirectory);
 
             var contextOptions = new DbContextOptionsBuilder<GamesContext>().UseInMemoryDatabase("memory").Options;

@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:2.1-sdk-alpine AS dotnetbuild
+FROM microsoft/dotnet:2.2-sdk AS dotnetbuild
 WORKDIR /src
 
 COPY src/*.csproj ./
@@ -18,7 +18,7 @@ COPY src/VueApp/. ./
 RUN yarn build
 
 
-FROM microsoft/dotnet:2.1-aspnetcore-runtime-alpine AS run
+FROM microsoft/dotnet:2.2-aspnetcore-runtime AS run
 WORKDIR /app
 
 COPY --from=dotnetbuild /src/out ./

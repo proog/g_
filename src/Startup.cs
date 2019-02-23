@@ -70,6 +70,7 @@ namespace Games
             services.AddOptions().Configure<AppSettings>(configuration);
 
             services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddJsonOptions(ConfigureJson);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
