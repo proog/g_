@@ -8,7 +8,7 @@ COPY src/. ./
 RUN dotnet publish -c Release -o out
 
 
-FROM node:8-alpine AS vuebuild
+FROM node:10-jessie-slim AS vuebuild
 WORKDIR /src/VueApp
 
 COPY src/VueApp/package.json src/VueApp/yarn.lock ./
