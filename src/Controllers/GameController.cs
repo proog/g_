@@ -99,10 +99,7 @@ namespace Games.Controllers
                 SortAs = vm.SortAs,
                 Playtime = vm.Playtime,
                 Rating = vm.Rating,
-                CurrentlyPlaying = vm.CurrentlyPlaying,
-                QueuePosition = vm.QueuePosition,
-                Hidden = vm.Hidden,
-                WishlistPosition = vm.WishlistPosition,
+                CurrentlyPlaying = vm.CurrentlyPlaying
             };
 
             game.User = user;
@@ -135,9 +132,6 @@ namespace Games.Controllers
             game.Playtime = vm.Playtime;
             game.Rating = vm.Rating;
             game.CurrentlyPlaying = vm.CurrentlyPlaying;
-            game.QueuePosition = vm.QueuePosition;
-            game.Hidden = vm.Hidden;
-            game.WishlistPosition = vm.WishlistPosition;
 
             game.GameGenres = vmFactory.MakeGameGenres(game, vm.GenreIds, user.Genres);
             game.GamePlatforms = vmFactory.MakeGamePlatforms(game, vm.PlatformIds, user.Platforms);

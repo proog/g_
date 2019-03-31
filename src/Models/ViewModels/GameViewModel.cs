@@ -34,12 +34,6 @@ namespace Games.Models.ViewModels
 
         public bool CurrentlyPlaying { get; set; }
 
-        public int? QueuePosition { get; set; }
-
-        public bool Hidden { get; set; }
-
-        public int? WishlistPosition { get; set; }
-
         public int UserId { get; set; }
 
         public List<int> GenreIds { get; set; }
