@@ -26,14 +26,14 @@ namespace Games.Controllers
         private readonly IAuthenticationService auth;
         private readonly IFileProvider data;
 
-        public ImageController(IGameRepository gameRepository, IUserRepository userRepository, IEventRepository eventRepository, IAuthenticationService auth, IFileProvider data, HttpClient httpClient, IViewModelFactory vmFactory)
+        public ImageController(IGameRepository gameRepository, IUserRepository userRepository, IEventRepository eventRepository, IAuthenticationService auth, IFileProvider data, IHttpClientFactory httpClientFactory, IViewModelFactory vmFactory)
         {
             this.gameRepository = gameRepository;
             this.userRepository = userRepository;
             this.eventRepository = eventRepository;
             this.auth = auth;
             this.data = data;
-            this.httpClient = httpClient;
+            this.httpClient = httpClientFactory.CreateClient();
             this.vmFactory = vmFactory;
         }
 
@@ -49,7 +49,8 @@ namespace Games.Controllers
             var path = $"images/{game.Id}/image.jpg";
             var fileInfo = data.GetFileInfo(path);
 
-            try {
+            try
+            {
                 var imageStream = Request.HasFormContentType
                 ? await ReadFormImage()
                 : await ReadGiantBombImage();

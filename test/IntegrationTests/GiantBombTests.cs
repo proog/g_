@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Games.Interfaces;
 using Games.Services;
+using Moq;
 using Xunit;
 
 namespace Games.IntegrationTests
@@ -17,8 +18,10 @@ namespace Games.IntegrationTests
         {
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("User-Agent", new[] { Guid.NewGuid().ToString() });
+            var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+            httpClientFactoryMock.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-            giantBomb = new GiantBombService(httpClient);
+            giantBomb = new GiantBombService(httpClientFactoryMock.Object);
             apiKey = Helper.GetConfiguration()["giantBombApiKey"];
         }
 

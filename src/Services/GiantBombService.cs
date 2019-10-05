@@ -15,9 +15,9 @@ namespace Games.Services
         private readonly HttpClient httpClient;
         private readonly JsonSerializerSettings jsonSettings;
 
-        public GiantBombService(HttpClient httpClient)
+        public GiantBombService(IHttpClientFactory httpClientFactory)
         {
-            this.httpClient = httpClient;
+            this.httpClient = httpClientFactory.CreateClient();
             this.jsonSettings = new JsonSerializerSettings
             {
                 ContractResolver = new DefaultContractResolver

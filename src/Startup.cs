@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Interfaces;
 using Games.Repositories;
@@ -78,6 +77,7 @@ namespace Games
 
             services.AddRouteUserIdAuthorization();
 
+            services.AddHttpClient<HttpClient>(ConfigureHttpClient);
             services.AddDbContextPool<GamesContext>(ConfigureDatabase)
                 .AddTransient<IAuthenticationService, AuthenticationService>()
                 .AddTransient<IGiantBombService, GiantBombService>()
@@ -92,7 +92,6 @@ namespace Games
                 .AddTransient<IViewModelFactory, ViewModelFactory>()
                 .AddScoped<IUrlHelper>(CreateUrlHelper)
                 .AddSingleton<IActionContextAccessor, ActionContextAccessor>()
-                .AddSingleton<HttpClient>(CreateHttpClient())
                 .AddSingleton<IFileProvider>(new PhysicalFileProvider(dataDirectory));
         }
 
@@ -145,13 +144,11 @@ namespace Games
                 options.UseSqlite(connectionString);
         }
 
-        private HttpClient CreateHttpClient()
+        private void ConfigureHttpClient(HttpClient client)
         {
-            var client = new HttpClient();
             client.DefaultRequestHeaders.Add(
                 "User-Agent", new[] { "permortensen.com g_sharp 0.1" }
             );
-            return client;
         }
 
         private IUrlHelper CreateUrlHelper(IServiceProvider serviceProvider)
