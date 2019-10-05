@@ -5,7 +5,7 @@ namespace Games.Interfaces
 {
     public interface IGameRepository
     {
-        IEnumerable<Game> All(User user);
+        List<Game> All(User user);
 
         Game Get(User user, int id);
 

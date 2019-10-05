@@ -19,7 +19,7 @@ namespace Games.Repositories
             this.dbSet = dbSet;
         }
 
-        public IEnumerable<T> All(User user)
+        public List<T> All(User user)
         {
             return dbSet.Where(x => x.UserId == user.Id).ToList();
         }

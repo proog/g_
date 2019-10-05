@@ -50,7 +50,7 @@ namespace Games.Services
             return response.Results;
         }
 
-        public async Task<IEnumerable<GBSearchResult>> Search(string title, string apiKey)
+        public async Task<List<GBSearchResult>> Search(string title, string apiKey)
         {
             var uri = GetUri("games", apiKey, new Dictionary<string, string>
             {

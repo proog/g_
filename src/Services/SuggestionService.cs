@@ -17,23 +17,14 @@ namespace Games.Services
 
         public List<Suggestion> GetSuggestions(User user, bool includeHidden = false)
         {
-            var allGames = gameRepository.All(user);
-
-            if (!includeHidden)
-                allGames = allGames.Where(game => !game.Hidden);
-
-            var applicableGames = allGames
-                .Where(g => g.Finished == Completion.NotFinished)
-                .Where(g => g.Rating == null)
-                .Where(g => g.Playtime == null)
-                .Where(g => g.QueuePosition == null)
-                .Where(g => !g.CurrentlyPlaying)
-                .Where(g => g.WishlistPosition == null)
+            var visibleGames = gameRepository.All(user)
+                .Where(game => includeHidden || !game.Hidden)
                 .ToList();
-            var topGames = allGames
+
+            var topGames = visibleGames
                 .OrderByDescending(g => g.Rating)
                 .OrderByDescending(g => g.Playtime)
-                .Take(allGames.Count() / 10) // top 10% of all games
+                .Take(visibleGames.Count / 10) // top 10% of all games
                 .ToList();
 
             // collect genres from top 10 and the occurrences of each
@@ -44,7 +35,13 @@ namespace Games.Services
                 .ToDictionary(it => it.Key, it => it.Count());
 
             var random = new Random();
-            return applicableGames
+            return visibleGames
+                .Where(g => g.Finished == Completion.NotFinished)
+                .Where(g => g.Rating == null)
+                .Where(g => g.Playtime == null)
+                .Where(g => g.QueuePosition == null)
+                .Where(g => !g.CurrentlyPlaying)
+                .Where(g => g.WishlistPosition == null)
                 .Select(game =>
                 {
                     var score = 0;

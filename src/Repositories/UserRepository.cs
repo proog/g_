@@ -3,7 +3,6 @@ using System.Linq;
 using Games.Interfaces;
 using Games.Models;
 using Games.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace Games.Repositories
 {
@@ -18,17 +17,17 @@ namespace Games.Repositories
 
         public User Get(int id)
         {
-            return Query().SingleOrDefault(u => u.Id == id);
+            return db.Users.SingleOrDefault(u => u.Id == id);
         }
 
         public User Get(string username)
         {
-            return Query().SingleOrDefault(u => u.Username == username);
+            return db.Users.SingleOrDefault(u => u.Username == username);
         }
 
-        public IEnumerable<User> All()
+        public List<User> All()
         {
-            return Query().ToList();
+            return db.Users.ToList();
         }
 
         public void Add(User user)
@@ -41,15 +40,6 @@ namespace Games.Repositories
         {
             db.Users.Update(user);
             db.SaveChanges();
-        }
-
-        private IQueryable<User> Query()
-        {
-            return db.Users
-                .Include(u => u.Games)
-                .Include(u => u.Genres)
-                .Include(u => u.Platforms)
-                .Include(u => u.Tags);
         }
     }
 }

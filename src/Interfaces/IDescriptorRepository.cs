@@ -5,7 +5,7 @@ namespace Games.Interfaces
 {
     public interface IDescriptorRepository<T> where T : Descriptor
     {
-        IEnumerable<T> All(User user);
+        List<T> All(User user);
 
         T Get(User user, int id);
 

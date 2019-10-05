@@ -19,13 +19,17 @@ namespace Games.Controllers
     {
         private readonly string apiKey;
         private readonly IUserRepository userRepository;
+        private readonly IGenreRepository genreRepository;
+        private readonly IPlatformRepository platformRepository;
         private readonly IGiantBombService giantBomb;
         private readonly IViewModelFactory vmFactory;
         private readonly ApiError NoApiKeyError = new ApiError("No Giant Bomb API key specified. Please request an API key and add it in the settings dialog or database.");
 
-        public GiantBombController(IConfigRepository configRepository, IUserRepository userRepository, IGiantBombService giantBomb, IViewModelFactory vmFactory)
+        public GiantBombController(IConfigRepository configRepository, IUserRepository userRepository, IGenreRepository genreRepository, IPlatformRepository platformRepository, IGiantBombService giantBomb, IViewModelFactory vmFactory)
         {
             this.userRepository = userRepository;
+            this.genreRepository = genreRepository;
+            this.platformRepository = platformRepository;
             this.giantBomb = giantBomb;
             this.vmFactory = vmFactory;
             apiKey = configRepository.DefaultConfig?.GiantBombApiKey;
@@ -52,9 +56,12 @@ namespace Games.Controllers
 
             var idClaim = User.FindFirst(Constants.UserIdClaim);
             var user = userRepository.Get(int.Parse(idClaim.Value));
+            var genres = genreRepository.All(user);
+            var platforms = platformRepository.All(user);
+
             var gb = await giantBomb.GetGame(id, apiKey);
 
-            return vmFactory.MakeAssistedGameResult(gb, user.Genres, user.Platforms);
+            return vmFactory.MakeAssistedGameResult(gb, genres, platforms);
         }
     }
 }

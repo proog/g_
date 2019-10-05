@@ -16,15 +16,21 @@ namespace Games.Controllers
     {
         private readonly IGameRepository gameRepository;
         private readonly IUserRepository userRepository;
+        private readonly IGenreRepository genreRepository;
+        private readonly IPlatformRepository platformRepository;
+        private readonly ITagRepository tagRepository;
         private readonly IEventRepository eventRepository;
         private readonly IAuthenticationService auth;
         private readonly IViewModelFactory vmFactory;
         private readonly ISuggestionService suggestionService;
 
-        public GameController(IGameRepository gameRepository, IUserRepository userRepository, IEventRepository eventRepository, IAuthenticationService auth, IViewModelFactory vmFactory, ISuggestionService suggestionService)
+        public GameController(IGameRepository gameRepository, IUserRepository userRepository, IGenreRepository genreRepository, IPlatformRepository platformRepository, ITagRepository tagRepository, IEventRepository eventRepository, IAuthenticationService auth, IViewModelFactory vmFactory, ISuggestionService suggestionService)
         {
             this.gameRepository = gameRepository;
             this.userRepository = userRepository;
+            this.genreRepository = genreRepository;
+            this.platformRepository = platformRepository;
+            this.tagRepository = tagRepository;
             this.eventRepository = eventRepository;
             this.auth = auth;
             this.vmFactory = vmFactory;
@@ -39,12 +45,10 @@ namespace Games.Controllers
             if (user == null)
                 return NotFound();
 
-            var games = gameRepository.All(user);
+            var includeHidden = IsCurrentUser(user);
 
-            if (!IsCurrentUser(user))
-                games = games.Where(game => !game.Hidden);
-
-            return games
+            return gameRepository.All(user)
+                .Where(game => includeHidden || !game.Hidden)
                 .Select(vmFactory.MakeGameViewModel)
                 .ToList();
         }
@@ -87,6 +91,9 @@ namespace Games.Controllers
         public ActionResult<GameViewModel> AddGame(int userId, [FromBody] GameViewModel vm)
         {
             var user = userRepository.Get(userId);
+            var genres = genreRepository.All(user);
+            var platforms = platformRepository.All(user);
+            var tags = tagRepository.All(user);
             var game = new Game
             {
                 Title = vm.Title,
@@ -103,9 +110,9 @@ namespace Games.Controllers
             };
 
             game.User = user;
-            game.GameGenres = vmFactory.MakeGameGenres(game, vm.GenreIds, user.Genres);
-            game.GamePlatforms = vmFactory.MakeGamePlatforms(game, vm.PlatformIds, user.Platforms);
-            game.GameTags = vmFactory.MakeGameTags(game, vm.TagIds, user.Tags);
+            game.GameGenres = vmFactory.MakeGameGenres(game, vm.GenreIds, genres);
+            game.GamePlatforms = vmFactory.MakeGamePlatforms(game, vm.PlatformIds, platforms);
+            game.GameTags = vmFactory.MakeGameTags(game, vm.TagIds, tags);
 
             gameRepository.Add(game);
             eventRepository.Add(new Event("GameAdded", CreateEventPayload(game), user));
@@ -122,6 +129,10 @@ namespace Games.Controllers
             if (game == null)
                 return NotFound();
 
+            var genres = genreRepository.All(user);
+            var platforms = platformRepository.All(user);
+            var tags = tagRepository.All(user);
+
             game.Title = vm.Title;
             game.Developer = vm.Developer;
             game.Publisher = vm.Publisher;
@@ -133,9 +144,9 @@ namespace Games.Controllers
             game.Rating = vm.Rating;
             game.CurrentlyPlaying = vm.CurrentlyPlaying;
 
-            game.GameGenres = vmFactory.MakeGameGenres(game, vm.GenreIds, user.Genres);
-            game.GamePlatforms = vmFactory.MakeGamePlatforms(game, vm.PlatformIds, user.Platforms);
-            game.GameTags = vmFactory.MakeGameTags(game, vm.TagIds, user.Tags);
+            game.GameGenres = vmFactory.MakeGameGenres(game, vm.GenreIds, genres);
+            game.GamePlatforms = vmFactory.MakeGamePlatforms(game, vm.PlatformIds, platforms);
+            game.GameTags = vmFactory.MakeGameTags(game, vm.TagIds, tags);
 
             gameRepository.Update(game);
             eventRepository.Add(new Event("GameUpdated", CreateEventPayload(game), user));

@@ -21,9 +21,9 @@ namespace Games.Repositories
             this.files = files;
         }
 
-        public IEnumerable<Game> All(User user)
+        public List<Game> All(User user)
         {
-            return Query(user);
+            return Query(user).ToList();
         }
 
         public Game Get(User user, int id)
