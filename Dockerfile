@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:2.2-sdk AS dotnetbuild
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS dotnetbuild
 WORKDIR /src
 
 COPY src/*.csproj ./
@@ -18,11 +18,11 @@ COPY src/VueApp/. ./
 RUN npm run build
 
 
-FROM microsoft/dotnet:2.2-aspnetcore-runtime AS run
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 AS run
 WORKDIR /app
 
 COPY --from=dotnetbuild /src/out ./
 COPY --from=vuebuild /src/wwwroot ./wwwroot
 
 EXPOSE 80
-ENTRYPOINT ["dotnet", "g_.dll"]
+ENTRYPOINT ["./g_"]

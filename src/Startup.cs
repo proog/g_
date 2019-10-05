@@ -28,7 +28,7 @@ namespace Games
         private readonly string dataDirectory;
         private readonly string imageDirectory;
 
-        public Startup(IConfiguration configuration, IHostingEnvironment env)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             this.configuration = configuration;
             dataDirectory = Path.Combine(env.ContentRootPath, configuration["dataDirectory"]);
@@ -58,22 +58,19 @@ namespace Games
                 .UseDefaultFiles() // serve index.html for /
                 .UseStaticFiles() // serve public
                 .UseFileServer(fileOptions) // serve uploaded images
+                .UseRouting()
                 .UseAuthentication()
-                .UseMvc();
+                .UseAuthorization()
+                .UseEndpoints(endpoints => endpoints.MapControllers());
             CreateDatabase(app);
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddOptions().Configure<AppSettings>(configuration);
-
-            services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddJsonOptions(ConfigureJson);
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(ConfigureJwtBearer);
-
+            services.AddRouting();
+            services.AddControllers().AddNewtonsoftJson(ConfigureJson);
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(ConfigureJwtBearer);
             services.AddRouteUserIdAuthorization();
 
             services.AddHttpClient<HttpClient>(ConfigureHttpClient);
@@ -100,7 +97,7 @@ namespace Games
             }
         }
 
-        private void ConfigureJson(MvcJsonOptions options)
+        private void ConfigureJson(MvcNewtonsoftJsonOptions options)
         {
             var settings = options.SerializerSettings;
             settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;

@@ -1,5 +1,6 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Games.Infrastructure
@@ -8,20 +9,38 @@ namespace Games.Infrastructure
     {
         public static IServiceCollection AddRouteUserIdAuthorization(this IServiceCollection services)
         {
-            return services.AddAuthorization(options =>
+            services.AddSingleton<IAuthorizationHandler, RequireSameUserAuthorizationHandler>();
+            services.AddHttpContextAccessor();
+            services.AddAuthorization(options =>
             {
                 options.AddPolicy(Constants.SameUserPolicy, policy =>
                 {
-                    policy.RequireAssertion(context => RequireSameUser(context));
+                    policy.AddRequirements(new SameUserRequirement());
                 });
             });
+            return services;
         }
 
-        public static bool RequireSameUser(AuthorizationHandlerContext context)
+        private class SameUserRequirement : IAuthorizationRequirement { }
+
+        private class RequireSameUserAuthorizationHandler : AuthorizationHandler<SameUserRequirement>
         {
-            var filterContext = context.Resource as AuthorizationFilterContext;
-            var routeUserId = filterContext?.RouteData?.Values[Constants.UserIdParameter] as string;
-            return context.User.HasClaim(Constants.UserIdClaim, routeUserId);
+            private readonly IHttpContextAccessor httpContextAccessor;
+
+            public RequireSameUserAuthorizationHandler(IHttpContextAccessor httpContextAccessor)
+            {
+                this.httpContextAccessor = httpContextAccessor;
+            }
+
+            protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, SameUserRequirement requirement)
+            {
+                var routeUserId = httpContextAccessor.HttpContext?.Request.RouteValues[Constants.UserIdParameter] as string;
+
+                if (routeUserId != null && context.User.HasClaim(Constants.UserIdClaim, routeUserId))
+                    context.Succeed(requirement);
+
+                return Task.CompletedTask;
+            }
         }
     }
 }
