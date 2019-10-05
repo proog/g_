@@ -76,7 +76,7 @@ namespace Games.Services
             });
             var builder = new UriBuilder
             {
-                Scheme = "http",
+                Scheme = "https",
                 Host = "www.giantbomb.com",
                 Path = $"api/{resource}",
                 Query = string.Join("&", queryParams.Select(it => $"{it.Key}={it.Value}"))
