@@ -10,7 +10,7 @@
     "build": "parcel build --out-dir ../wwwroot --public-url / --no-cache --no-source-maps index.html"
   },
   "dependencies": {
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.13",
     "vue": "^2.5.17",
     "vue-hot-reload-api": "^2.3.0",
     "vue-router": "^3.0.1"
