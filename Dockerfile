@@ -11,11 +11,11 @@ RUN dotnet publish -c Release -o out
 FROM node:10-jessie-slim AS vuebuild
 WORKDIR /src/VueApp
 
-COPY src/VueApp/package.json src/VueApp/yarn.lock ./
-RUN yarn
+COPY src/VueApp/package.json src/VueApp/package-lock.json ./
+RUN npm install
 
 COPY src/VueApp/. ./
-RUN yarn build
+RUN npm run build
 
 
 FROM microsoft/dotnet:2.2-aspnetcore-runtime AS run
