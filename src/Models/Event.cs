@@ -32,6 +32,7 @@ namespace Games.Models
             EventPayload = eventPayload;
             UserId = user?.Id;
             Username = user?.Username;
+            CreatedAt = DateTime.UtcNow;
         }
 
         public Event(string eventType, object eventPayload, User user)

@@ -1,6 +1,9 @@
+using System.Linq;
 using Games.Infrastructure;
 using Games.Interfaces;
+using Games.Models;
 using Games.Models.ViewModels;
+using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,15 +14,13 @@ namespace Games.Controllers
     [Route("api/settings", Name = Route.Settings)]
     public class SettingsController : ControllerBase
     {
-        private readonly IConfigRepository configRepository;
-        private readonly IUserRepository userRepository;
+        private readonly GamesContext dbContext;
         private readonly IAuthenticationService auth;
         private readonly IViewModelFactory vmFactory;
 
-        public SettingsController(IConfigRepository configRepository, IUserRepository userRepository, IAuthenticationService auth, IViewModelFactory vmFactory)
+        public SettingsController(GamesContext dbContext, IAuthenticationService auth, IViewModelFactory vmFactory)
         {
-            this.configRepository = configRepository;
-            this.userRepository = userRepository;
+            this.dbContext = dbContext;
             this.auth = auth;
             this.vmFactory = vmFactory;
         }
@@ -27,7 +28,7 @@ namespace Games.Controllers
         [HttpGet]
         public AuthorizedSettings GetSettings()
         {
-            var config = configRepository.DefaultConfig;
+            var config = dbContext.Configs.FirstOrDefault();
             return new AuthorizedSettings
             {
                 DefaultUserId = config.DefaultUserId,
@@ -39,26 +40,37 @@ namespace Games.Controllers
         public ActionResult<AuthorizedSettings> UpdateSettings([FromBody] AuthorizedSettingsInput settings)
         {
             var idClaim = User.FindFirst(Constants.UserIdClaim);
-            var user = userRepository.Get(int.Parse(idClaim.Value));
-            var hash = auth.HashPassword(settings.OldPassword);
+            var userId = int.Parse(idClaim.Value);
+            var passwordHash = auth.HashPassword(settings.OldPassword);
 
-            if (hash != user.Password)
+            var user = dbContext.Users.FirstOrDefault(u => u.Id == userId && u.Password == passwordHash);
+            if (user == null)
                 return Unauthorized();
 
-            var defaultUser = userRepository.Get(settings.DefaultUserId);
-
+            var defaultUser = dbContext.Users.Find(settings.DefaultUserId);
             if (defaultUser == null)
                 return BadRequest();
 
-            configRepository.Configure(defaultUser, settings.GiantBombApiKey);
-
-            if (!string.IsNullOrEmpty(settings.NewPassword))
+            var config = dbContext.Configs.FirstOrDefault();
+            if (config == null)
             {
-                user.Password = auth.HashPassword(settings.NewPassword);
-                userRepository.Update(user);
+                config = new Config();
+                dbContext.Configs.Add(config);
             }
 
-            return GetSettings();
+            config.DefaultUser = defaultUser;
+            config.GiantBombApiKey = settings.GiantBombApiKey;
+
+            if (!string.IsNullOrEmpty(settings.NewPassword))
+                user.Password = auth.HashPassword(settings.NewPassword);
+
+            dbContext.SaveChanges();
+
+            return new AuthorizedSettings
+            {
+                DefaultUserId = config.DefaultUserId,
+                GiantBombApiKey = config.GiantBombApiKey
+            };
         }
     }
 }

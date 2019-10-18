@@ -8,16 +8,18 @@ namespace Games.Services
 {
     public class SuggestionService : ISuggestionService
     {
-        private readonly IGameRepository gameRepository;
+        private readonly GamesContext dbContext;
 
-        public SuggestionService(IGameRepository gameRepository)
+        public SuggestionService(GamesContext dbContext)
         {
-            this.gameRepository = gameRepository;
+            this.dbContext = dbContext;
         }
 
         public List<Suggestion> GetSuggestions(User user, bool includeHidden = false)
         {
-            var visibleGames = gameRepository.All(user)
+            var visibleGames = dbContext.Entry(user)
+                .Collection(u => u.Games)
+                .Query()
                 .Where(game => includeHidden || !game.Hidden)
                 .ToList();
 

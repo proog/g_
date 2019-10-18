@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Text;
 using Games.Infrastructure;
 using Games.Interfaces;
-using Games.Repositories;
 using Games.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -82,13 +81,7 @@ namespace Games
                 .AddTransient<IAuthenticationService, AuthenticationService>()
                 .AddTransient<IGiantBombService, GiantBombService>()
                 .AddTransient<ISuggestionService, SuggestionService>()
-                .AddTransient<IGameRepository, GameRepository>()
-                .AddTransient<IUserRepository, UserRepository>()
-                .AddTransient<IGenreRepository, GenreRepository>()
-                .AddTransient<IPlatformRepository, PlatformRepository>()
-                .AddTransient<ITagRepository, TagRepository>()
-                .AddTransient<IConfigRepository, ConfigRepository>()
-                .AddTransient<IEventRepository, EventRepository>()
+                .AddTransient<IImageService, ImageService>()
                 .AddTransient<IViewModelFactory, ViewModelFactory>()
                 .AddScoped<IUrlHelper>(CreateUrlHelper)
                 .AddSingleton<IActionContextAccessor, ActionContextAccessor>()

@@ -1,7 +1,10 @@
+using System.Linq;
 using Games.Infrastructure;
 using Games.Interfaces;
 using Games.Models.ViewModels;
+using Games.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Games.Controllers
 {
@@ -9,19 +12,19 @@ namespace Games.Controllers
     [Route("api", Name = Route.Root)]
     public class RootController : ControllerBase
     {
-        private readonly IConfigRepository configRepository;
+        private readonly GamesContext dbContext;
         private readonly IViewModelFactory vmFactory;
 
-        public RootController(IConfigRepository configRepository, IViewModelFactory vmFactory)
+        public RootController(GamesContext dbContext, IViewModelFactory vmFactory)
         {
-            this.configRepository = configRepository;
+            this.dbContext = dbContext;
             this.vmFactory = vmFactory;
         }
 
         [HttpGet]
         public ActionResult<Root> GetRoot()
         {
-            var config = configRepository.DefaultConfig;
+            var config = dbContext.Configs.Include(x => x.DefaultUser).FirstOrDefault();
             return vmFactory.MakeRoot(config);
         }
     }

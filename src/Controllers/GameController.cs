@@ -5,8 +5,10 @@ using Games.Infrastructure;
 using Games.Interfaces;
 using Games.Models;
 using Games.Models.ViewModels;
+using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Games.Controllers
 {
@@ -14,41 +16,28 @@ namespace Games.Controllers
     [Route("api/users/{" + Constants.UserIdParameter + "}")]
     public class GameController : ControllerBase
     {
-        private readonly IGameRepository gameRepository;
-        private readonly IUserRepository userRepository;
-        private readonly IGenreRepository genreRepository;
-        private readonly IPlatformRepository platformRepository;
-        private readonly ITagRepository tagRepository;
-        private readonly IEventRepository eventRepository;
-        private readonly IAuthenticationService auth;
+        private readonly GamesContext dbContext;
         private readonly IViewModelFactory vmFactory;
         private readonly ISuggestionService suggestionService;
+        private readonly IImageService imageService;
 
-        public GameController(IGameRepository gameRepository, IUserRepository userRepository, IGenreRepository genreRepository, IPlatformRepository platformRepository, ITagRepository tagRepository, IEventRepository eventRepository, IAuthenticationService auth, IViewModelFactory vmFactory, ISuggestionService suggestionService)
+        public GameController(GamesContext dbContext, IViewModelFactory vmFactory, ISuggestionService suggestionService, IImageService imageService)
         {
-            this.gameRepository = gameRepository;
-            this.userRepository = userRepository;
-            this.genreRepository = genreRepository;
-            this.platformRepository = platformRepository;
-            this.tagRepository = tagRepository;
-            this.eventRepository = eventRepository;
-            this.auth = auth;
+            this.dbContext = dbContext;
             this.vmFactory = vmFactory;
             this.suggestionService = suggestionService;
+            this.imageService = imageService;
         }
 
         [HttpGet("games", Name = Route.Games)]
         public ActionResult<List<GameViewModel>> GetGames(int userId)
         {
-            var user = userRepository.Get(userId);
+            var user = dbContext.Users.Find(userId);
 
             if (user == null)
                 return NotFound();
 
-            var includeHidden = IsCurrentUser(user);
-
-            return gameRepository.All(user)
-                .Where(game => includeHidden || !game.Hidden)
+            return QueryGames(user)
                 .Select(vmFactory.MakeGameViewModel)
                 .ToList();
         }
@@ -56,14 +45,14 @@ namespace Games.Controllers
         [HttpGet("games/{id}", Name = Route.Game)]
         public ActionResult<GameViewModel> GetGame(int userId, int id)
         {
-            var user = userRepository.Get(userId);
+            var user = dbContext.Users.Find(userId);
 
             if (user == null)
                 return NotFound();
 
-            var game = gameRepository.Get(user, id);
+            var game = QueryGames(user).FirstOrDefault(g => g.Id == id);
 
-            if (game == null || game.Hidden && !IsCurrentUser(user))
+            if (game == null)
                 return NotFound();
 
             return vmFactory.MakeGameViewModel(game);
@@ -72,7 +61,7 @@ namespace Games.Controllers
         [HttpGet("suggestions", Name = Route.Suggestions)]
         public ActionResult<List<SuggestionViewModel>> GetSuggestions(int userId)
         {
-            var user = userRepository.Get(userId);
+            var user = dbContext.Users.Find(userId);
 
             if (user == null)
                 return NotFound();
@@ -90,10 +79,12 @@ namespace Games.Controllers
         [HttpPost("games")]
         public ActionResult<GameViewModel> AddGame(int userId, [FromBody] GameViewModel vm)
         {
-            var user = userRepository.Get(userId);
-            var genres = genreRepository.All(user);
-            var platforms = platformRepository.All(user);
-            var tags = tagRepository.All(user);
+            var user = dbContext.Users
+                .Include(u => u.Genres)
+                .Include(u => u.Platforms)
+                .Include(u => u.Tags)
+                .First(u => u.Id == userId);
+            var now = DateTime.UtcNow;
             var game = new Game
             {
                 Title = vm.Title,
@@ -106,16 +97,22 @@ namespace Games.Controllers
                 SortAs = vm.SortAs,
                 Playtime = vm.Playtime,
                 Rating = vm.Rating,
-                CurrentlyPlaying = vm.CurrentlyPlaying
+                CurrentlyPlaying = vm.CurrentlyPlaying,
+                CreatedAt = now,
+                UpdatedAt = now
             };
 
             game.User = user;
-            game.GameGenres = vmFactory.MakeGameGenres(game, vm.GenreIds, genres);
-            game.GamePlatforms = vmFactory.MakeGamePlatforms(game, vm.PlatformIds, platforms);
-            game.GameTags = vmFactory.MakeGameTags(game, vm.TagIds, tags);
+            game.GameGenres = vmFactory.MakeGameGenres(game, vm.GenreIds, user.Genres);
+            game.GamePlatforms = vmFactory.MakeGamePlatforms(game, vm.PlatformIds, user.Platforms);
+            game.GameTags = vmFactory.MakeGameTags(game, vm.TagIds, user.Tags);
 
-            gameRepository.Add(game);
-            eventRepository.Add(new Event("GameAdded", CreateEventPayload(game), user));
+            dbContext.Games.Add(game);
+            dbContext.SaveChanges();
+
+            dbContext.Events.Add(new Event("GameAdded", CreateEventPayload(game), user));
+            dbContext.SaveChanges();
+
             return vmFactory.MakeGameViewModel(game);
         }
 
@@ -123,15 +120,15 @@ namespace Games.Controllers
         [HttpPut("games/{id}")]
         public ActionResult<GameViewModel> UpdateGame(int userId, int id, [FromBody] GameViewModel vm)
         {
-            var user = userRepository.Get(userId);
-            var game = gameRepository.Get(user, id);
+            var user = dbContext.Users
+                .Include(u => u.Genres)
+                .Include(u => u.Platforms)
+                .Include(u => u.Tags)
+                .First(u => u.Id == userId);
+            var game = QueryGames(user).FirstOrDefault(g => g.Id == id);
 
             if (game == null)
                 return NotFound();
-
-            var genres = genreRepository.All(user);
-            var platforms = platformRepository.All(user);
-            var tags = tagRepository.All(user);
 
             game.Title = vm.Title;
             game.Developer = vm.Developer;
@@ -143,13 +140,14 @@ namespace Games.Controllers
             game.Playtime = vm.Playtime;
             game.Rating = vm.Rating;
             game.CurrentlyPlaying = vm.CurrentlyPlaying;
+            game.UpdatedAt = DateTime.UtcNow;
 
-            game.GameGenres = vmFactory.MakeGameGenres(game, vm.GenreIds, genres);
-            game.GamePlatforms = vmFactory.MakeGamePlatforms(game, vm.PlatformIds, platforms);
-            game.GameTags = vmFactory.MakeGameTags(game, vm.TagIds, tags);
+            game.GameGenres = vmFactory.MakeGameGenres(game, vm.GenreIds, user.Genres);
+            game.GamePlatforms = vmFactory.MakeGamePlatforms(game, vm.PlatformIds, user.Platforms);
+            game.GameTags = vmFactory.MakeGameTags(game, vm.TagIds, user.Tags);
 
-            gameRepository.Update(game);
-            eventRepository.Add(new Event("GameUpdated", CreateEventPayload(game), user));
+            dbContext.Events.Add(new Event("GameUpdated", CreateEventPayload(game), user));
+            dbContext.SaveChanges();
 
             return vmFactory.MakeGameViewModel(game);
         }
@@ -158,14 +156,17 @@ namespace Games.Controllers
         [HttpDelete("games/{id}")]
         public ActionResult DeleteGame(int userId, int id)
         {
-            var user = userRepository.Get(userId);
-            var game = gameRepository.Get(user, id);
+            var user = dbContext.Users.Find(userId);
+            var game = QueryGames(user).FirstOrDefault(g => g.Id == id);
 
             if (game == null)
                 return NotFound();
 
-            gameRepository.Delete(game);
-            eventRepository.Add(new Event("GameDeleted", CreateEventPayload(game), user));
+            imageService.DeleteImage(game);
+            dbContext.Games.Remove(game);
+            dbContext.Events.Add(new Event("GameDeleted", CreateEventPayload(game), user));
+            dbContext.SaveChanges();
+
             return NoContent();
         }
 
@@ -193,5 +194,15 @@ namespace Games.Controllers
             game.Hidden,
             game.WishlistPosition,
         };
+
+        private IQueryable<Game> QueryGames(User user)
+        {
+            var includeHidden = IsCurrentUser(user);
+            return dbContext.Entry(user).Collection(u => u.Games).Query()
+                .Include(g => g.GameGenres)
+                .Include(g => g.GamePlatforms)
+                .Include(g => g.GameTags)
+                .Where(g => includeHidden || !g.Hidden);
+        }
     }
 }

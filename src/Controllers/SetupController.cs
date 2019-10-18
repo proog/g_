@@ -1,7 +1,9 @@
+using System.Linq;
 using Games.Infrastructure;
 using Games.Interfaces;
 using Games.Models;
 using Games.Models.ViewModels;
+using Games.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers
@@ -10,17 +12,13 @@ namespace Games.Controllers
     [Route("api/setup", Name = Route.Setup)]
     public class SetupController : ControllerBase
     {
-        private readonly IConfigRepository configRepository;
-        private readonly IUserRepository userRepository;
-        private readonly IEventRepository eventRepository;
+        private readonly GamesContext dbContext;
         private readonly IAuthenticationService auth;
         private readonly IViewModelFactory vmFactory;
 
-        public SetupController(IConfigRepository configRepository, IUserRepository userRepository, IEventRepository eventRepository, IAuthenticationService auth, IViewModelFactory vmFactory)
+        public SetupController(GamesContext dbContext, IAuthenticationService auth, IViewModelFactory vmFactory)
         {
-            this.configRepository = configRepository;
-            this.userRepository = userRepository;
-            this.eventRepository = eventRepository;
+            this.dbContext = dbContext;
             this.auth = auth;
             this.vmFactory = vmFactory;
         }
@@ -28,7 +26,9 @@ namespace Games.Controllers
         [HttpPost]
         public ActionResult<Root> Configure([FromBody] SetupViewModel vm)
         {
-            if (configRepository.IsConfigured)
+            var config = dbContext.Configs.FirstOrDefault();
+
+            if (config != null)
                 return BadRequest(new ApiError("Already configured"));
 
             var defaultUser = new User
@@ -36,14 +36,19 @@ namespace Games.Controllers
                 Username = vm.Username.Trim(),
                 Password = auth.HashPassword(vm.Password)
             };
+            config = new Config();
+            config.DefaultUser = defaultUser;
+            config.GiantBombApiKey = vm.ApiKey?.Trim();
 
-            userRepository.Add(defaultUser);
-            configRepository.Configure(defaultUser, vm.ApiKey?.Trim());
+            dbContext.Users.Add(defaultUser);
+            dbContext.Configs.Add(config);
+            dbContext.SaveChanges();
 
             var eventPayload = new { defaultUserId = defaultUser.Id, defaultUsername = defaultUser.Username };
-            eventRepository.Add(new Event("SetupCompleted", eventPayload, null));
+            dbContext.Events.Add(new Event("SetupCompleted", eventPayload, null));
+            dbContext.SaveChanges();
 
-            return vmFactory.MakeRoot(configRepository.DefaultConfig);
+            return vmFactory.MakeRoot(config);
         }
     }
 }

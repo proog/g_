@@ -3,6 +3,7 @@ using System.Linq;
 using Games.Infrastructure;
 using Games.Interfaces;
 using Games.Models.ViewModels;
+using Games.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers
@@ -11,19 +12,19 @@ namespace Games.Controllers
     [Route("api/users")]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository userRepository;
+        private readonly GamesContext dbContext;
         private readonly IViewModelFactory vmFactory;
 
-        public UserController(IUserRepository userRepository, IViewModelFactory vmFactory)
+        public UserController(GamesContext dbContext, IViewModelFactory vmFactory)
         {
-            this.userRepository = userRepository;
+            this.dbContext = dbContext;
             this.vmFactory = vmFactory;
         }
 
         [HttpGet(Name = Route.Users)]
         public List<UserViewModel> GetUsers()
         {
-            return userRepository.All()
+            return dbContext.Users
                 .Select(vmFactory.MakeUserViewModel)
                 .ToList();
         }
@@ -31,7 +32,7 @@ namespace Games.Controllers
         [HttpGet("{id}", Name = Route.User)]
         public ActionResult<UserViewModel> GetUser(int id)
         {
-            var user = userRepository.Get(id);
+            var user = dbContext.Users.Find(id);
 
             if (user == null)
                 return NotFound();

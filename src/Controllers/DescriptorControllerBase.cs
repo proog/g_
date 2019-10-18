@@ -1,31 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Games.Infrastructure;
 using Games.Interfaces;
 using Games.Models;
 using Games.Models.ViewModels;
-using Microsoft.AspNetCore.Authorization;
+using Games.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers
 {
-    public abstract class DescriptorControllerBase : ControllerBase
+    public abstract class DescriptorControllerBase<T> : ControllerBase where T : Descriptor, new()
     {
-        private readonly IUserRepository userRepository;
-        private readonly IEventRepository eventRepository;
+        private readonly GamesContext dbContext;
         private readonly IViewModelFactory vmFactory;
 
-        protected DescriptorControllerBase(IUserRepository userRepository, IEventRepository eventRepository, IViewModelFactory vmFactory)
+        protected DescriptorControllerBase(GamesContext dbContext, IViewModelFactory vmFactory)
         {
-            this.userRepository = userRepository;
-            this.eventRepository = eventRepository;
+            this.dbContext = dbContext;
             this.vmFactory = vmFactory;
         }
 
-        protected ActionResult<DescriptorViewModel> Add<T>(int userId, DescriptorViewModel vm, IDescriptorRepository<T> repository) where T : Descriptor, new()
+        protected ActionResult<DescriptorViewModel> Add(int userId, DescriptorViewModel vm)
         {
-            var user = userRepository.Get(userId);
+            var user = dbContext.Users.Find(userId);
+
+            var dbSet = dbContext.Set<T>();
             var descriptor = new T
             {
                 Name = vm.Name,
@@ -34,17 +33,22 @@ namespace Games.Controllers
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
+            dbSet.Add(descriptor);
+            dbContext.SaveChanges();
 
-            repository.Add(descriptor);
-            eventRepository.Add(new Event("DescriptorAdded", new { descriptor.Id, descriptor.Name, descriptor.ShortName }, user));
+            var @event = new Event("DescriptorAdded", new { descriptor.Id, descriptor.Name, descriptor.ShortName }, user);
+            dbContext.Events.Add(@event);
+            dbContext.SaveChanges();
 
             return vmFactory.MakeDescriptorViewModel(descriptor);
         }
 
-        protected ActionResult<DescriptorViewModel> Update<T>(int userId, int id, DescriptorViewModel vm, IDescriptorRepository<T> repository) where T : Descriptor
+        protected ActionResult<DescriptorViewModel> Update(int userId, int id, DescriptorViewModel vm)
         {
-            var user = userRepository.Get(userId);
-            var descriptor = repository.Get(user, id);
+            var user = dbContext.Users.Find(userId);
+
+            var dbSet = dbContext.Set<T>();
+            var descriptor = dbSet.FirstOrDefault(x => x.UserId == user.Id && x.Id == id);
 
             if (descriptor == null)
                 return NotFound();
@@ -53,46 +57,51 @@ namespace Games.Controllers
             descriptor.ShortName = vm.ShortName;
             descriptor.UpdatedAt = DateTime.UtcNow;
 
-            repository.Update(descriptor);
-            eventRepository.Add(new Event("DescriptorUpdated", new { descriptor.Id, descriptor.Name, descriptor.ShortName }, user));
+            var @event = new Event("DescriptorUpdated", new { descriptor.Id, descriptor.Name, descriptor.ShortName }, user);
+            dbContext.Events.Add(@event);
+            dbContext.SaveChanges();
 
             return vmFactory.MakeDescriptorViewModel(descriptor);
         }
 
-        protected ActionResult Delete<T>(int userId, int id, IDescriptorRepository<T> repository) where T : Descriptor
+        protected ActionResult Delete(int userId, int id)
         {
-            var user = userRepository.Get(userId);
-            var descriptor = repository.Get(user, id);
+            var user = dbContext.Users.Find(userId);
+
+            var dbSet = dbContext.Set<T>();
+            var descriptor = dbSet.FirstOrDefault(x => x.UserId == user.Id && x.Id == id);
 
             if (descriptor == null)
                 return NotFound();
 
-            repository.Delete(descriptor);
-            eventRepository.Add(new Event("DescriptorDeleted", new { descriptor.Id, descriptor.Name, descriptor.ShortName }, user));
+            dbSet.Remove(descriptor);
+            dbContext.Events.Add(new Event("DescriptorDeleted", new { descriptor.Id, descriptor.Name, descriptor.ShortName }, user));
+            dbContext.SaveChanges();
 
             return NoContent();
         }
 
-        protected ActionResult<List<DescriptorViewModel>> All<T>(int userId, IDescriptorRepository<T> repository) where T : Descriptor
+        protected ActionResult<List<DescriptorViewModel>> All(int userId)
         {
-            var user = userRepository.Get(userId);
+            var user = dbContext.Users.Find(userId);
 
             if (user == null)
                 return NotFound();
 
-            return repository.All(user)
+            return dbContext.Set<T>()
+                .Where(x => x.UserId == userId)
                 .Select(vmFactory.MakeDescriptorViewModel)
                 .ToList();
         }
 
-        protected ActionResult<DescriptorViewModel> Single<T>(int userId, int id, IDescriptorRepository<T> repository) where T : Descriptor
+        protected ActionResult<DescriptorViewModel> Single(int userId, int id)
         {
-            var user = userRepository.Get(userId);
+            var user = dbContext.Users.Find(userId);
 
             if (user == null)
                 return NotFound();
 
-            var descriptor = repository.Get(user, id);
+            var descriptor = dbContext.Set<T>().FirstOrDefault(x => x.UserId == user.Id && x.Id == id);
 
             if (descriptor == null)
                 return NotFound();

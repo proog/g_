@@ -1,14 +1,15 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Games.Infrastructure;
 using Games.Interfaces;
 using Games.Models;
 using Games.Models.ViewModels;
+using Games.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json.Linq;
 
 namespace Games.Controllers
@@ -18,54 +19,48 @@ namespace Games.Controllers
     [Route("api/users/{" + Constants.UserIdParameter + "}/games/{id}/image", Name = Route.Image)]
     public class ImageController : ControllerBase
     {
-        private readonly IGameRepository gameRepository;
-        private readonly IUserRepository userRepository;
-        private readonly IEventRepository eventRepository;
+        private readonly GamesContext dbContext;
         private readonly HttpClient httpClient;
         private readonly IViewModelFactory vmFactory;
-        private readonly IAuthenticationService auth;
-        private readonly IFileProvider data;
+        private readonly IImageService imageService;
 
-        public ImageController(IGameRepository gameRepository, IUserRepository userRepository, IEventRepository eventRepository, IAuthenticationService auth, IFileProvider data, IHttpClientFactory httpClientFactory, IViewModelFactory vmFactory)
+        public ImageController(GamesContext dbContext, IHttpClientFactory httpClientFactory, IViewModelFactory vmFactory, IImageService imageService)
         {
-            this.gameRepository = gameRepository;
-            this.userRepository = userRepository;
-            this.eventRepository = eventRepository;
-            this.auth = auth;
-            this.data = data;
+            this.dbContext = dbContext;
             this.httpClient = httpClientFactory.CreateClient();
             this.vmFactory = vmFactory;
+            this.imageService = imageService;
         }
 
         [HttpPost]
         public async Task<ActionResult<GameViewModel>> UploadImage(int userId, int id)
         {
-            var user = userRepository.Get(userId);
-            var game = gameRepository.Get(user, id);
+            var user = dbContext.Users.Find(userId);
+            var game = dbContext.Entry(user).Collection(u => u.Games).Query().FirstOrDefault(g => g.Id == id);
 
             if (game == null)
                 return NotFound();
 
-            var path = $"images/{game.Id}/image.jpg";
-            var fileInfo = data.GetFileInfo(path);
-
+            string imagePath;
             try
             {
                 var imageStream = Request.HasFormContentType
-                ? await ReadFormImage()
-                : await ReadGiantBombImage();
+                    ? await ReadFormImage()
+                    : await ReadGiantBombImage();
 
                 using (imageStream)
-                    await WriteToFile(imageStream, fileInfo.PhysicalPath);
+                    imagePath = await imageService.CreateImage(game, imageStream);
             }
             catch (ArgumentException e)
             {
                 return BadRequest(new ApiError(e.Message));
             }
 
-            game.Image = path;
-            gameRepository.Update(game);
-            eventRepository.Add(new Event("ImageUpdated", new { game.Id, game.Image }, user));
+            game.Image = imagePath;
+            game.UpdatedAt = DateTime.UtcNow;
+
+            dbContext.Events.Add(new Event("ImageUpdated", new { game.Id, game.Image }, user));
+            dbContext.SaveChanges();
 
             return vmFactory.MakeGameViewModel(game);
         }
@@ -73,15 +68,18 @@ namespace Games.Controllers
         [HttpDelete]
         public ActionResult DeleteImage(int userId, int id)
         {
-            var user = userRepository.Get(userId);
-            var game = gameRepository.Get(user, id);
+            var user = dbContext.Users.Find(userId);
+            var game = dbContext.Entry(user).Collection(u => u.Games).Query().FirstOrDefault(g => g.Id == id);
 
             if (game == null)
                 return NotFound();
 
+            imageService.DeleteImage(game);
             game.Image = null;
-            gameRepository.Update(game);
-            eventRepository.Add(new Event("ImageDeleted", new { game.Id }, user));
+            game.UpdatedAt = DateTime.UtcNow;
+
+            dbContext.Events.Add(new Event("ImageDeleted", new { game.Id }, user));
+            dbContext.SaveChanges();
 
             return NoContent();
         }
@@ -115,14 +113,6 @@ namespace Games.Controllers
                 throw new Exception("Giant Bomb returned non-success status code");
 
             return await response.Content.ReadAsStreamAsync();
-        }
-
-        private async Task WriteToFile(Stream stream, string path)
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
-
-            using (var file = new FileStream(path, FileMode.Create))
-                await stream.CopyToAsync(file);
         }
     }
 }

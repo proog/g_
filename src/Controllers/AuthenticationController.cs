@@ -1,7 +1,8 @@
+using System.Linq;
 using Games.Infrastructure;
 using Games.Interfaces;
 using Games.Models.ViewModels;
-using Microsoft.AspNetCore.Authorization;
+using Games.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Games.Controllers
@@ -10,13 +11,13 @@ namespace Games.Controllers
     [Route("api")]
     public class AuthenticationController : ControllerBase
     {
-        private readonly IUserRepository userRepository;
+        private readonly GamesContext dbContext;
         private readonly IAuthenticationService auth;
         private readonly IViewModelFactory vmFactory;
 
-        public AuthenticationController(IUserRepository userRepository, IAuthenticationService auth, IViewModelFactory vmFactory)
+        public AuthenticationController(GamesContext dbContext, IAuthenticationService auth, IViewModelFactory vmFactory)
         {
-            this.userRepository = userRepository;
+            this.dbContext = dbContext;
             this.auth = auth;
             this.vmFactory = vmFactory;
         }
@@ -25,9 +26,9 @@ namespace Games.Controllers
         public ActionResult<OAuthResponse> Token([FromForm] OAuthCredentials cred)
         {
             var hash = auth.HashPassword(cred.Password);
-            var user = userRepository.Get(cred.Username);
+            var user = dbContext.Users.FirstOrDefault(u => u.Username == cred.Username && u.Password == hash);
 
-            if (user == null || user.Password != hash)
+            if (user == null)
                 return Unauthorized();
 
             var jwt = auth.Authenticate(user);
