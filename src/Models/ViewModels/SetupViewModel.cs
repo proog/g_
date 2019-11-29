@@ -10,7 +10,7 @@ namespace Games.Models.ViewModels
         [Required, StringLength(64, MinimumLength = 8)]
         public string Password { get; set; }
 
-        [StringLength(40, MinimumLength = 40)]
+        [RegularExpression(@".{40}?")]
         public string ApiKey { get; set; }
     }
 }

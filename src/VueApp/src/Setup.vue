@@ -19,18 +19,18 @@
         g_ needs at least one user to function. Create your login details here.
       </p>
       <div class="form-group">
-        <input type="text" class="form-control" placeholder="Username" required v-focus v-model="username">
+        <input type="text" class="form-control" placeholder="Username" required maxlength="10" v-focus v-model="username">
         <small class="form-text text-muted">
           This username will be visible in the application to identify your collection.
         </small>
       </div>
       <div class="form-group">
-        <input type="password" class="form-control" placeholder="Password" required v-model="password">
+        <input type="password" class="form-control" placeholder="Password" required minlength="8" maxlength="64" v-model="password">
       </div>
 
       <h2>Other settings</h2>
       <div class="form-group">
-        <input type="text" class="form-control" placeholder="Giant Bomb API key (optional)" v-model="apiKey">
+        <input type="text" class="form-control" placeholder="Giant Bomb API key (optional)" minlength="40" maxlength="40" v-model="apiKey">
         <small class="form-text text-muted">
           g_ relies on the Giant Bomb game wiki for assisted game creation, making it possible to automatically retrieve most information when adding games to your collection.<br>
           If you want to use this feature, you need to create a free Giant Bomb account and <a href="http://www.giantbomb.com/api/" target="_blank" rel="noopener noreferrer">request an API key</a>.
@@ -95,7 +95,7 @@ export default {
           this.saving = false
         })
         .catch(error => {
-          this.error = error
+          this.error = error.title || error
           this.saving = false
         })
     }
