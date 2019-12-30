@@ -100,7 +100,7 @@ namespace Games.Controllers
             string url;
             using (var reader = new StreamReader(Request.Body))
             {
-                var json = reader.ReadToEnd();
+                var json = await reader.ReadToEndAsync();
                 url = (string)JObject.Parse(json)["image_url"];
             }
 
