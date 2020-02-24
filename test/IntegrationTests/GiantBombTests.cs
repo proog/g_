@@ -51,7 +51,7 @@ namespace Games.IntegrationTests
             var result = await giantBomb.GetGame(73, apiKey);
             Assert.NotNull(result);
             Assert.Equal("Steel Panthers III: Brigade Command (1939-1999)", result.Name);
-            Assert.Equal("1997-10-31 00:00:00", result.OriginalReleaseDate);
+            Assert.Equal("1997-10-31", result.OriginalReleaseDate);
             Assert.Single(result.Developers);
             Assert.Single(result.Publishers);
             Assert.Single(result.Genres);
