@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS dotnetbuild
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS dotnetbuild
 WORKDIR /src
 
 COPY src/*.csproj ./
@@ -8,7 +8,7 @@ COPY src/. ./
 RUN dotnet publish -c Release -o out
 
 
-FROM node:10-jessie-slim AS vuebuild
+FROM node:lts-buster-slim AS vuebuild
 WORKDIR /src/VueApp
 
 COPY src/VueApp/package.json src/VueApp/package-lock.json ./
@@ -18,7 +18,7 @@ COPY src/VueApp/. ./
 RUN npm run build
 
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 AS run
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS run
 WORKDIR /app
 
 COPY --from=dotnetbuild /src/out ./
