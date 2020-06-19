@@ -1,0 +1,19 @@
+name: Build and push Docker image
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Docker build and push
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: proog/games
+          tag_with_ref: true # tag with branch name or latest for master
+          tag_with_sha: true # tag with short commit sha
